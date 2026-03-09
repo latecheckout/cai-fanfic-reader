@@ -1,0 +1,21 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.ratingG  { background: var(--rating-g); }
+.ratingT  { background: var(--rating-t); }
+.ratingM  { background: var(--rating-m); }
+.ratingE  { background: var(--rating-e); }
+.ratingNR { background: var(--rating-nr); }

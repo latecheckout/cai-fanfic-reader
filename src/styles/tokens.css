@@ -1,0 +1,152 @@
+/* ============================================================
+   DESIGN TOKENS
+   Three themes via data-theme attribute on <html>
+   Governing principle: Ink on Paper (e-ink aesthetic)
+   ============================================================ */
+
+:root {
+  /* Default to light theme */
+  --bg: #F7F4EF;
+  --text: #1A1816;
+  --secondary: #8A857D;
+  --border: rgba(26, 24, 22, 0.12);
+  --border-strong: rgba(26, 24, 22, 0.22);
+  --border-chip: rgba(26, 24, 22, 0.18);
+  --border-active: rgba(26, 24, 22, 0.40);
+  --accent: #8B4040;
+  --accent-subtle: rgba(139, 64, 64, 0.12);
+
+  /* Card surface ("page on paper") — solid colours for cross-browser safety */
+  --card-bg: #FBFAF8;
+  --card-border: rgba(26, 24, 22, 0.09);
+
+  /* Rating dot colors — per brief spec */
+  --rating-g:  #3d9970;
+  --rating-t:  #c8a020;
+  --rating-m:  #c0601a;
+  --rating-e:  #b02828;
+  --rating-nr: #aaaaaa;
+
+  /* Typography */
+  --font-serif: "Lora", Georgia, 'Times New Roman', serif;
+  --font-sans: "Character Sans", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: "Character Mono", 'Courier New', monospace;
+  --font-body: var(--font-serif);
+  --font-size-body: 19px;
+
+  /* Spacing (8px base unit) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Bubble chrome */
+  --bubble-bg: #ffffff;
+  --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.055);
+  --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.07);
+
+  /* Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring:        cubic-bezier(0.16, 1, 0.3, 1);   /* panel opening — soft deceleration */
+  --collapse:      cubic-bezier(0.4, 0, 0.8, 1);    /* panel closing — quick, purposeful */
+
+  /* Reader line width */
+  --line-width-narrow:  560px;
+  --line-width-default: 680px;
+  --line-width-wide:    780px;
+  --reader-line-width:  var(--line-width-default);
+
+  /* Reading layout */
+  --reader-max-width: 68ch;
+  --browse-max-width: 860px;
+  --content-padding: 40px;
+
+  /* Grid lines */
+  --grid-line: rgba(26, 24, 22, 0.055);
+
+  /* Transitions */
+  --transition-micro: 150ms ease-in-out;
+  --transition-panel: 250ms ease-in-out;
+  --transition-chrome: 200ms ease-in-out;
+  --ghost-opacity: 0.12;
+  --ghost-progress-opacity: 0.25;
+}
+
+[data-theme="light"] {
+  --bg: #F7F4EF;
+  --text: #1A1816;
+  --secondary: #8A857D;
+  --border: rgba(26, 24, 22, 0.12);
+  --border-strong: rgba(26, 24, 22, 0.22);
+  --border-chip: rgba(26, 24, 22, 0.18);
+  --border-active: rgba(26, 24, 22, 0.40);
+  --accent: #8B4040;
+  --accent-subtle: rgba(139, 64, 64, 0.12);
+  --card-bg: #FBFAF8;
+  --card-border: rgba(26, 24, 22, 0.09);
+  --rating-g:  #3d9970;
+  --rating-t:  #c8a020;
+  --rating-m:  #c0601a;
+  --rating-e:  #b02828;
+  --rating-nr: #aaaaaa;
+  --bubble-bg: #ffffff;
+  --grid-line: rgba(26, 24, 22, 0.055);
+}
+
+[data-theme="paper"] {
+  --bg: #EDE8DE;
+  --text: #1A1816;
+  --secondary: #7A756D;
+  --border: rgba(26, 24, 22, 0.14);
+  --border-strong: rgba(26, 24, 22, 0.24);
+  --border-chip: rgba(26, 24, 22, 0.18);
+  --border-active: rgba(26, 24, 22, 0.42);
+  --accent: #8B4040;
+  --accent-subtle: rgba(139, 64, 64, 0.12);
+  --card-bg: #F4F1EB;
+  --card-border: rgba(26, 24, 22, 0.09);
+  --rating-g:  #3d9970;
+  --rating-t:  #c8a020;
+  --rating-m:  #c0601a;
+  --rating-e:  #b02828;
+  --rating-nr: #aaaaaa;
+  --bubble-bg: #f5f0e8;
+  --grid-line: rgba(26, 24, 22, 0.055);
+}
+
+[data-theme="dark"] {
+  --bg: #141210;
+  --text: #E5E1D8;
+  --secondary: #5C5852;
+  --border: rgba(229, 225, 216, 0.10);
+  --border-strong: rgba(229, 225, 216, 0.20);
+  --border-chip: rgba(229, 225, 216, 0.15);
+  --border-active: rgba(229, 225, 216, 0.38);
+  --accent: #C4785A;
+  --accent-subtle: rgba(196, 120, 90, 0.14);
+  --card-bg: #1D1B1A;
+  --card-border: rgba(229, 225, 216, 0.12);
+  --rating-g:  #3d9970;
+  --rating-t:  #c8a020;
+  --rating-m:  #c0601a;
+  --rating-e:  #b02828;
+  --rating-nr: #666666;
+  --bubble-bg: #272523;
+  --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  --grid-line: rgba(229, 225, 216, 0.055);
+}
+
+/* Font preference */
+[data-font="sans"] {
+  --font-body: var(--font-sans);
+}
+
+[data-font="serif"] {
+  --font-body: var(--font-serif);
+}

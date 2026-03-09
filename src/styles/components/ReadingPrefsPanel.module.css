@@ -1,0 +1,229 @@
+/* ============================================================
+   PREFS PANEL — Morph panel (always in DOM, JS-animated)
+   Opens upward from prefs pill. 240×210px target.
+   Theme control uses circular color swatches.
+   Used by PrefsPanel.tsx (formerly ReadingPrefsPanel).
+   ============================================================ */
+
+/* ── Morph container — z-150, no CSS transition (set inline by JS) ── */
+.panel {
+  position: fixed;
+  z-index: 150;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  top: -9999px;
+  left: -9999px;
+  width: 0;
+  height: 0;
+  /* transition is set inline by JS during open/close */
+}
+
+.panel[data-state="open"] {
+  pointer-events: auto;
+}
+
+[data-theme="dark"] .panel {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Panel content — fades in after morph completes ── */
+.panelContent {
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.panel[data-content="visible"] .panelContent {
+  opacity: 1;
+  transition: opacity 180ms ease 120ms;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.heading {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: color var(--transition-micro), background var(--transition-micro);
+}
+
+.closeBtn:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+/* ── Sections ── */
+.sections {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex: 1;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.sectionValue {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+}
+
+/* ── Range control ── */
+.rangeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rangeSmall {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.rangeLarge {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.range {
+  flex: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  cursor: pointer;
+}
+
+.range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+/* ── Segmented control (line width) ── */
+.segmented {
+  display: flex;
+  border: 1px solid var(--border-chip);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.segBtn {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--secondary);
+  padding: 7px 4px;
+  cursor: pointer;
+  border-right: 1px solid var(--border-chip);
+  transition: background var(--transition-micro), color var(--transition-micro);
+  text-align: center;
+}
+
+.segBtn:last-child {
+  border-right: none;
+}
+
+.segBtn:hover {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.segActive {
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 500;
+}
+
+.segActive:hover {
+  background: var(--text);
+}
+
+/* ── Circular theme swatches ── */
+.swatches {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+}
+
+.swatch:hover {
+  transform: scale(1.08);
+}
+
+.swatchActive {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px var(--text);
+}
+
+.swatchActive:hover {
+  transform: scale(1.1);
+}

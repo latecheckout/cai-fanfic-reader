@@ -1,0 +1,118 @@
+/* ============================================================
+   FILTER PANEL — horizontal bar redesign
+   Left: active pills + dashed add-filter button
+   Right: work count (mono) + sort text trigger (CustomSelect)
+   ============================================================ */
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+}
+
+/* Left zone: pills + add button */
+.barLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right zone: count + sort */
+.barRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+/* ── Active filter pill — filled dark ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  border-radius: 3px;
+  padding: 3px 8px 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--transition-micro);
+  line-height: 1.5;
+}
+
+.pill:hover {
+  opacity: 0.8;
+}
+
+.pillX {
+  opacity: 0.55;
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pill:hover .pillX {
+  opacity: 1;
+}
+
+/* ── Exclude pill — strikethrough, dashed border ── */
+.excludePill {
+  background: transparent;
+  color: var(--secondary);
+  border: 1px dashed var(--border-strong);
+  text-decoration: line-through;
+  text-decoration-color: var(--secondary);
+}
+
+.excludePill:hover {
+  opacity: 0.7;
+}
+
+/* ── Add filter button — dashed border ── */
+.addFilterBtn {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--secondary);
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: 3px;
+  padding: 3px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.5;
+  transition: color var(--transition-micro), border-color var(--transition-micro);
+}
+
+.addFilterBtn:hover {
+  color: var(--text);
+  border-color: var(--border-active);
+}
+
+/* ── Work count ── */
+.workCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+/* ── Page load animation ── */
+@media (prefers-reduced-motion: no-preference) {
+  .bar {
+    animation: fadeUp 340ms var(--ease-out-expo) 175ms both;
+  }
+}

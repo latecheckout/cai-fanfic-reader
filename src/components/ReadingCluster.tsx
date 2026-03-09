@@ -1,0 +1,445 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useReading } from '@/context/ReadingContext';
+import { ratingClass } from '@/lib/utils';
+import { MetadataOverlay } from './MetadataOverlay';
+import { ChapterPanel } from './ChapterPanel';
+import { PrefsPanel } from './PrefsPanel';
+import styles from '@/styles/components/ReadingCluster.module.css';
+
+type PanelName = 'metadata' | 'chapter' | 'prefs';
+
+// ── Target rect calculator — called at open-time, never cached ──────────────
+function getTargetRect(
+  name: PanelName,
+  pillRect: DOMRect,
+  context: { chapterCount: number }
+) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  if (name === 'metadata') {
+    const w = Math.min(640, vw - 48);
+    const h = Math.min(480, vh - 120);
+    const midX = pillRect.left + pillRect.width / 2;
+    const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
+    return { left, top: pillRect.bottom + 8, width: w, height: h };
+  }
+
+  if (name === 'chapter') {
+    // Content-hugging: 44px header + 40px per row + 16px bottom padding
+    const contentH = 44 + context.chapterCount * 40 + 16;
+    const h = Math.min(contentH, vh * 0.7);
+    const w = Math.max(280, pillRect.width + 40);
+    const midX = pillRect.left + pillRect.width / 2;
+    const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
+    return { left, top: pillRect.bottom + 8, width: w, height: h };
+  }
+
+  // prefs — 240×272, all controls visible without scroll
+  const w = 240;
+  const h = 272;
+  const midX = pillRect.left + pillRect.width / 2;
+  const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
+  return { left, top: pillRect.bottom + 10, width: w, height: h };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
+export function ReadingCluster() {
+  const { workMeta, chapterTitles, totalChapters, activeChapterIndex, scrollToChapter } =
+    useReading();
+  const [scrollPct, setScrollPct] = useState(0);
+  const [activePanel, setActivePanel] = useState<PanelName | null>(null);
+  const [isSticky, setIsSticky] = useState(false);
+
+  // Ref tracks the active panel synchronously (avoids stale-closure issues)
+  const activePanelRef = useRef<PanelName | null>(null);
+
+  // Pill refs
+  const titlePillRef   = useRef<HTMLButtonElement>(null);
+  const chapterPillRef = useRef<HTMLButtonElement>(null);
+  const prefsPillRef   = useRef<HTMLButtonElement>(null);
+
+  // Panel refs — forwarded to morph panel components
+  const metaPanelRef    = useRef<HTMLDivElement>(null);
+  const chapterPanelRef = useRef<HTMLDivElement>(null);
+  const prefsPanelRef   = useRef<HTMLDivElement>(null);
+
+  // Backdrop ref
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  // Cluster outer ref — for measuring natural top position
+  const clusterRef = useRef<HTMLDivElement>(null);
+  const naturalTopRef = useRef<number | null>(null);
+
+  const rClass = ratingClass(workMeta.rating);
+
+  // ── Measure natural top after mount ────────────────────────────────────────
+
+  useEffect(() => {
+    if (clusterRef.current) {
+      naturalTopRef.current = clusterRef.current.getBoundingClientRect().top + window.scrollY;
+    }
+  }, []);
+
+  // ── Sticky detection ───────────────────────────────────────────────────────
+
+  useEffect(() => {
+    function onStickyCheck() {
+      if (naturalTopRef.current === null) return;
+      // 24px accounts for the padding-top before the bubbles
+      setIsSticky(window.scrollY >= naturalTopRef.current - 24);
+    }
+    window.addEventListener('scroll', onStickyCheck, { passive: true });
+    return () => window.removeEventListener('scroll', onStickyCheck);
+  }, []);
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
+  function getPillEl(name: PanelName): HTMLButtonElement | null {
+    if (name === 'metadata') return titlePillRef.current;
+    if (name === 'chapter')  return chapterPillRef.current;
+    return prefsPillRef.current;
+  }
+
+  function getPanelEl(name: PanelName): HTMLDivElement | null {
+    if (name === 'metadata') return metaPanelRef.current;
+    if (name === 'chapter')  return chapterPanelRef.current;
+    return prefsPanelRef.current;
+  }
+
+  // ── openPanel — 8-step morph sequence ─────────────────────────────────────
+
+  function openPanel(name: PanelName) {
+    const pillEl  = getPillEl(name);
+    const panelEl = getPanelEl(name);
+    if (!pillEl || !panelEl) return;
+
+    // 1. Read pill bounding rect BEFORE any DOM changes
+    const pillRect = pillEl.getBoundingClientRect();
+
+    // Update tracked state
+    activePanelRef.current = name;
+    setActivePanel(name);
+
+    // 2. Disable transition — panel snaps from resting position to pill instantly
+    panelEl.style.transition = 'none';
+
+    // 3. Snap panel to pill position (pill shape, same position, opacity 1)
+    panelEl.style.top          = `${pillRect.top}px`;
+    panelEl.style.left         = `${pillRect.left}px`;
+    panelEl.style.width        = `${pillRect.width}px`;
+    panelEl.style.height       = `${pillRect.height}px`;
+    panelEl.style.borderRadius = '999px';
+    panelEl.style.opacity      = '1';
+    panelEl.setAttribute('data-state', 'open');
+    panelEl.removeAttribute('data-content');
+
+    // 4. Fade pill out (CSS reads data-expanding → opacity 0, scale 0.92)
+    pillEl.setAttribute('data-expanding', 'true');
+
+    // 5. Force reflow — commits snapped position as the animation start frame
+    void panelEl.offsetHeight;
+
+    // 6. Apply spring transition + target rect → morph begins
+    const target = getTargetRect(name, pillRect, { chapterCount: totalChapters });
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+      // Skip morph — snap to target, fade in only
+      panelEl.style.transition   = 'none';
+      panelEl.style.top          = `${target.top}px`;
+      panelEl.style.left         = `${target.left}px`;
+      panelEl.style.width        = `${target.width}px`;
+      panelEl.style.height       = `${target.height}px`;
+      panelEl.style.borderRadius = '12px';
+      void panelEl.offsetHeight;
+      panelEl.style.transition   = 'opacity 80ms ease';
+    } else {
+      panelEl.style.transition = [
+        'top 320ms var(--spring)',
+        'left 320ms var(--spring)',
+        'width 320ms var(--spring)',
+        'height 320ms var(--spring)',
+        'border-radius 320ms var(--spring)',
+      ].join(', ');
+      panelEl.style.top          = `${target.top}px`;
+      panelEl.style.left         = `${target.left}px`;
+      panelEl.style.width        = `${target.width}px`;
+      panelEl.style.height       = `${target.height}px`;
+      panelEl.style.borderRadius = '12px';
+    }
+
+    // 7. Reveal content after morph is well underway
+    setTimeout(() => {
+      panelEl.setAttribute('data-content', 'visible');
+    }, prefersReducedMotion ? 80 : 200);
+
+    // 8. Show backdrop + dim reading content
+    backdropRef.current?.setAttribute('data-visible', 'true');
+    document.body.classList.add('panel-open');
+  }
+
+  // ── closeAll — 5-step collapse sequence ───────────────────────────────────
+
+  function closeAll() {
+    const name = activePanelRef.current;
+    if (!name) return;
+
+    // Clear state immediately so togglePanel can queue a new open after 60ms
+    activePanelRef.current = null;
+    setActivePanel(null);
+
+    const pillEl  = getPillEl(name);
+    const panelEl = getPanelEl(name);
+    if (!pillEl || !panelEl) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // 1. Remove content attribute → content fades out immediately (CSS transition)
+    panelEl.removeAttribute('data-content');
+
+    if (prefersReducedMotion) {
+      panelEl.style.transition = 'opacity 80ms ease';
+      panelEl.style.opacity    = '0';
+      pillEl.removeAttribute('data-expanding');
+      setTimeout(() => {
+        panelEl.removeAttribute('data-state');
+        panelEl.style.top          = '-9999px';
+        panelEl.style.left         = '-9999px';
+        panelEl.style.width        = '0';
+        panelEl.style.height       = '0';
+        panelEl.style.transition   = '';
+        panelEl.style.opacity      = '';
+        panelEl.style.borderRadius = '';
+        backdropRef.current?.removeAttribute('data-visible');
+        document.body.classList.remove('panel-open');
+      }, 100);
+      return;
+    }
+
+    // 2. Set collapse transition
+    panelEl.style.transition = [
+      'top 240ms var(--collapse)',
+      'left 240ms var(--collapse)',
+      'width 240ms var(--collapse)',
+      'height 240ms var(--collapse)',
+      'border-radius 240ms var(--collapse)',
+      'opacity 160ms ease 80ms',
+    ].join(', ');
+
+    // 3. Animate panel back to pill position
+    const pillRect = pillEl.getBoundingClientRect();
+    panelEl.style.top          = `${pillRect.top}px`;
+    panelEl.style.left         = `${pillRect.left}px`;
+    panelEl.style.width        = `${pillRect.width}px`;
+    panelEl.style.height       = `${pillRect.height}px`;
+    panelEl.style.borderRadius = '999px';
+    panelEl.style.opacity      = '0';
+
+    // 4. Pill re-emerges at 120ms (fluid overlap with collapse)
+    setTimeout(() => {
+      pillEl.removeAttribute('data-expanding');
+    }, 120);
+
+    // 5. Full cleanup after collapse animation (300ms)
+    setTimeout(() => {
+      panelEl.removeAttribute('data-state');
+      panelEl.style.top          = '-9999px';
+      panelEl.style.left         = '-9999px';
+      panelEl.style.width        = '0';
+      panelEl.style.height       = '0';
+      panelEl.style.transition   = '';
+      panelEl.style.opacity      = '';
+      panelEl.style.borderRadius = '';
+      backdropRef.current?.removeAttribute('data-visible');
+      document.body.classList.remove('panel-open');
+    }, 300);
+  }
+
+  // ── togglePanel — open / switch / close ───────────────────────────────────
+
+  function togglePanel(name: PanelName) {
+    const current = activePanelRef.current;
+    if (current === name) {
+      // Same panel → close
+      closeAll();
+    } else if (current !== null) {
+      // Different panel open → close then open new (60ms overlap creates fluid feel)
+      closeAll();
+      setTimeout(() => openPanel(name), 60);
+    } else {
+      // No panel open → open
+      openPanel(name);
+    }
+  }
+
+  // ── Track scroll for progress bar ─────────────────────────────────────────
+
+  useEffect(() => {
+    function onScroll() {
+      const { scrollY, innerHeight } = window;
+      const { scrollHeight } = document.documentElement;
+      const pct =
+        scrollHeight - innerHeight > 0
+          ? (scrollY / (scrollHeight - innerHeight)) * 100
+          : 0;
+      setScrollPct(Math.min(100, Math.max(0, pct)));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // ── Keyboard: Escape closes, arrows navigate chapters ─────────────────────
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === 'ArrowLeft' || e.key === 'j') {
+        e.preventDefault();
+        scrollToChapter(activeChapterIndex - 1);
+      } else if (e.key === 'ArrowRight' || e.key === 'k') {
+        e.preventDefault();
+        scrollToChapter(activeChapterIndex + 1);
+      } else if (e.key === 'Escape') {
+        closeAll(); // reads from ref — safe in stale closure
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [activeChapterIndex, scrollToChapter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Resize: snap open panel to new target without animation ───────────────
+
+  useEffect(() => {
+    function handleResize() {
+      const name = activePanelRef.current;
+      if (!name) return;
+      const pillEl  = getPillEl(name);
+      const panelEl = getPanelEl(name);
+      if (!pillEl || !panelEl) return;
+
+      const pillRect = pillEl.getBoundingClientRect();
+      const target   = getTargetRect(name, pillRect, { chapterCount: totalChapters });
+
+      // Snap immediately — no animation on resize
+      panelEl.style.transition   = 'none';
+      panelEl.style.top          = `${target.top}px`;
+      panelEl.style.left         = `${target.left}px`;
+      panelEl.style.width        = `${target.width}px`;
+      panelEl.style.height       = `${target.height}px`;
+      void panelEl.offsetHeight;
+      panelEl.style.transition   = '';
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const chapterTitle = chapterTitles[activeChapterIndex] ?? '';
+
+  return (
+    <>
+      {/* Sticky cluster wrapper — sticks to top when scrolled past */}
+      <div ref={clusterRef} className={styles.clusterOuter}>
+        <div className={styles.cluster}>
+          {/* Title bubble → metadata panel — hidden until sticky */}
+          <button
+            ref={titlePillRef}
+            className={`${styles.bubble} ${styles.titleBubble} ${!isSticky ? styles.titleHidden : ''}`}
+            onClick={() => togglePanel('metadata')}
+            aria-label="View work details"
+          >
+            <span className={styles.titleText}>{workMeta.title}</span>
+          </button>
+
+          {/* Chapter bubble → chapter panel */}
+          {totalChapters > 1 && (
+            <button
+              ref={chapterPillRef}
+              className={`${styles.bubble} ${styles.chapterBubble}`}
+              onClick={() => togglePanel('chapter')}
+              data-active={activePanel === 'chapter' ? 'true' : undefined}
+              aria-label="Chapter navigation"
+            >
+              <span className={styles.chapterNum}>{activeChapterIndex + 1}</span>
+              <span className={styles.chapterDivider} aria-hidden="true" />
+              <span className={styles.chapterName}>{chapterTitle}</span>
+              <svg
+                className={styles.chevron}
+                width="10"
+                height="10"
+                viewBox="0 0 10 10"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2 4L5 7L8 4"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {/* Embedded progress bar */}
+              <span
+                className={`${styles.progressBar} ${
+                  styles[`progress_${rClass}` as keyof typeof styles]
+                }`}
+                style={{ width: `${scrollPct}%` }}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+
+          {/* Prefs bubble → prefs panel */}
+          <button
+            ref={prefsPillRef}
+            className={`${styles.bubble} ${styles.prefsBubble}`}
+            onClick={() => togglePanel('prefs')}
+            data-active={activePanel === 'prefs' ? 'true' : undefined}
+            aria-label="Reading preferences"
+          >
+            <svg
+              className={styles.sliderIcon}
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+            >
+              <line x1="2" y1="4" x2="12" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <circle cx="5" cy="4" r="1.5" fill="currentColor" />
+              <line x1="2" y1="8" x2="12" y2="8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <circle cx="9" cy="8" r="1.5" fill="currentColor" />
+              <line x1="2" y1="12" x2="12" y2="12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <circle cx="6" cy="12" r="1.5" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Backdrop — z-50, click to close any open panel */}
+      <div
+        ref={backdropRef}
+        className={styles.backdrop}
+        onClick={closeAll}
+        aria-hidden="true"
+      />
+
+      {/* Panels — always in DOM at z-150, animated by JS */}
+      <MetadataOverlay ref={metaPanelRef} onClose={closeAll} />
+      <ChapterPanel
+        ref={chapterPanelRef}
+        chapters={chapterTitles}
+        activeIndex={activeChapterIndex}
+        onSelect={(i) => { scrollToChapter(i); closeAll(); }}
+        onClose={closeAll}
+      />
+      <PrefsPanel ref={prefsPanelRef} onClose={closeAll} />
+    </>
+  );
+}

@@ -1,0 +1,201 @@
+/* ============================================================
+   SEARCH OVERLAY — ⌘K tag-first discovery
+   Backdrop blur + solid panel, 2-column browser
+   ============================================================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Blurred backdrop — rgba so it adapts to theme */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* Panel — solid, fixed width, no border-radius per brief */
+.panel {
+  position: relative;
+  z-index: 1;
+  margin-top: 80px;
+  width: min(640px, calc(100vw - 48px));
+  background: var(--card-bg);
+  border: 1px solid var(--border-strong);
+  border-top: 2px solid var(--text);
+  border-radius: 0;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  animation: slideDown 180ms var(--ease-out-expo) both;
+}
+
+[data-theme="dark"] .panel {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Input row ── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.searchIcon {
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 19px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.input::placeholder {
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.escBtn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--secondary);
+  background: var(--border);
+  border: none;
+  border-radius: 3px;
+  padding: 3px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  transition: color var(--transition-micro), background var(--transition-micro);
+}
+
+.escBtn:hover {
+  color: var(--text);
+  background: var(--border-strong);
+}
+
+/* ── 2-column browser ── */
+.columns {
+  display: flex;
+  min-height: 280px;
+  max-height: calc(80vh - 120px);
+  overflow: hidden;
+}
+
+.col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.colDivider {
+  width: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.colLabel {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  padding: var(--space-4) var(--space-5) var(--space-2);
+}
+
+/* Scrollable list */
+.itemList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.itemRow {
+  border-top: 1px solid var(--border);
+}
+
+.itemRow:first-child {
+  border-top: none;
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 10px var(--space-5);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-micro);
+}
+
+.item:hover {
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+}
+
+.itemName {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fandoms use serif italic */
+.itemFandom .itemName {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+}
+
+.itemCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.noResults {
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--secondary);
+  opacity: 0.6;
+}

@@ -1,0 +1,68 @@
+/* Base chip */
+.chip {
+  display: inline-block;
+  border: 1px solid var(--border-chip);
+  border-radius: 3px;
+  padding: 3px 8px;
+  background: transparent;
+  color: var(--text);
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  line-height: 1.4;
+  transition: border-color var(--transition-micro);
+}
+
+/* Category: fandom */
+.fandom {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Category: relationship */
+.relationship {
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Category: character */
+.character {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Category: additional / trope */
+.additional {
+  font-size: 11px;
+  font-weight: 300;
+}
+
+/* Category: warning */
+.warning {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--secondary);
+  border-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Category: category (M/F, F/F, etc) */
+.category {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--secondary);
+}
+
+/* Clickable state */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: var(--border-active);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

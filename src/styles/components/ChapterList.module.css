@@ -1,0 +1,10 @@
+.list {
+  /* The outer container — focus effect pseudo-elements attach here */
+  position: relative;
+}
+
+.chapter {
+  max-width: var(--reader-line-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) 0;
+}
