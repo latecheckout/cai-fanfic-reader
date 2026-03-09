@@ -1,19 +1,24 @@
 ---
-title: "Echoes in the Machine"
-author: "DigitalDreamer"
-rating: "Mature"
-warnings: ["No Archive Warnings Apply"]
+title: "The Dogfather"
+author: "padfoot_lives"
+rating: "Teen And Up"
+warnings: ["Creator Chose Not To Use Archive Warnings"]
 category: ["Gen"]
-fandom: ["Cyberpunk 2077"]
-relationships: ["V & Johnny Silverhand"]
-characters: ["V", "Johnny Silverhand", "Judy Alvarez"]
-tags: ["Cyberpunk", "Identity", "Memory", "Existentialism", "Character Study"]
-summary: "V can't tell where they end and Johnny begins anymore. In the neon-soaked streets of Night City, identity becomes just another commodity to be bought, sold, and corrupted. A meditation on consciousness, memory, and what it means to be human when your mind isn't entirely your own."
+fandom: ["Harry Potter - J. K. Rowling"]
+relationships: ["Sirius Black & Harry Potter", "Sirius Black & Remus Lupin", "Harry Potter & Ron Weasley & Hermione Granger"]
+characters: ["Sirius Black", "Harry Potter", "Remus Lupin", "Albus Dumbledore", "Minerva McGonagall", "Nymphadora Tonks", "Kingsley Shacklebolt", "Petunia Evans Dursley", "Dudley Dursley", "Arabella Figg"]
+tags: ["Alternate Universe - Sirius Raises Harry", "Kid Fic", "Found Family", "Fluff and Angst", "Worldbuilding", "Sirius Black Lives", "Good Godfather Sirius Black", "Pre-Hogwarts", "Slice of Life", "Protective Sirius Black", "Domestic", "Humor", "Sirius Black's Flying Motorbike", "Muggle Culture", "Sirius Black is a Good Parent", "POV Sirius Black", "Fix-It", "Harry Potter Was Raised by Sirius Black", "no beta we die like men"]
+summary: "In which Sirius Black makes a series of increasingly questionable parenting decisions, most of which involve a toddler, a flying motorcycle, and the complete disregard of Albus Dumbledore's wishes. A story about raising a child when you're barely an adult yourself, about building a family from the wreckage of war, and about discovering that the most terrifying Dark creature isn't a werewolf — it's a three-year-old who has learned the word \"why.\""
 language: "English"
-published: "2024-03-01"
-status: "In Progress"
-chapters: 3
-words: 2100
+published: "2022-03-12"
+updated: "2023-11-28"
+status: "Complete"
+chapters: 35
+words: 178600
+kudos: 89300
+bookmarks: 24100
+hits: 2340000
+comments: 6700
 ---
 
 :::chapter Chapter 1: Ghost in the System

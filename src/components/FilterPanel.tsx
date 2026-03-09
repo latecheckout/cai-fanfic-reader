@@ -36,6 +36,7 @@ const EMPTY_SEARCH_OPTIONS: SearchOptions = { tags: [], fandoms: [] };
 const SORT_OPTIONS = [
   { value: 'updated:desc', label: 'recently updated' },
   { value: 'published:desc', label: 'newest first' },
+  { value: 'kudos:desc', label: 'most kudos' },
   { value: 'words:desc', label: 'longest first' },
   { value: 'words:asc', label: 'shortest first' },
 ];

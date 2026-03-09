@@ -1,19 +1,24 @@
 ---
-title: "The Weight of Crowns"
-author: "HistoricalFantasy"
-rating: "Teen And Up"
-warnings: ["No Archive Warnings Apply"]
-category: ["F/F"]
-fandom: ["Original Work"]
-relationships: ["Queen Seraphina/Lady Elena"]
-characters: ["Queen Seraphina", "Lady Elena", "Duke Aldric"]
-tags: ["Fantasy", "Political Intrigue", "Slow Burn", "Royalty", "Court Drama", "Forbidden Love"]
-summary: "Queen Seraphina never asked for the crown, but she wears it nonetheless. When a mysterious diplomat from the Eastern Kingdoms arrives at court, Seraphina finds herself drawn into a web of political machinations that threatens everything she holds dear. But the greatest danger may not be the assassins in the shadows—it may be her own treacherous heart."
+title: "The Long Way Home"
+author: "brooklynbridge"
+rating: "Mature"
+warnings: ["Graphic Depictions Of Violence"]
+category: ["M/M"]
+fandom: ["Marvel Cinematic Universe", "Captain America (Movies)"]
+relationships: ["James 'Bucky' Barnes/Steve Rogers", "Pepper Potts/Tony Stark", "Clint Barton/Natasha Romanov"]
+characters: ["James 'Bucky' Barnes", "Steve Rogers", "Natasha Romanov", "Sam Wilson", "Tony Stark", "Pepper Potts", "Clint Barton", "Wanda Maximoff", "Bruce Banner", "Shuri"]
+tags: ["Post-Captain America: The Winter Soldier", "Recovery", "Slow Burn", "Friends to Lovers", "Bucky Barnes Recovering", "Protective Steve Rogers", "Hurt/Comfort", "PTSD", "Nightmares", "Touch-Starved", "Domestic Avengers", "Avengers Tower", "Memory Recovery", "Found Family", "Bucky Barnes Needs a Hug", "Steve Rogers Is Not a Virgin", "Pining", "Sharing a Bed", "5+1 Things", "Canon-Typical Violence", "Happy Ending", "I Wrote This Instead of Sleeping"]
+summary: "Bucky Barnes has seventy years of winter to thaw out of. Steve Rogers has been waiting seventy years to help. Between memory fragments, sleepless nights in Avengers Tower, and Sam Wilson's unsolicited therapy advice, they figure out that coming home was never about a place."
 language: "English"
-published: "2024-02-15"
+published: "2023-08-20"
+updated: "2024-05-10"
 status: "Complete"
-chapters: 3
-words: 1800
+chapters: 21
+words: 98400
+kudos: 42100
+bookmarks: 11600
+hits: 876000
+comments: 3400
 ---
 
 :::chapter The Diplomat's Arrival

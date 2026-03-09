@@ -13,6 +13,13 @@ export function formatWords(words: number): string {
   return `${words} words`;
 }
 
+/** Format count with k/M suffix for social stats */
+export function formatCount(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
 /** Return CSS class key for rating dot */
 export function ratingClass(rating: string): string {
   const r = rating.toLowerCase();

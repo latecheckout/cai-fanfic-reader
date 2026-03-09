@@ -115,6 +115,10 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
         aVal = a.meta.published;
         bVal = b.meta.published;
         break;
+      case 'kudos':
+        aVal = a.meta.kudos;
+        bVal = b.meta.kudos;
+        break;
       default: // 'updated'
         aVal = a.meta.updated || a.meta.published;
         bVal = b.meta.updated || b.meta.published;

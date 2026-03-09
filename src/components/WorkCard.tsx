@@ -1,13 +1,16 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { WorkSummary } from '@/types';
-import { formatWords, ratingClass, wordTier, categoryLabel } from '@/lib/utils';
+import { formatWords, formatCount, ratingClass, wordTier, categoryLabel } from '@/lib/utils';
 import styles from '@/styles/components/WorkCard.module.css';
 
 interface Props {
   work: WorkSummary;
 }
 
-const MAX_TAGS = 5;
+const MAX_TAGS = 12;
 
 const RATING_LETTER: Record<string, string> = {
   G: 'G', T: 'T', M: 'M', E: 'E',
@@ -16,6 +19,7 @@ const RATING_LETTER: Record<string, string> = {
 
 export function WorkCard({ work }: Props) {
   const { meta, slug } = work;
+  const [tagsExpanded, setTagsExpanded] = useState(false);
 
   const tier = wordTier(meta.words);
   const rClass = ratingClass(meta.rating);
@@ -25,12 +29,16 @@ export function WorkCard({ work }: Props) {
     meta.status.toLowerCase() === 'wip' ||
     meta.status.toLowerCase() === 'in-progress';
 
-  const statsTop = [
+  const statsItems = [
     formatWords(meta.words),
     meta.chapters > 1 ? `${meta.chapters} ch.` : '1 ch.',
-  ].join(' · ');
+    (meta.updated || meta.published) ? `updated ${meta.updated || meta.published}` : null,
+    meta.kudos > 0 ? `\u2665 ${formatCount(meta.kudos)}` : null,
+    meta.bookmarks > 0 ? `\u2691 ${formatCount(meta.bookmarks)}` : null,
+    meta.hits > 0 ? `\u25CB ${formatCount(meta.hits)}` : null,
+  ].filter(Boolean).join(' · ');
 
-  const visibleTags = meta.tags.slice(0, MAX_TAGS);
+  const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, MAX_TAGS);
   const hiddenTagCount = meta.tags.length - MAX_TAGS;
 
   return (
@@ -70,18 +78,7 @@ export function WorkCard({ work }: Props) {
 
       {/* ── Right content column ── */}
       <div className={styles.content}>
-        {/* Title — stretched link via ::after covers whole card.
-            Tags/ships sit above via position: relative; z-index: 1 */}
-        <div className={styles.titleRow}>
-          <Link href={`/works/${slug}`} className={styles.titleLink}>
-            <span className={styles.title}>{meta.title}</span>
-          </Link>
-          {meta.author && (
-            <span className={styles.author}>by {meta.author}</span>
-          )}
-        </div>
-
-        {/* Fandom: clickable → filter by fandom */}
+        {/* 1. Fandom: context frame */}
         {meta.fandom.length > 0 && (
           <div className={`${styles.fandom} ${styles.interactive}`}>
             {meta.fandom.map((f, i) => (
@@ -95,7 +92,7 @@ export function WorkCard({ work }: Props) {
           </div>
         )}
 
-        {/* Ships: clickable → filter by relationship. Em dash if none. */}
+        {/* 2. Ships: primary scanning target */}
         <div className={`${styles.ships} ${styles.interactive}`}>
           {meta.relationships.length === 0 ? (
             <span className={styles.shipEmpty}>—</span>
@@ -111,46 +108,42 @@ export function WorkCard({ work }: Props) {
           )}
         </div>
 
-        {/* Characters: each character clickable → filter by character */}
-        {meta.characters.length > 0 && (
-          <div className={`${styles.characters} ${styles.interactive}`}>
-            {meta.characters.slice(0, 5).map((c, i) => (
-              <span key={c}>
-                {i > 0 && <span className={styles.charSeparator}> · </span>}
-                <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.charLink}>
-                  {c}
-                </Link>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Tags: each tag clickable → filter by tag */}
+        {/* 3. Tags: decision core (chip style) */}
         {meta.tags.length > 0 && (
           <div className={`${styles.tags} ${styles.interactive}`}>
-            {visibleTags.map((t, i) => (
-              <span key={t}>
-                {i > 0 && <span className={styles.tagSeparator}> · </span>}
-                <Link href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagLink}>
-                  {t}
-                </Link>
-              </span>
+            {visibleTags.map((t) => (
+              <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>
+                {t}
+              </Link>
             ))}
             {hiddenTagCount > 0 && (
-              <span className={styles.tagsMore}> +{hiddenTagCount} more</span>
+              <button
+                type="button"
+                className={styles.tagsMore}
+                onClick={() => setTagsExpanded(!tagsExpanded)}
+              >
+                {tagsExpanded ? 'show less' : `+${hiddenTagCount}`}
+              </button>
             )}
           </div>
         )}
 
-        {/* Summary */}
+        {/* 4. Title + author — demoted, stretched link via ::after covers whole card */}
+        <div className={styles.titleRow}>
+          <Link href={`/works/${slug}`} className={styles.titleLink}>
+            <span className={styles.title}>{meta.title}</span>
+          </Link>
+          {meta.author && (
+            <span className={styles.author}>by {meta.author}</span>
+          )}
+        </div>
+
+        {/* 5. Summary: the closer */}
         {meta.summary && <p className={styles.summary}>{meta.summary}</p>}
 
-        {/* Stats bottom */}
+        {/* 6. Stats: words · chapters · updated | social proof */}
         <div className={styles.statsBottom}>
-          <span>{statsTop}</span>
-          {(meta.updated || meta.published) && (
-            <span>· updated {meta.updated || meta.published}</span>
-          )}
+          {statsItems}
         </div>
       </div>
     </article>

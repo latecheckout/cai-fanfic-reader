@@ -1,18 +1,24 @@
 ---
-title: "The Last Light"
-author: "MidnightScribe"
-rating: "General Audiences"
+title: "The Unbearable Lightness of Draco Malfoy"
+author: "ferretface_apologist"
+rating: "Explicit"
 warnings: ["No Archive Warnings Apply"]
-category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Female Character", "Original Male Character"]
-tags: ["Post-Apocalyptic", "Found Family", "Hope"]
-summary: "In a world where the sun has dimmed, two strangers find light in unexpected places."
+category: ["M/M"]
+fandom: ["Harry Potter - J. K. Rowling"]
+relationships: ["Draco Malfoy/Harry Potter", "Hermione Granger/Ron Weasley", "Pansy Parkinson/Blaise Zabini", "Neville Longbottom/Luna Lovegood"]
+characters: ["Draco Malfoy", "Harry Potter", "Hermione Granger", "Ron Weasley", "Pansy Parkinson", "Blaise Zabini", "Luna Lovegood", "Neville Longbottom", "Minerva McGonagall", "Narcissa Black Malfoy"]
+tags: ["Hogwarts Eighth Year", "Enemies to Lovers", "Slow Burn", "Post-War", "Draco Malfoy Redemption", "POV Draco Malfoy", "Mutual Pining", "Unresolved Sexual Tension", "Room of Requirement", "Bed Sharing", "Forced Proximity", "Touch-Starved Draco Malfoy", "Angst with a Happy Ending", "Panic Attacks", "PTSD", "Not Epilogue Compliant", "Praise Kink", "First Kiss", "First Time", "Everyone Is Gay and Nothing Hurts", "Draco Malfoy is Bad at Feelings", "Harry Potter is a Mess", "The Author Is Not Sorry", "scandalous hand touching"]
+summary: "Draco Malfoy returns to Hogwarts for an eighth year he neither wanted nor deserved. Harry Potter returns because he doesn't know how to be anything other than a student or a soldier. When a mandatory \"inter-house unity\" housing assignment puts them in adjacent rooms, Draco discovers that Potter's hero complex extends to lost causes — and that he might be Potter's most ambitious project yet."
 language: "English"
-published: "2024-02-01"
+published: "2024-01-10"
+updated: "2024-09-15"
 status: "Complete"
-chapters: 3
-words: 1250
+chapters: 28
+words: 142800
+kudos: 67400
+bookmarks: 19200
+hits: 1890000
+comments: 5200
 ---
 
 :::chapter The Last Light

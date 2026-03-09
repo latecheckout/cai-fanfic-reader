@@ -15,6 +15,10 @@ export interface WorkMeta {
   words: number;
   published: string;
   updated: string;
+  kudos: number;
+  bookmarks: number;
+  hits: number;
+  comments: number;
 }
 
 export interface Chapter {
@@ -45,7 +49,7 @@ export interface FilterState {
   rating?: string;
   status?: string;
   warnings?: string;
-  sort?: 'updated' | 'published' | 'words';
+  sort?: 'updated' | 'published' | 'words' | 'kudos';
   order?: 'asc' | 'desc';
   q?: string;
   // Exclude filters — remove works matching these values

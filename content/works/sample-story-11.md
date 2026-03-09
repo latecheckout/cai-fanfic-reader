@@ -1,18 +1,24 @@
 ---
-title: "The Color of Sound"
-author: "SynaesthesiaArt"
-rating: "General Audiences"
+title: "Gentlebeard's Guide to Retirement"
+author: "blackbeards_bathrobe"
+rating: "Mature"
 warnings: ["No Archive Warnings Apply"]
-category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Female Character", "Original Male Character"]
-tags: ["Contemporary", "Music", "Synesthesia", "Art", "Romance"]
-summary: "A painter who sees music as color meets a composer who's lost the ability to hear his own work."
+category: ["M/M"]
+fandom: ["Our Flag Means Death (TV)"]
+relationships: ["Blackbeard | Ed Teach/Stede Bonnet", "Jim Jimenez/Oluwande Boodhari"]
+characters: ["Blackbeard | Ed Teach", "Stede Bonnet", "Jim Jimenez", "Oluwande Boodhari", "Izzy Hands", "Lucius Spriggs", "Black Pete", "The Swede", "Frenchie", "Buttons"]
+tags: ["Post-Season 2", "Domestic Fluff", "Retired Pirates", "Established Relationship", "Fluff and Humor", "Healing", "Ed Teach Deserves Nice Things", "Soft Blackbeard | Ed Teach", "Stede Bonnet Tries His Best", "Found Family", "Crew as Family", "Cooking", "Gardening", "Ed Teach's Bathrobe", "Light Angst", "Communication", "They're Married Your Honor", "Izzy Hands Lives Because I Said So", "the author is not immune to pirates"]
+summary: "Ed and Stede retire from piracy. This goes about as smoothly as everything else they've ever done, which is to say: not very. A collection of interconnected stories about learning to be soft after a lifetime of sharp edges, featuring: one (1) vegetable garden, several failed attempts at cooking, an improbable amount of knitwear, and a crew that refuses to leave."
 language: "English"
-published: "2024-04-25"
-status: "Complete"
-chapters: 3
-words: 1190
+published: "2023-04-01"
+updated: "2024-06-18"
+status: "In Progress"
+chapters: 12
+words: 52300
+kudos: 22400
+bookmarks: 6100
+hits: 389000
+comments: 1800
 ---
 
 :::chapter The Color of Sound

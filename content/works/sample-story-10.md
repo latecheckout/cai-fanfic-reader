@@ -1,18 +1,24 @@
 ---
-title: "The Last Bookshop"
-author: "PageTurner"
-rating: "General Audiences"
-warnings: ["No Archive Warnings Apply"]
-category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Male Character", "Original Female Character"]
-tags: ["Contemporary", "Books", "Community", "Change"]
-summary: "When the last independent bookshop in the city faces closure, its owner discovers that some stories refuse to end."
+title: "Osmanthus Wine and Other Things He Remembers"
+author: "geo_archon_simp"
+rating: "Teen And Up"
+warnings: ["Creator Chose Not To Use Archive Warnings"]
+category: ["M/M"]
+fandom: ["原神 | Genshin Impact (Video Game)"]
+relationships: ["Zhongli/Tartaglia | Childe (Genshin Impact)", "Kamisato Ayato/Thoma (Genshin Impact)"]
+characters: ["Zhongli (Genshin Impact)", "Tartaglia | Childe (Genshin Impact)", "Xiao (Genshin Impact)", "Ganyu (Genshin Impact)", "Hu Tao (Genshin Impact)", "Ningguang (Genshin Impact)", "Kaeya (Genshin Impact)", "Traveler (Genshin Impact)"]
+tags: ["Alternate Universe - Modern Setting", "Alternate Universe - Coffee Shop", "Slow Burn", "Mutual Pining", "Fluff", "Domestic Fluff", "Hurt/Comfort", "Past Lives", "Reincarnation", "Memory Loss", "Zhongli Has Feelings", "Childe Being Childe", "POV Alternating", "Found Family", "Tooth-Rotting Fluff", "Light Angst", "they were roommates", "oh my god they were roommates", "Author Is Zhongli Kinnie"]
+summary: "Zhongli is a history professor who can't remember why osmanthus wine tastes like grief. Childe is the barista at the campus coffee shop who keeps slipping extra shots into his lattes. In a modern AU where gods forgot they were gods, old contracts still bind — even when nobody remembers signing them."
 language: "English"
-published: "2024-04-18"
-status: "Complete"
-chapters: 3
-words: 1280
+published: "2024-02-20"
+updated: "2024-02-20"
+status: "In Progress"
+chapters: 8
+words: 45200
+kudos: 15800
+bookmarks: 4300
+hits: 198000
+comments: 1200
 ---
 
 :::chapter The Last Bookshop

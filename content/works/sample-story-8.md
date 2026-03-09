@@ -1,18 +1,24 @@
 ---
-title: "The Memory Keeper"
-author: "GhostWriter99"
+title: "A Certain Arrangement"
+author: "ineffable_husbands"
 rating: "Teen And Up"
 warnings: ["No Archive Warnings Apply"]
-category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Male Character", "Original Female Character"]
-tags: ["Supernatural", "Memory", "Small Town", "Secrets"]
-summary: "In a small coastal town, one person is chosen each generation to remember what everyone else forgets."
+category: ["M/M"]
+fandom: ["Good Omens (TV)", "Good Omens - Neil Gaiman & Terry Pratchett"]
+relationships: ["Aziraphale/Crowley (Good Omens)", "Anathema Device/Newton Pulsifer"]
+characters: ["Aziraphale (Good Omens)", "Crowley (Good Omens)", "Anathema Device", "Newton Pulsifer", "Madame Tracy (Good Omens)", "Sergeant Shadwell (Good Omens)", "God (Good Omens)", "The Metatron (Good Omens)"]
+tags: ["Post-Season 2", "Fix-It", "Idiots in Love", "Mutual Pining", "6000 Years of Slow Burn", "Ineffable Husbands", "Aziraphale's Bookshop", "Crowley's Plants", "Fluff and Angst", "Emotional Hurt/Comfort", "Love Confessions", "Kissing", "South Downs Cottage", "Domestic Fluff", "Angel/Demon Relationship", "They Invented Being In Love", "Aziraphale Loves Crowley", "Crowley Loves Aziraphale", "the ending was homophobic and I'm fixing it", "Author Has Feelings About a Certain Elevator Scene"]
+summary: "After the Metatron's offer tears them apart, Crowley spends six months pretending he's fine, Aziraphale spends six months pretending he made the right choice, and the universe spends six months waiting for them to stop being idiots. A love story six thousand years in the making deserves a better ending than that."
 language: "English"
-published: "2024-04-01"
+published: "2023-08-10"
+updated: "2024-01-15"
 status: "Complete"
-chapters: 3
-words: 1250
+chapters: 15
+words: 72400
+kudos: 38600
+bookmarks: 10200
+hits: 654000
+comments: 3100
 ---
 
 :::chapter The Memory Keeper

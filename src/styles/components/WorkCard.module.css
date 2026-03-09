@@ -1,7 +1,7 @@
 /* ============================================================
    WORK CARD — Signal Strip Layout
    Left 48px strip (rating dot, length bars, status pill)
-   Right content column (title, fandom, ships, tags, summary, stats)
+   Right content column (fandom, ships, tags, title, summary, characters, stats)
    Stretched link pattern: titleLink::after covers whole card;
    tags/ships/fandom sit above via position: relative; z-index: 1
    ============================================================ */
@@ -116,16 +116,16 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 8px;
 }
 
-/* Title + author row — leads the card */
+/* Title + author row — demoted to position 4 in hierarchy */
 .titleRow {
   display: flex;
   align-items: baseline;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 1px;
+  margin-top: 10px;
 }
 
 /* Title link — ::after is the stretched click area for the whole card */
@@ -141,13 +141,13 @@
   z-index: 0; /* sits below .interactive elements */
 }
 
-/* Title: serif */
+/* Title: serif, demoted from 20px to 15px */
 .title {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text);
-  line-height: 1.2;
+  line-height: 1.4;
 }
 
 .card:hover .title {
@@ -192,8 +192,8 @@
 
 /* ── Ships ── */
 .ships {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text);
 }
 
@@ -233,9 +233,10 @@
 /* ── Characters ── */
 .characters {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--secondary);
   line-height: 1.5;
+  margin-top: 2px;
 }
 
 .charLink {
@@ -255,37 +256,55 @@
   opacity: 0.4;
 }
 
-/* ── Tags ── */
+/* ── Tags (chip style) ── */
 .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.tagChip {
+  display: inline-block;
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--secondary);
-  line-height: 1.5;
-}
-
-.tagLink {
+  background: var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
   text-decoration: none;
-  color: inherit;
-  transition: color var(--transition-micro);
+  transition: color var(--transition-micro), background var(--transition-micro);
+  line-height: 1.4;
 }
 
-.tagLink:hover {
+.tagChip:hover {
   color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
-}
-
-.tagSeparator {
-  opacity: 0.4;
+  background: var(--border-strong);
 }
 
 .tagsMore {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--secondary);
   opacity: 0.7;
+  padding: 2px 7px;
+  background: none;
+  border: 1px dashed var(--border-chip, var(--border));
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: opacity var(--transition-micro);
+}
+
+.tagsMore:hover {
+  opacity: 1;
 }
 
 /* Summary: 2-line clamp, italic serif */
 .summary {
+  margin-top: 1px;
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 13px;
@@ -312,6 +331,11 @@
 
 .card:hover .statsBottom {
   color: var(--text);
+}
+
+.socialStats {
+  margin-left: auto;
+  letter-spacing: 0.02em;
 }
 
 /* Category label in signal strip */

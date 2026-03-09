@@ -30,6 +30,10 @@ function normalizeWorkMeta(data: Record<string, unknown>): WorkMeta {
     words: Number(data.words ?? 0),
     published: String(data.published ?? ''),
     updated: String(data.updated ?? ''),
+    kudos: Number(data.kudos ?? 0),
+    bookmarks: Number(data.bookmarks ?? 0),
+    hits: Number(data.hits ?? 0),
+    comments: Number(data.comments ?? 0),
   };
 }
 

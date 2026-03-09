@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { WorkMeta } from '@/types';
-import { formatWords, readingTime } from '@/lib/utils';
+import { formatWords, formatCount, readingTime } from '@/lib/utils';
 import styles from '@/styles/components/WorkHeader.module.css';
 
 interface Props {
@@ -37,6 +37,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
     readingTime(meta.words),
     totalChapters > 1 ? `${totalChapters} chapters` : null,
     meta.language !== 'English' ? meta.language : null,
+    meta.kudos > 0 ? `\u2665 ${formatCount(meta.kudos)}` : null,
+    meta.bookmarks > 0 ? `\u2691 ${formatCount(meta.bookmarks)}` : null,
   ]
     .filter(Boolean)
     .join(' · ');

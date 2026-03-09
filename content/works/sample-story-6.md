@@ -1,18 +1,24 @@
 ---
-title: "Neon Dreams"
-author: "CyberPunkWriter"
+title: "the kids aren't alright (but they will be)"
+author: "spideywhump"
 rating: "Teen And Up"
-warnings: ["No Archive Warnings Apply"]
+warnings: ["Creator Chose Not To Use Archive Warnings"]
 category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Female Character", "AI Character"]
-tags: ["Cyberpunk", "Artificial Intelligence", "Identity", "Near Future"]
-summary: "In 2087, a hacker discovers an AI that claims to dream. What she learns challenges everything she believes about consciousness."
+fandom: ["Marvel Cinematic Universe", "Spider-Man (Tom Holland Movies)"]
+relationships: ["Peter Parker & Tony Stark", "Peter Parker & May Parker", "Peter Parker & Ned Leeds", "Pepper Potts/Tony Stark"]
+characters: ["Peter Parker", "Tony Stark", "May Parker", "Ned Leeds", "Michelle Jones", "Pepper Potts", "Happy Hogan", "James 'Rhodey' Rhodes"]
+tags: ["Hurt Peter Parker", "Protective Tony Stark", "Irondad", "Spiderson", "Whump", "Panic Attacks", "Sensory Overload", "Peter Parker Needs a Hug", "Tony Stark Has A Heart", "Post-Spider-Man: Homecoming", "Found Family", "Fluff and Angst", "Hurt/Comfort", "Identity Reveal", "Secret Identity", "Field Trips", "Peter Parker's Field Trip to Stark Industries", "The Avengers Are Good Bros", "i'm going to make myself cry writing this"]
+summary: "Five times Tony Stark didn't know Peter Parker was hurt, and one time he did. (Or: Peter Parker has a talent for hiding injuries, a pathological need to not be a burden, and a mentor who is slowly losing his mind.)"
 language: "English"
-published: "2024-03-15"
+published: "2024-04-15"
+updated: "2024-04-15"
 status: "Complete"
-chapters: 3
-words: 1180
+chapters: 6
+words: 34200
+kudos: 28700
+bookmarks: 7800
+hits: 445000
+comments: 2100
 ---
 
 :::chapter Neon Dreams

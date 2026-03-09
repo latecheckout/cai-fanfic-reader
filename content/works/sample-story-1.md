@@ -1,20 +1,24 @@
 ---
-title: "Stars Between Us"
-author: "CosmicWriter42"
-rating: "Teen And Up"
-warnings: ["No Archive Warnings Apply"]
-category: ["F/M", "Gen"]
-fandom: ["Star Trek: Strange New Worlds"]
-relationships: ["Spock/T'Pring", "Christine Chapel & Spock"]
-characters: ["Spock", "T'Pring", "Christine Chapel", "Nyota Uhura", "Christopher Pike"]
-tags: ["Fluff", "Romance", "First Kiss", "Vulcan Culture", "Slow Burn", "Friends to Lovers", "Mutual Pining", "Telepathy"]
-summary: "When a diplomatic mission brings T'Pring aboard the Enterprise, Spock must navigate the complexities of Vulcan tradition and his own unexpected emotions. As they work together to prevent a interstellar incident, both discover that logic alone cannot explain the connection they share."
+title: "The Last Great Marauder"
+author: "moonmoony"
+rating: "Mature"
+warnings: ["Graphic Depictions Of Violence", "Major Character Death"]
+category: ["M/M"]
+fandom: ["Harry Potter - J. K. Rowling"]
+relationships: ["Sirius Black/Remus Lupin", "James Potter/Lily Evans Potter", "Marlene McKinnon/Dorcas Meadowes"]
+characters: ["Sirius Black", "Remus Lupin", "James Potter", "Lily Evans Potter", "Peter Pettigrew", "Marlene McKinnon", "Dorcas Meadowes", "Regulus Black", "Albus Dumbledore", "Minerva McGonagall", "Fenrir Greyback", "Walburga Black"]
+tags: ["Marauders Era", "Slow Burn", "Friends to Lovers", "First War with Voldemort", "Angst with a Happy Ending", "Mutual Pining", "Wolfstar", "Get Together", "Canonical Character Death", "Period Typical Attitudes", "Hogwarts Era", "Post-Hogwarts", "Protective Sirius Black", "Remus Lupin Needs a Hug", "Full Moon", "Animagus", "The Prank", "Sirius Black's Flying Motorbike", "POV Remus Lupin", "Everyone Knows Before They Do", "The Author Regrets Nothing"]
+summary: "Remus Lupin has spent six years carefully constructing walls around himself. Sirius Black has spent six years running headfirst into them. When the war outside Hogwarts begins to cast long shadows through its corridors, the careful distance Remus has maintained starts to feel less like protection and more like a waste of what little time they might have left."
 language: "English"
-published: "2024-01-15"
-updated: "2024-01-20"
+published: "2023-06-15"
+updated: "2024-02-28"
 status: "Complete"
-chapters: 3
-words: 4850
+chapters: 42
+words: 287400
+kudos: 156200
+bookmarks: 41800
+hits: 4200000
+comments: 8900
 ---
 
 :::chapter Chapter 1: Arrival

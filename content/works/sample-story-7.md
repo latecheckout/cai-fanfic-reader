@@ -1,18 +1,24 @@
 ---
-title: "The Cartographer's Daughter"
-author: "InkAndQuill"
-rating: "General Audiences"
+title: "Teach Me How to Pray"
+author: "falling_grace"
+rating: "Mature"
 warnings: ["No Archive Warnings Apply"]
-category: ["Gen"]
-fandom: ["Original Work"]
-characters: ["Original Female Character", "Original Male Character"]
-tags: ["Fantasy", "Maps", "Adventure", "Family Legacy"]
-summary: "Elena inherits her father's map shop and discovers that some maps don't show places—they show possibilities."
+category: ["M/M"]
+fandom: ["Supernatural (TV 2005)"]
+relationships: ["Castiel/Dean Winchester", "Eileen Leahy/Sam Winchester"]
+characters: ["Dean Winchester", "Castiel", "Sam Winchester", "Eileen Leahy", "Jack Kline", "Bobby Singer", "Charlie Bradbury", "Rowena MacLeod"]
+tags: ["Post-Canon Fix-It", "Castiel Gets Pulled Out of The Empty", "Dean Winchester Deserves Better", "Emotional Constipation", "Mutual Pining", "Love Confessions", "First Kiss", "Slow Burn", "Domestic Fluff", "Retired Hunter Dean Winchester", "Human Castiel", "Angst with a Happy Ending", "Grief/Mourning", "Curtain Fic", "Dean Winchester Cooks", "They're Both Idiots", "Everyone Knows Except Them", "Cas Deserved Better and I'm Giving It to Him", "the finale didn't happen and i refuse to acknowledge it"]
+summary: "Dean gets Cas out of the Empty. That's the easy part. The hard part is everything after: learning to live without a mission, building something that isn't a weapon, and saying the thing he couldn't say in that dungeon. A post-canon fix-it for everyone who screamed at their television on November 19, 2020."
 language: "English"
-published: "2024-03-20"
+published: "2023-01-05"
+updated: "2023-07-22"
 status: "Complete"
-chapters: 3
-words: 1320
+chapters: 18
+words: 86700
+kudos: 53200
+bookmarks: 14900
+hits: 1120000
+comments: 4800
 ---
 
 :::chapter The Cartographer's Daughter
