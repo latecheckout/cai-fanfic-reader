@@ -9,21 +9,17 @@
   padding: var(--space-8) var(--space-6) 0;
 }
 
-/* ── Last read position marker ── */
-.lastReadMarker {
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
+/* ── Last read position banner — in document flow, above chapter content ── */
+.lastReadBanner {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: 0 var(--space-6);
-  z-index: 10;
+  padding: var(--space-5) 0 var(--space-6);
+  pointer-events: none;
 }
 
-.lastReadMarker::before,
-.lastReadMarker::after {
+.lastReadBanner::before,
+.lastReadBanner::after {
   content: '';
   flex: 1;
   height: 1px;
@@ -36,7 +32,21 @@
   font-size: 9px;
   letter-spacing: 0.1em;
   color: var(--secondary);
-  opacity: 0.35;
+  opacity: 0.45;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* ── End-of-chapter label — sits above the comments zone ── */
+.chapterEndLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  opacity: 0.45;
+  text-align: center;
+  max-width: var(--reader-line-width);
+  margin: 56px auto 0;
+  padding: 0 var(--space-6);
 }

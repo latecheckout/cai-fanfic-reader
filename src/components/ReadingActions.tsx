@@ -1,14 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useReading } from '@/context/ReadingContext';
 import styles from '@/styles/components/ReadingActions.module.css';
 
 const SAVED_KEY = 'fanfic-saved-works';
 
 export function ReadingActions() {
-  const { slug } = useReading();
+  const { slug, externalPrefsRef, prefsToggleFnRef } = useReading();
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load bookmark state on mount
   useEffect(() => {
@@ -29,9 +31,14 @@ export function ReadingActions() {
       if (saved.includes(slug)) {
         updated = saved.filter((s) => s !== slug);
         setIsBookmarked(false);
+        // No animation on remove
       } else {
         updated = [...saved, slug];
         setIsBookmarked(true);
+        // Trigger pop + sparkle animation
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
+        setIsAnimating(true);
+        animTimerRef.current = setTimeout(() => setIsAnimating(false), 420);
       }
       localStorage.setItem(SAVED_KEY, JSON.stringify(updated));
     } catch {
@@ -40,27 +47,58 @@ export function ReadingActions() {
   }
 
   return (
-    <button
-      className={styles.bookmarkBubble}
-      onClick={handleBookmark}
-      aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this work'}
-      aria-pressed={isBookmarked}
-    >
-      {/* Bookmark ribbon icon — filled when saved, outline when not */}
-      <svg
-        width="13"
-        height="16"
-        viewBox="0 0 13 16"
-        fill={isBookmarked ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-        className={isBookmarked ? styles.filled : styles.outline}
+    <div className={styles.actions}>
+      {/* Prefs button — morphs prefs panel from this button's position */}
+      <button
+        ref={externalPrefsRef}
+        className={styles.prefsBubble}
+        onClick={() => prefsToggleFnRef.current?.()}
+        aria-label="Reading preferences"
       >
-        <path d="M1.5 2.5C1.5 1.948 1.948 1.5 2.5 1.5h8c.552 0 1 .448 1 1v11.5l-4.5-3-4.5 3V2.5z" />
-      </svg>
-    </button>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          aria-hidden="true"
+        >
+          <line x1="2" y1="4" x2="12" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="5" cy="4" r="1.5" fill="currentColor" />
+          <line x1="2" y1="8" x2="12" y2="8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="9" cy="8" r="1.5" fill="currentColor" />
+          <line x1="2" y1="12" x2="12" y2="12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+          <circle cx="6" cy="12" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
+
+      {/* Bookmark button — with pop + sparkle animation */}
+      <button
+        className={`${styles.bookmarkBubble} ${isAnimating ? styles.pop : ''}`}
+        onClick={handleBookmark}
+        aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this work'}
+        aria-pressed={isBookmarked}
+      >
+        {/* Sparkle particles — animate outward on bookmark add */}
+        <span className={styles.spark} aria-hidden="true" />
+        <span className={styles.spark} aria-hidden="true" />
+        <span className={styles.spark} aria-hidden="true" />
+        <span className={styles.spark} aria-hidden="true" />
+        {/* Bookmark ribbon icon — filled when saved, outline when not */}
+        <svg
+          width="13"
+          height="16"
+          viewBox="0 0 13 16"
+          fill={isBookmarked ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          className={isBookmarked ? styles.filled : styles.outline}
+        >
+          <path d="M2 1.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5V14l-4.5-3-4.5 3V1.5z" />
+        </svg>
+      </button>
+    </div>
   );
 }

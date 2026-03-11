@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
-import { Chapter, WorkSummary } from '@/types';
+import { useEffect, useRef, useCallback } from 'react';
+import { Chapter, WorkMeta, WorkSummary } from '@/types';
 import { ChapterContent } from './ChapterContent';
 import { ChapterBreak } from './ChapterBreak';
 import { ChapterComments } from './ChapterComments';
 import { EndOfStory } from './EndOfStory';
+import { KudosSection } from './KudosSection';
 import { useReading } from '@/context/ReadingContext';
 import styles from '@/styles/components/ChapterList.module.css';
 
@@ -13,20 +14,20 @@ interface Props {
   chapters: Chapter[];
   chapterHtmls: string[];
   recommendations: WorkSummary[];
+  workMeta: WorkMeta;
 }
 
 // How far from the top of the viewport to consider a chapter "active"
 const HUD_OFFSET = 90;
 
-export function ChapterList({ chapters, chapterHtmls, recommendations }: Props) {
-  const { setActiveChapterIndex, registerChapter, slug, workMeta, totalChapters } = useReading();
+export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta }: Props) {
+  const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex } = useReading();
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didRestoreRef = useRef(false);
   const activeRef = useRef(0);
   const furthestPctRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
-  const [markerTop, setMarkerTop] = useState<number | null>(null);
 
   // Restore scroll position on mount; also load furthest position for marker
   useEffect(() => {
@@ -51,29 +52,15 @@ export function ChapterList({ chapters, chapterHtmls, recommendations }: Props) 
           if (typeof saved.furthestScrollPercent === 'number') {
             furthestPctRef.current = saved.furthestScrollPercent;
           }
+          // Track last-read chapter for the inline banner
+          if (typeof saved.activeChapterIndex === 'number') {
+            setLastReadChapterIndex(saved.activeChapterIndex);
+          }
         }
       }
     } catch {
       // Fail silently
     }
-  }, [slug]);
-
-  // Place the "You were here" marker after layout stabilises
-  useEffect(() => {
-    if (furthestPctRef.current < 0.02) return; // too close to start — don't show
-
-    const placeMarker = () => {
-      const listEl = listRef.current;
-      if (!listEl) return;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const absoluteY = furthestPctRef.current * maxScroll;
-      const markerY = absoluteY - listEl.offsetTop;
-      if (markerY > 0) setMarkerTop(markerY);
-    };
-
-    // Wait for fonts and layout to stabilise
-    const timer = setTimeout(placeMarker, 400);
-    return () => clearTimeout(timer);
   }, [slug]);
 
   // Scroll-based active chapter detection
@@ -153,17 +140,6 @@ export function ChapterList({ chapters, chapterHtmls, recommendations }: Props) 
 
   return (
     <div ref={listRef} className={`${styles.list} prose-outer`}>
-      {/* "You were here" position marker */}
-      {markerTop !== null && (
-        <div
-          className={styles.lastReadMarker}
-          style={{ top: markerTop }}
-          aria-hidden="true"
-        >
-          <span className={styles.lastReadLabel}>· you were here ·</span>
-        </div>
-      )}
-
       {chapters.map((chapter, i) => (
         <div key={i}>
           <section
@@ -172,6 +148,12 @@ export function ChapterList({ chapters, chapterHtmls, recommendations }: Props) 
             className={styles.chapter}
             aria-label={chapter.title || `Chapter ${i + 1}`}
           >
+            {/* In-flow "you left off here" banner — only for chapters after the first */}
+            {lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
+              <div className={styles.lastReadBanner} aria-hidden="true">
+                <span className={styles.lastReadLabel}>· you left off here ·</span>
+              </div>
+            )}
             <ChapterContent
               chapter={chapter}
               chapterHtml={chapterHtmls[i]}
@@ -179,8 +161,23 @@ export function ChapterList({ chapters, chapterHtmls, recommendations }: Props) 
             />
           </section>
 
+          {/* End of chapter label — appears above the comments zone for multi-chapter works */}
+          {chapters.length > 1 && (
+            <div className={styles.chapterEndLabel} aria-hidden="true">
+              END OF CHAPTER {i + 1}
+            </div>
+          )}
+
           {/* Comments after each chapter */}
-          <ChapterComments slug={slug} chapterIndex={i} />
+          <ChapterComments
+            slug={slug}
+            chapterIndex={i}
+          />
+
+          {/* Kudos section after the last chapter's comments */}
+          {i === chapters.length - 1 && (
+            <KudosSection slug={slug} totalKudos={workMeta.kudos} />
+          )}
 
           {/* Chapter break before next chapter */}
           {i < chapters.length - 1 && <ChapterBreak chapterNumber={i + 1} />}

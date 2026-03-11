@@ -35,6 +35,9 @@ interface PageProps {
     ex_status?: string;
     ex_category?: string;
     ex_warning?: string;
+    date_preset?: string;
+    date_from?: string;
+    date_to?: string;
   }>;
 }
 
@@ -64,6 +67,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     exStatus: params.ex_status,
     exCategory: params.ex_category,
     exWarning: params.ex_warning,
+    datePreset: params.date_preset,
+    dateFrom: params.date_from,
+    dateTo: params.date_to,
   };
 
   const allWorks = getWorkSummaries();
@@ -79,7 +85,8 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     params.min_words || params.max_words ||
     params.ex_fandom || params.ex_relationship || params.ex_tag ||
     params.ex_character || params.ex_rating || params.ex_status ||
-    params.ex_category || params.ex_warning
+    params.ex_category || params.ex_warning ||
+    params.date_preset || params.date_from || params.date_to
   );
 
   return (

@@ -19,6 +19,9 @@ interface Props {
     character?: string;
     rating?: string;
     status?: string;
+    category?: string;
+    language?: string;
+    warning?: string;
     sort?: string;
     order?: string;
     q?: string;
@@ -28,6 +31,13 @@ interface Props {
     ex_character?: string;
     ex_rating?: string;
     ex_status?: string;
+    ex_category?: string;
+    ex_warning?: string;
+    min_words?: string;
+    max_words?: string;
+    date_preset?: string;
+    date_from?: string;
+    date_to?: string;
   };
   totalCount: number;
   filteredCount: number;

@@ -78,7 +78,7 @@
 }
 
 [data-theme="light"] {
-  --bg: #F7F4EF;
+  --bg: #FFFFFF;
   --text: #1A1816;
   --secondary: #8A857D;
   --border: rgba(26, 24, 22, 0.12);
@@ -87,7 +87,7 @@
   --border-active: rgba(26, 24, 22, 0.40);
   --accent: #8B4040;
   --accent-subtle: rgba(139, 64, 64, 0.12);
-  --card-bg: #FBFAF8;
+  --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;

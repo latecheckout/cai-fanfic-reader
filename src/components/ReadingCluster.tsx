@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useReading } from '@/context/ReadingContext';
 import { ratingClass } from '@/lib/utils';
 import { MetadataOverlay } from './MetadataOverlay';
@@ -28,8 +29,8 @@ function getTargetRect(
   }
 
   if (name === 'chapter') {
-    // Content-hugging: 44px header + 40px per row + 16px bottom padding
-    const contentH = 44 + context.chapterCount * 40 + 16;
+    // Initial estimate: 48px header + 46px per row (allows for title wrapping) + 16px list padding
+    const contentH = 48 + context.chapterCount * 46 + 16;
     const h = Math.min(contentH, vh * 0.7);
     const w = Math.max(280, pillRect.width + 40);
     const midX = pillRect.left + pillRect.width / 2;
@@ -37,9 +38,9 @@ function getTargetRect(
     return { left, top: pillRect.bottom + 8, width: w, height: h };
   }
 
-  // prefs — 240×272, all controls visible without scroll
-  const w = 240;
-  const h = 272;
+  // prefs — 260×314, hugs content (header 48 + sections 266)
+  const w = 260;
+  const h = 314;
   const midX = pillRect.left + pillRect.width / 2;
   const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
   return { left, top: pillRect.bottom + 10, width: w, height: h };
@@ -48,11 +49,14 @@ function getTargetRect(
 // ────────────────────────────────────────────────────────────────────────────
 
 export function ReadingCluster() {
-  const { workMeta, chapterTitles, totalChapters, activeChapterIndex, scrollToChapter } =
-    useReading();
+  const {
+    workMeta, chapterTitles, totalChapters, activeChapterIndex, scrollToChapter,
+    externalPrefsRef, prefsToggleFnRef,
+  } = useReading();
   const [scrollPct, setScrollPct] = useState(0);
   const [activePanel, setActivePanel] = useState<PanelName | null>(null);
   const [isSticky, setIsSticky] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Ref tracks the active panel synchronously (avoids stale-closure issues)
   const activePanelRef = useRef<PanelName | null>(null);
@@ -76,6 +80,9 @@ export function ReadingCluster() {
 
   const rClass = ratingClass(workMeta.rating);
 
+  // ── Mark client mount (prevents SSR hydration mismatch for portal) ──────────
+  useEffect(() => { setIsMounted(true); }, []);
+
   // ── Measure natural top after mount ────────────────────────────────────────
 
   useEffect(() => {
@@ -96,12 +103,20 @@ export function ReadingCluster() {
     return () => window.removeEventListener('scroll', onStickyCheck);
   }, []);
 
+  // ── Register prefs toggle fn so ReadingActions can trigger it ─────────────
+
+  useEffect(() => {
+    prefsToggleFnRef.current = () => togglePanel('prefs');
+    return () => { prefsToggleFnRef.current = null; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Helpers ────────────────────────────────────────────────────────────────
 
   function getPillEl(name: PanelName): HTMLButtonElement | null {
     if (name === 'metadata') return titlePillRef.current;
     if (name === 'chapter')  return chapterPillRef.current;
-    return prefsPillRef.current;
+    // Prefer external button (ReadingActions) as the morph origin/destination for prefs
+    return externalPrefsRef.current ?? prefsPillRef.current;
   }
 
   function getPanelEl(name: PanelName): HTMLDivElement | null {
@@ -154,7 +169,7 @@ export function ReadingCluster() {
       panelEl.style.left         = `${target.left}px`;
       panelEl.style.width        = `${target.width}px`;
       panelEl.style.height       = `${target.height}px`;
-      panelEl.style.borderRadius = '12px';
+      panelEl.style.borderRadius = '18px';
       void panelEl.offsetHeight;
       panelEl.style.transition   = 'opacity 80ms ease';
     } else {
@@ -169,13 +184,28 @@ export function ReadingCluster() {
       panelEl.style.left         = `${target.left}px`;
       panelEl.style.width        = `${target.width}px`;
       panelEl.style.height       = `${target.height}px`;
-      panelEl.style.borderRadius = '12px';
+      panelEl.style.borderRadius = '18px';
     }
 
     // 7. Reveal content after morph is well underway
     setTimeout(() => {
       panelEl.setAttribute('data-content', 'visible');
     }, prefersReducedMotion ? 80 : 200);
+
+    // For chapter panel: snap height to actual content after morph (handles title wrapping)
+    if (name === 'chapter' && !prefersReducedMotion) {
+      setTimeout(() => {
+        if (activePanelRef.current !== name) return;
+        const headerEl = panelEl.firstElementChild?.firstElementChild as HTMLElement | null;
+        const listEl   = panelEl.firstElementChild?.children[1] as HTMLElement | null;
+        if (!headerEl || !listEl) return;
+        const neededH = headerEl.offsetHeight + listEl.scrollHeight;
+        const maxH    = Math.floor(window.innerHeight * 0.7);
+        const finalH  = Math.min(neededH, maxH);
+        panelEl.style.transition = 'height 100ms ease';
+        panelEl.style.height     = `${finalH}px`;
+      }, 340); // after 320ms spring morph
+    }
 
     // 8. Show backdrop + dim reading content
     backdropRef.current?.setAttribute('data-visible', 'true');
@@ -395,13 +425,15 @@ export function ReadingCluster() {
             </button>
           )}
 
-          {/* Prefs bubble → prefs panel */}
+          {/* Prefs bubble — hidden, morph still uses prefsPillRef as fallback */}
           <button
             ref={prefsPillRef}
-            className={`${styles.bubble} ${styles.prefsBubble}`}
+            className={`${styles.bubble} ${styles.prefsBubble} ${styles.prefsBubbleHidden}`}
             onClick={() => togglePanel('prefs')}
             data-active={activePanel === 'prefs' ? 'true' : undefined}
             aria-label="Reading preferences"
+            aria-hidden="true"
+            tabIndex={-1}
           >
             <svg
               className={styles.sliderIcon}
@@ -422,24 +454,21 @@ export function ReadingCluster() {
         </div>
       </div>
 
-      {/* Backdrop — z-50, click to close any open panel */}
-      <div
-        ref={backdropRef}
-        className={styles.backdrop}
-        onClick={closeAll}
-        aria-hidden="true"
-      />
-
-      {/* Panels — always in DOM at z-150, animated by JS */}
-      <MetadataOverlay ref={metaPanelRef} onClose={closeAll} />
-      <ChapterPanel
-        ref={chapterPanelRef}
-        chapters={chapterTitles}
-        activeIndex={activeChapterIndex}
-        onSelect={(i) => { scrollToChapter(i); closeAll(); }}
-        onClose={closeAll}
-      />
-      <PrefsPanel ref={prefsPanelRef} onClose={closeAll} />
+      {isMounted && createPortal(
+        <>
+          <div ref={backdropRef} data-panel-backdrop className={styles.backdrop} onClick={closeAll} />
+          <MetadataOverlay ref={metaPanelRef} onClose={closeAll} />
+          <ChapterPanel
+            ref={chapterPanelRef}
+            chapters={chapterTitles}
+            activeIndex={activeChapterIndex}
+            onSelect={(i) => { scrollToChapter(i); closeAll(); }}
+            onClose={closeAll}
+          />
+          <PrefsPanel ref={prefsPanelRef} onClose={closeAll} />
+        </>,
+        document.body
+      )}
     </>
   );
 }

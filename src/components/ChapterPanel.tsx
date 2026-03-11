@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useReading } from '@/context/ReadingContext';
 import styles from '@/styles/components/ChapterDrawer.module.css';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export const ChapterPanel = React.forwardRef<HTMLDivElement, Props>(
   function ChapterPanel({ chapters, activeIndex, onSelect, onClose }, ref) {
+    const { lastReadChapterIndex } = useReading();
     return (
       <div
         ref={ref}
@@ -43,6 +45,9 @@ export const ChapterPanel = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.chapterTitle}>
                     {title || `Chapter ${i + 1}`}
                   </span>
+                  {lastReadChapterIndex !== null && i === lastReadChapterIndex && (
+                    <span className={styles.lastReadDot} aria-label="Last read" title="You left off here">·</span>
+                  )}
                 </button>
               </li>
             ))}

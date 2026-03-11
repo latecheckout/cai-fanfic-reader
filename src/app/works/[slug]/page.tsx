@@ -95,6 +95,7 @@ export default async function ReaderPage({ params }: PageProps) {
             chapters={chapters}
             chapterHtmls={chapterHtmls}
             recommendations={recommendations}
+            workMeta={meta}
           />
         </main>
       </ReadingProvider>

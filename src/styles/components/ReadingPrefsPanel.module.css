@@ -1,14 +1,12 @@
 /* ============================================================
    PREFS PANEL — Morph panel (always in DOM, JS-animated)
-   Opens upward from prefs pill. 240×210px target.
-   Theme control uses circular color swatches.
-   Used by PrefsPanel.tsx (formerly ReadingPrefsPanel).
+   Opens from prefs button. Rounded panel with no header rule.
    ============================================================ */
 
-/* ── Morph container — z-150, no CSS transition (set inline by JS) ── */
+/* ── Morph container — z-300, no CSS transition (set inline by JS) ── */
 .panel {
   position: fixed;
-  z-index: 150;
+  z-index: 300;
   overflow: hidden;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -43,28 +41,28 @@
   transition: opacity 180ms ease 120ms;
 }
 
-/* ── Header ── */
+/* ── Header — no dividing line ── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-5) var(--space-3);
-  border-bottom: 1px solid var(--border);
+  padding: 16px 18px 8px;
   flex-shrink: 0;
 }
 
 .heading {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--secondary);
+  opacity: 0.7;
 }
 
 .closeBtn {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,6 +70,9 @@
   color: var(--secondary);
   cursor: pointer;
   transition: color var(--transition-micro), background var(--transition-micro);
+  border: none;
+  background: none;
+  padding: 0;
 }
 
 .closeBtn:hover {
@@ -81,17 +82,17 @@
 
 /* ── Sections ── */
 .sections {
-  padding: var(--space-4) var(--space-5);
+  padding: 4px 18px 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 20px;
   flex: 1;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .sectionLabel {
@@ -101,12 +102,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--secondary);
-}
-
-.sectionValue {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--secondary);
+  opacity: 0.75;
 }
 
 /* ── Range control ── */
@@ -118,9 +114,10 @@
 
 .rangeSmall {
   font-family: var(--font-serif);
-  font-size: 14px;
+  font-size: 13px;
   color: var(--secondary);
   flex-shrink: 0;
+  opacity: 0.6;
 }
 
 .rangeLarge {
@@ -128,17 +125,48 @@
   font-size: 20px;
   color: var(--secondary);
   flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* ── Track wrapper — positions the floating tooltip ── */
+.rangeTrack {
+  flex: 1;
+  position: relative;
+  padding-top: 24px; /* space for tooltip above */
+}
+
+/* ── Floating value tooltip — appears above thumb while dragging ── */
+.thumbTooltip {
+  position: absolute;
+  top: 0;
+  /* left: map thumb-ratio (0–1) to thumb center position */
+  /* thumb is 16px wide; at ratio=0 center=8px, at ratio=1 center=trackWidth-8px */
+  left: calc(var(--thumb-ratio) * (100% - 16px) + 8px);
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 120ms ease;
+  white-space: nowrap;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.thumbTooltipVisible {
+  opacity: 0.7;
 }
 
 .range {
-  flex: 1;
+  width: 100%;
   appearance: none;
   -webkit-appearance: none;
-  height: 4px;
+  height: 3px;
   background: var(--border-strong);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
+  display: block;
 }
 
 .range::-webkit-slider-thumb {
@@ -148,6 +176,11 @@
   border-radius: 50%;
   background: var(--text);
   cursor: pointer;
+  transition: transform 150ms var(--ease-out-expo);
+}
+
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.2);
 }
 
 .range::-moz-range-thumb {
@@ -159,24 +192,29 @@
   cursor: pointer;
 }
 
-/* ── Segmented control (line width) ── */
+/* ── Segmented control (line width) — icon + label stacked ── */
 .segmented {
   display: flex;
   border: 1px solid var(--border-chip);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 .segBtn {
   flex: 1;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  color: var(--secondary);
-  padding: 7px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 4px 8px;
   cursor: pointer;
   border-right: 1px solid var(--border-chip);
+  color: var(--secondary);
   transition: background var(--transition-micro), color var(--transition-micro);
-  text-align: center;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
 }
 
 .segBtn:last-child {
@@ -185,45 +223,75 @@
 
 .segBtn:hover {
   background: color-mix(in srgb, var(--text) 4%, transparent);
+  color: var(--text);
+}
+
+.segLabel {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.02em;
 }
 
 .segActive {
   background: var(--text);
   color: var(--bg);
-  font-weight: 500;
 }
 
 .segActive:hover {
   background: var(--text);
+  color: var(--bg);
 }
 
-/* ── Circular theme swatches ── */
+/* ── Theme swatches — swatch circle + label ── */
 .swatches {
   display: flex;
-  gap: 10px;
+  gap: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.swatchItem {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 6px;
 }
 
 .swatch {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   cursor: pointer;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease;
   flex-shrink: 0;
-  border: none;
+  border: 1.5px solid transparent;
   padding: 0;
+  display: block;
 }
 
 .swatch:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .swatchActive {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 2px var(--text);
+  transform: scale(1.12);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text);
 }
 
 .swatchActive:hover {
-  transform: scale(1.1);
+  transform: scale(1.12);
+}
+
+.swatchLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+  opacity: 0.5;
+  transition: opacity 120ms ease;
+}
+
+.swatchLabelActive {
+  opacity: 1;
+  color: var(--text);
 }

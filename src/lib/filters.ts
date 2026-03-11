@@ -1,9 +1,14 @@
 import { WorkSummary, FilterState } from '@/types';
 
+// Split a comma-separated filter value into an array of lowercase strings
+function splitFilter(val: string): string[] {
+  return val.split(',').map((v) => v.trim().toLowerCase()).filter(Boolean);
+}
+
 export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSummary[] {
   let result = [...works];
 
-  // Text search across title, author, summary, tags
+  // Text search across title, author, summary, tags, fandom
   if (filters.q) {
     const q = filters.q.toLowerCase();
     result = result.filter((w) => {
@@ -17,14 +22,14 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     });
   }
 
-  // Fandom filter
+  // Fandom filter (single value)
   if (filters.fandom) {
     result = result.filter((w) =>
       w.meta.fandom.some((f) => f.toLowerCase() === filters.fandom!.toLowerCase())
     );
   }
 
-  // Relationship filter — matches any item in relationships[]
+  // Relationship filter
   if (filters.relationship) {
     const rel = filters.relationship.toLowerCase();
     result = result.filter((w) =>
@@ -32,15 +37,15 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     );
   }
 
-  // Tag filter — matches any item in tags[]
+  // Tag filter — comma-sep OR: works must have at least one of the listed tags
   if (filters.tag) {
-    const tag = filters.tag.toLowerCase();
+    const tags = splitFilter(filters.tag);
     result = result.filter((w) =>
-      w.meta.tags.some((t) => t.toLowerCase() === tag)
+      tags.some((tag) => w.meta.tags.some((t) => t.toLowerCase() === tag))
     );
   }
 
-  // Character filter — matches any item in characters[]
+  // Character filter
   if (filters.character) {
     const char = filters.character.toLowerCase();
     result = result.filter((w) =>
@@ -48,25 +53,27 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     );
   }
 
-  // Rating filter
+  // Rating filter — comma-sep OR
   if (filters.rating) {
-    result = result.filter(
-      (w) => w.meta.rating.toLowerCase() === filters.rating!.toLowerCase()
-    );
-  }
-
-  // Status filter
-  if (filters.status) {
-    result = result.filter(
-      (w) => w.meta.status.toLowerCase() === filters.status!.toLowerCase()
-    );
-  }
-
-  // Category filter
-  if (filters.category) {
-    const cat = filters.category.toLowerCase();
+    const ratings = splitFilter(filters.rating);
     result = result.filter((w) =>
-      w.meta.category.some((c) => c.toLowerCase() === cat)
+      ratings.some((r) => w.meta.rating.toLowerCase() === r)
+    );
+  }
+
+  // Status filter — comma-sep OR
+  if (filters.status) {
+    const statuses = splitFilter(filters.status);
+    result = result.filter((w) =>
+      statuses.some((s) => w.meta.status.toLowerCase() === s)
+    );
+  }
+
+  // Category filter — comma-sep OR
+  if (filters.category) {
+    const cats = splitFilter(filters.category);
+    result = result.filter((w) =>
+      cats.some((cat) => w.meta.category.some((c) => c.toLowerCase() === cat))
     );
   }
 
@@ -76,11 +83,11 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     result = result.filter((w) => w.meta.language.toLowerCase() === lang);
   }
 
-  // Warning filter (include only works with this warning)
+  // Warning filter — comma-sep OR: works must have at least one of the listed warnings
   if (filters.warning) {
-    const warn = filters.warning.toLowerCase();
+    const warns = splitFilter(filters.warning);
     result = result.filter((w) =>
-      w.meta.warnings.some((wn) => wn.toLowerCase() === warn)
+      warns.some((warn) => w.meta.warnings.some((wn) => wn.toLowerCase() === warn))
     );
   }
 
@@ -92,7 +99,34 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     result = result.filter((w) => w.meta.words <= filters.maxWords!);
   }
 
-  // ── Exclude filters — remove works that match these values ────────────────
+  // Date filter
+  if (filters.datePreset && filters.datePreset !== 'custom') {
+    const now = Date.now();
+    const msMap: Record<string, number> = {
+      last_week: 7 * 24 * 60 * 60 * 1000,
+      last_month: 30 * 24 * 60 * 60 * 1000,
+      last_year: 365 * 24 * 60 * 60 * 1000,
+    };
+    const cutoffMs = msMap[filters.datePreset];
+    if (cutoffMs) {
+      const cutoff = new Date(now - cutoffMs);
+      result = result.filter((w) => {
+        const updated = new Date(w.meta.updated || w.meta.published);
+        return updated >= cutoff;
+      });
+    }
+  }
+  if (filters.dateFrom) {
+    const from = new Date(filters.dateFrom);
+    result = result.filter((w) => new Date(w.meta.updated || w.meta.published) >= from);
+  }
+  if (filters.dateTo) {
+    const to = new Date(filters.dateTo);
+    result = result.filter((w) => new Date(w.meta.updated || w.meta.published) <= to);
+  }
+
+  // ── Exclude filters ───────────────────────────────────────────────────────
+
   if (filters.exFandom) {
     const ex = filters.exFandom.toLowerCase();
     result = result.filter((w) =>
@@ -106,9 +140,9 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     );
   }
   if (filters.exTag) {
-    const ex = filters.exTag.toLowerCase();
+    const exTags = splitFilter(filters.exTag);
     result = result.filter((w) =>
-      !w.meta.tags.some((t) => t.toLowerCase() === ex)
+      !exTags.some((ex) => w.meta.tags.some((t) => t.toLowerCase() === ex))
     );
   }
   if (filters.exCharacter) {
@@ -118,25 +152,27 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     );
   }
   if (filters.exRating) {
-    result = result.filter(
-      (w) => w.meta.rating.toLowerCase() !== filters.exRating!.toLowerCase()
+    const exRatings = splitFilter(filters.exRating);
+    result = result.filter((w) =>
+      !exRatings.some((r) => w.meta.rating.toLowerCase() === r)
     );
   }
   if (filters.exStatus) {
-    result = result.filter(
-      (w) => w.meta.status.toLowerCase() !== filters.exStatus!.toLowerCase()
+    const exStatuses = splitFilter(filters.exStatus);
+    result = result.filter((w) =>
+      !exStatuses.some((s) => w.meta.status.toLowerCase() === s)
     );
   }
   if (filters.exCategory) {
-    const ex = filters.exCategory.toLowerCase();
+    const exCats = splitFilter(filters.exCategory);
     result = result.filter((w) =>
-      !w.meta.category.some((c) => c.toLowerCase() === ex)
+      !exCats.some((cat) => w.meta.category.some((c) => c.toLowerCase() === cat))
     );
   }
   if (filters.exWarning) {
-    const ex = filters.exWarning.toLowerCase();
+    const exWarns = splitFilter(filters.exWarning);
     result = result.filter((w) =>
-      !w.meta.warnings.some((wn) => wn.toLowerCase() === ex)
+      !exWarns.some((ex) => w.meta.warnings.some((wn) => wn.toLowerCase() === ex))
     );
   }
 
@@ -222,7 +258,6 @@ export interface FeelingData {
 }
 
 export function buildFeelingData(works: WorkSummary[]): FeelingData {
-  // Top trope: most common tag across all works
   const tagMap = new Map<string, number>();
   for (const w of works) {
     w.meta.tags.forEach((t) => tagMap.set(t, (tagMap.get(t) ?? 0) + 1));
@@ -247,7 +282,6 @@ export function buildFeelingData(works: WorkSummary[]): FeelingData {
     topTrope = { name, count, relatedTags };
   }
 
-  // Active fandom: fandom with the most recent update date
   const fandomLastUpdate = new Map<string, string>();
   const fandomCount = new Map<string, number>();
   for (const w of works) {
@@ -265,7 +299,6 @@ export function buildFeelingData(works: WorkSummary[]): FeelingData {
     ? { name: activeFandomEntry[0], count: fandomCount.get(activeFandomEntry[0]) ?? 0 }
     : null;
 
-  // Short works: complete works ≤ 15k words
   const shortCount = works.filter(
     (w) =>
       w.meta.words > 0 &&
@@ -280,25 +313,135 @@ export function buildFeelingData(works: WorkSummary[]): FeelingData {
 export interface SearchOptions {
   tags: SearchOption[];
   fandoms: SearchOption[];
+  authors?: SearchOption[];
+  characters?: SearchOption[];
+  relationships?: SearchOption[];
+  titles?: { title: string; slug: string }[];
 }
 
 export function buildSearchOptions(works: WorkSummary[]): SearchOptions {
   const tagMap = new Map<string, number>();
   const fandomMap = new Map<string, number>();
+  const authorMap = new Map<string, number>();
+  const charMap = new Map<string, number>();
+  const relMap = new Map<string, number>();
 
   for (const w of works) {
     w.meta.tags.forEach((t) => tagMap.set(t, (tagMap.get(t) ?? 0) + 1));
     w.meta.fandom.forEach((f) => fandomMap.set(f, (fandomMap.get(f) ?? 0) + 1));
+    if (w.meta.author) authorMap.set(w.meta.author, (authorMap.get(w.meta.author) ?? 0) + 1);
+    w.meta.characters.forEach((c) => charMap.set(c, (charMap.get(c) ?? 0) + 1));
+    w.meta.relationships.forEach((r) => relMap.set(r, (relMap.get(r) ?? 0) + 1));
   }
 
-  const tags = Array.from(tagMap.entries())
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 24);
+  const toSorted = (map: Map<string, number>, limit: number): SearchOption[] =>
+    Array.from(map.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
 
-  const fandoms = Array.from(fandomMap.entries())
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+  return {
+    tags: toSorted(tagMap, 24),
+    fandoms: toSorted(fandomMap, 50),
+    authors: toSorted(authorMap, 12),
+    characters: toSorted(charMap, 12),
+    relationships: toSorted(relMap, 12),
+    titles: works.map((w) => ({ title: w.meta.title, slug: w.slug })),
+  };
+}
 
-  return { tags, fandoms };
+// ── Vibe engine ────────────────────────────────────────────────────────────
+
+interface VibeRule {
+  kw: string[];
+  tags?: string[];
+  exTags?: string[];
+  warnings?: string[];
+  exWarnings?: string[];
+  ratings?: string[];
+  maxWords?: number;
+  desc: string;
+}
+
+const VIBE_RULES: VibeRule[] = [
+  {
+    kw: ['cozy', 'comfort', 'soft', 'fluffy', 'warm', 'gentle', 'wholesome'],
+    tags: ['Fluff', 'Hurt/Comfort', 'Happy Ending'],
+    exWarnings: ['Major Character Death'],
+    desc: 'cozy comfort',
+  },
+  {
+    kw: ['slow burn', 'slowburn', 'slow-burn', 'pining', 'ust', 'tension', 'longing', 'yearning'],
+    tags: ['Slow Burn', 'Pining'],
+    desc: 'slow burn',
+  },
+  {
+    kw: ['angst', 'dark', 'sad', 'tragedy', 'hurt', 'angsty', 'grief', 'devastat'],
+    tags: ['Angst'],
+    ratings: ['Mature'],
+    desc: 'angst / dark',
+  },
+  {
+    kw: ['funny', 'humor', 'humour', 'crack', 'comedy', 'laugh', 'lighthearted', 'light-hearted'],
+    tags: ['Humor', 'Crack'],
+    ratings: ['General Audiences', 'Teen And Up Audiences'],
+    desc: 'humor / crack',
+  },
+  {
+    kw: ['enemies', 'rivals', 'hate to love', 'antagonist'],
+    tags: ['Enemies to Lovers'],
+    desc: 'enemies to lovers',
+  },
+  {
+    kw: ['short', 'quick', 'one-shot', 'oneshot', 'fast', 'brief'],
+    maxWords: 15000,
+    desc: 'short read (< 15k words)',
+  },
+  {
+    kw: ['no death', 'no major death', 'nobody dies', 'safe', 'no character death'],
+    exWarnings: ['Major Character Death'],
+    desc: 'no major deaths',
+  },
+  {
+    kw: ['found family', 'family', 'ensemble', 'team', 'squad'],
+    tags: ['Found Family'],
+    desc: 'found family',
+  },
+];
+
+export interface VibeResult {
+  filters: Partial<FilterState>;
+  desc: string;
+  pills: { label: string; mode: 'include' | 'exclude' }[];
+}
+
+export function buildVibeFilters(query: string): VibeResult | null {
+  const q = query.toLowerCase();
+  const matched = VIBE_RULES.filter((rule) => rule.kw.some((kw) => q.includes(kw)));
+  if (matched.length === 0) return null;
+
+  const filters: Partial<FilterState> = {};
+  const descs: string[] = [];
+  const pills: VibeResult['pills'] = [];
+
+  const incTags = new Set<string>();
+  const exTagsSet = new Set<string>();
+  const exWarns = new Set<string>();
+  const incRatings = new Set<string>();
+
+  for (const rule of matched) {
+    descs.push(rule.desc);
+    rule.tags?.forEach((t) => { incTags.add(t); pills.push({ label: t, mode: 'include' }); });
+    rule.exTags?.forEach((t) => { exTagsSet.add(t); pills.push({ label: t, mode: 'exclude' }); });
+    rule.exWarnings?.forEach((w) => { exWarns.add(w); pills.push({ label: w, mode: 'exclude' }); });
+    rule.ratings?.forEach((r) => incRatings.add(r));
+    if (rule.maxWords) filters.maxWords = rule.maxWords;
+  }
+
+  if (incTags.size > 0) filters.tag = Array.from(incTags).join(',');
+  if (exTagsSet.size > 0) filters.exTag = Array.from(exTagsSet).join(',');
+  if (exWarns.size > 0) filters.exWarning = Array.from(exWarns).join(',');
+  if (incRatings.size > 0) filters.rating = Array.from(incRatings).join(',');
+
+  return { filters, desc: descs.join(', '), pills };
 }

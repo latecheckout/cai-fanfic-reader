@@ -1,59 +1,52 @@
-/* ============================================================
-   CHAPTER COMMENTS — Collapsed comment thread after each chapter
-   Shows 2 preview comments; expands on click
-   ============================================================ */
-
-.container {
-  max-width: var(--reader-line-width);
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-6) var(--space-10);
-  border-top: 1px solid var(--border);
+/* ── Full-width tinted zone ─────────────────────────────────────────── */
+.zone {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  background: color-mix(in srgb, var(--text) 3.5%, var(--bg));
+  padding: 40px 0 64px;
+  margin-top: 24px;
 }
 
+.inner {
+  max-width: var(--reader-line-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+/* ── Comments header ────────────────────────────────────────────────── */
 .header {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  opacity: 0.6;
   margin-bottom: var(--space-5);
 }
 
-.headerLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--secondary);
-  opacity: 0.7;
-}
-
-/* ── Comment items ── */
-.commentList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
+/* ── Individual comment ─────────────────────────────────────────────── */
 .comment {
   display: flex;
   gap: var(--space-3);
-  align-items: flex-start;
+  padding: var(--space-3) 0;
 }
 
-.reply {
-  margin-top: var(--space-3);
+.comment + .comment {
+  border-top: 1px solid var(--border);
 }
 
-.commentAvatar {
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+.avatar {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--text) 8%, transparent);
-  color: var(--secondary);
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 500;
+  background: color-mix(in srgb, var(--text) 10%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--secondary);
+  flex-shrink: 0;
 }
 
 .commentBody {
@@ -65,101 +58,155 @@
   display: flex;
   align-items: baseline;
   gap: var(--space-2);
-  margin-bottom: 4px;
-  flex-wrap: wrap;
+  margin-bottom: var(--space-1);
 }
 
-.commentAuthor {
+.author {
   font-family: var(--font-sans);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text);
 }
 
-.authorBadge {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--bg);
-  background: var(--text);
-  padding: 1px 5px;
-  border-radius: 2px;
-}
-
-.commentDate {
+.date {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--secondary);
   opacity: 0.6;
 }
 
-.commentText {
+.text {
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.55;
   color: var(--text);
-  margin: 0 0 var(--space-2);
+  opacity: 0.85;
 }
 
 .commentActions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
-.commentLikes {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--secondary);
-  opacity: 0.6;
-}
-
-.repliesToggle {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--secondary);
+.likeBtn {
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  opacity: 0.6;
-  transition: opacity 100ms;
-}
-
-.repliesToggle:hover {
-  opacity: 1;
-}
-
-/* ── Replies container ── */
-.repliesContainer {
-  margin-top: var(--space-3);
-  padding-left: var(--space-4);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-/* ── Show more button ── */
-.showMore {
-  margin-top: var(--space-5);
-  display: block;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--secondary);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 120ms;
+}
+.likeBtn:hover { opacity: 1; }
+
+.replyToggle {
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+  opacity: 0.5;
   text-decoration: underline;
   text-underline-offset: 2px;
-  opacity: 0.6;
-  transition: opacity 100ms;
+  transition: opacity 120ms;
+}
+.replyToggle:hover { opacity: 0.8; }
+
+/* ── Replies (indented) ─────────────────────────────────────────────── */
+.replies {
+  margin-top: var(--space-2);
+  margin-left: calc(28px + var(--space-3));
+  border-left: 2px solid var(--border);
+  padding-left: var(--space-3);
 }
 
-.showMore:hover {
+/* ── Show more ──────────────────────────────────────────────────────── */
+.showMore {
+  background: none;
+  border: none;
+  padding: var(--space-3) 0 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+  opacity: 0.55;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 120ms;
+}
+.showMore:hover { opacity: 0.85; }
+
+/* ── Empty state ────────────────────────────────────────────────────── */
+.emptyState {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+  opacity: 0.4;
+  text-align: center;
+  padding: 28px 0 12px;
+}
+
+/* ── Comment form ───────────────────────────────────────────────────── */
+.commentForm {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.commentInput {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  color: var(--text);
+  resize: none;
+  min-height: 80px;
+  transition: border-color 150ms ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+.commentInput:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+.commentInput::placeholder {
+  color: var(--secondary);
+  opacity: 0.5;
+}
+
+.commentSubmit {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 8px 20px;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.7;
+  transition: opacity 120ms, background 120ms;
+}
+.commentSubmit:hover {
   opacity: 1;
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+}
+.commentSubmit:disabled {
+  opacity: 0.3;
+  cursor: default;
 }

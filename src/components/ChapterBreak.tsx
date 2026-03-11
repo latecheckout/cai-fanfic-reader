@@ -6,9 +6,6 @@ interface Props {
 
 export function ChapterBreak({ chapterNumber }: Props) {
   return (
-    <div className={styles.break} aria-hidden="true">
-      <hr className={styles.rule} />
-      <p className={styles.chapterEndLabel}>End of Chapter {chapterNumber}</p>
-    </div>
+    <div className={styles.break} aria-hidden="true" />
   );
 }

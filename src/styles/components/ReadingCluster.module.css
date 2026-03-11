@@ -151,6 +151,11 @@
   justify-content: center;
 }
 
+/* ── Hide internal prefs pill — ReadingActions button handles it ── */
+.prefsBubbleHidden {
+  display: none;
+}
+
 /* Slider icon — rotates 45° when prefs panel is open */
 .sliderIcon {
   transition: transform 200ms ease;
@@ -164,16 +169,21 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 100;
   opacity: 0;
   pointer-events: none;
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  /* No backdrop-filter — it creates compositor stacking issues that can obscure panels */
   transition: opacity 280ms ease;
 }
 
 .backdrop[data-visible="true"] {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* Fade backdrop fully away while dragging font slider — lets user see text */
+.backdrop[data-dragging] {
+  opacity: 0 !important;
+  transition: opacity 160ms ease;
 }

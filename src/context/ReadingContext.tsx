@@ -13,6 +13,16 @@ interface ReadingContextValue {
   registerChapter: (i: number, el: HTMLElement | null) => void;
   scrollToChapter: (i: number) => void;
   slug: string;
+
+  // ── Prefs panel wiring — allows ReadingActions to trigger prefs morph ──────
+  /** Ref to the external prefs button in ReadingActions. ReadingActions sets this. */
+  externalPrefsRef: React.RefObject<HTMLButtonElement | null>;
+  /** Ref to the toggle fn registered by ReadingCluster. Call to open/close prefs panel. */
+  prefsToggleFnRef: React.MutableRefObject<(() => void) | null>;
+
+  // ── Last read position — set by ChapterList on mount ──────────────────────
+  lastReadChapterIndex: number | null;
+  setLastReadChapterIndex: (i: number | null) => void;
 }
 
 const ReadingContext = createContext<ReadingContextValue | null>(null);
@@ -33,7 +43,12 @@ export function ReadingProvider({
   children,
 }: Props) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
+  const [lastReadChapterIndex, setLastReadChapterIndex] = useState<number | null>(null);
   const chapterRefsMap = useRef<Map<number, HTMLElement>>(new Map());
+
+  // Prefs wiring refs — identity never changes, no re-renders on write
+  const externalPrefsRef = useRef<HTMLButtonElement | null>(null);
+  const prefsToggleFnRef = useRef<(() => void) | null>(null);
 
   const registerChapter = useCallback((i: number, el: HTMLElement | null) => {
     if (el) {
@@ -64,6 +79,10 @@ export function ReadingProvider({
         registerChapter,
         scrollToChapter,
         slug,
+        externalPrefsRef,
+        prefsToggleFnRef,
+        lastReadChapterIndex,
+        setLastReadChapterIndex,
       }}
     >
       {children}

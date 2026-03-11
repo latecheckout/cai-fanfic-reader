@@ -6,22 +6,30 @@ export function ThemeScript() {
   const script = `
 (function() {
   try {
-    var theme = localStorage.getItem('fanfic-theme') || 'light';
+    var root = document.documentElement;
+    var readerTheme = localStorage.getItem('fanfic-reader-theme');
+    if (readerTheme && readerTheme !== 'default') {
+      root.setAttribute('data-theme', readerTheme);
+    } else {
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        var current = localStorage.getItem('fanfic-reader-theme');
+        if (!current || current === 'default') {
+          document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+      });
+    }
     var font = localStorage.getItem('fanfic-font') || 'serif';
     var fontSize = localStorage.getItem('fanfic-font-size') || '19';
     var lineWidth = localStorage.getItem('fanfic-line-width');
-    var root = document.documentElement;
-    root.setAttribute('data-theme', theme);
     root.setAttribute('data-font', font);
     root.style.setProperty('--font-size-body', fontSize + 'px');
     if (lineWidth) {
-      var widthMap = {
-        narrow: 'var(--line-width-narrow)',
-        default: 'var(--line-width-default)',
-        wide: 'var(--line-width-wide)'
-      };
-      var resolved = widthMap[lineWidth];
-      if (resolved) root.style.setProperty('--reader-line-width', resolved);
+      var m = {narrow:'var(--line-width-narrow)',default:'var(--line-width-default)',wide:'var(--line-width-wide)'};
+      if (m[lineWidth]) root.style.setProperty('--reader-line-width', m[lineWidth]);
     }
   } catch(e) {}
 })();

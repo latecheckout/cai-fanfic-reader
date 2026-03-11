@@ -16,24 +16,21 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
   const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
-    <div className={`${styles.comment} ${depth > 0 ? styles.reply : ''}`}>
-      <div className={styles.commentAvatar} aria-hidden="true">
+    <div className={styles.comment}>
+      <div className={styles.avatar} aria-hidden="true">
         {comment.author[0].toUpperCase()}
       </div>
       <div className={styles.commentBody}>
         <div className={styles.commentMeta}>
-          <span className={styles.commentAuthor}>{comment.author}</span>
-          {comment.isAuthor && (
-            <span className={styles.authorBadge}>Author</span>
-          )}
-          <span className={styles.commentDate}>{comment.timestamp}</span>
+          <span className={styles.author}>{comment.author}</span>
+          <span className={styles.date}>{comment.timestamp}</span>
         </div>
-        <p className={styles.commentText}>{comment.text}</p>
+        <p className={styles.text}>{comment.text}</p>
         <div className={styles.commentActions}>
-          <span className={styles.commentLikes}>♥ {comment.likes.toLocaleString()}</span>
+          <span className={styles.likeBtn}>♥ {comment.likes.toLocaleString()}</span>
           {hasReplies && (
             <button
-              className={styles.repliesToggle}
+              className={styles.replyToggle}
               onClick={() => setRepliesOpen((o) => !o)}
               aria-expanded={repliesOpen}
             >
@@ -44,7 +41,7 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
           )}
         </div>
         {hasReplies && repliesOpen && (
-          <div className={styles.repliesContainer}>
+          <div className={styles.replies}>
             {comment.replies!.map((reply) => (
               <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
             ))}
@@ -57,45 +54,90 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
 
 export function ChapterComments({ slug, chapterIndex }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const allComments = getComments(slug, chapterIndex);
+  const [localComments, setLocalComments] = useState<Comment[]>([]);
+  const [commentText, setCommentText] = useState('');
 
-  // No comments for this chapter — render nothing
-  if (allComments.length === 0) return null;
-
+  const seededComments = getComments(slug, chapterIndex);
+  const allComments = [...seededComments, ...localComments];
   const visibleComments = expanded ? allComments : allComments.slice(0, PREVIEW_COUNT);
   const hiddenCount = allComments.length - PREVIEW_COUNT;
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const text = commentText.trim();
+    if (!text) return;
+    const newComment: Comment = {
+      id: `local-${Date.now()}`,
+      author: 'you',
+      text,
+      timestamp: 'just now',
+      likes: 0,
+    };
+    setLocalComments((prev) => [...prev, newComment]);
+    setCommentText('');
+    if (!expanded && allComments.length >= PREVIEW_COUNT) {
+      setExpanded(true);
+    }
+  }
+
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <span className={styles.headerLabel}>
-          {allComments.length} {allComments.length === 1 ? 'comment' : 'comments'}
-        </span>
+    <div className={styles.zone}>
+      <div className={styles.inner}>
+        <div className={styles.header}>
+          <span>
+            {allComments.length === 0
+              ? 'comments'
+              : `${allComments.length} ${allComments.length === 1 ? 'comment' : 'comments'}`}
+          </span>
+        </div>
+
+        {allComments.length === 0 ? (
+          <p className={styles.emptyState}>· be the first to comment ·</p>
+        ) : (
+          <div>
+            {visibleComments.map((comment) => (
+              <CommentItem key={comment.id} comment={comment} />
+            ))}
+          </div>
+        )}
+
+        {!expanded && hiddenCount > 0 && (
+          <button
+            className={styles.showMore}
+            onClick={() => setExpanded(true)}
+          >
+            Show {hiddenCount} more {hiddenCount === 1 ? 'comment' : 'comments'}
+          </button>
+        )}
+
+        {expanded && allComments.length > PREVIEW_COUNT && (
+          <button
+            className={styles.showMore}
+            onClick={() => setExpanded(false)}
+          >
+            Show less
+          </button>
+        )}
+
+        {/* Add comment form — always visible */}
+        <form className={styles.commentForm} onSubmit={handleSubmit}>
+          <textarea
+            className={styles.commentInput}
+            placeholder="Leave a comment..."
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            rows={3}
+            aria-label="Write a comment"
+          />
+          <button
+            type="submit"
+            className={styles.commentSubmit}
+            disabled={!commentText.trim()}
+          >
+            Post
+          </button>
+        </form>
       </div>
-
-      <div className={styles.commentList}>
-        {visibleComments.map((comment) => (
-          <CommentItem key={comment.id} comment={comment} />
-        ))}
-      </div>
-
-      {!expanded && hiddenCount > 0 && (
-        <button
-          className={styles.showMore}
-          onClick={() => setExpanded(true)}
-        >
-          Show {hiddenCount} more {hiddenCount === 1 ? 'comment' : 'comments'}
-        </button>
-      )}
-
-      {expanded && allComments.length > PREVIEW_COUNT && (
-        <button
-          className={styles.showMore}
-          onClick={() => setExpanded(false)}
-        >
-          Show less
-        </button>
-      )}
     </div>
   );
 }
