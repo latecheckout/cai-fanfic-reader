@@ -51,6 +51,20 @@ const RATING_LABELS: Record<string, string> = {
   'Explicit': 'E',
   'Not Rated': 'NR',
 };
+const RATING_KEYS: Record<string, string> = {
+  'General Audiences': 'g',
+  'Teen And Up Audiences': 't',
+  'Mature': 'm',
+  'Explicit': 'e',
+  'Not Rated': 'nr',
+};
+const RATING_SHORT_NAMES: Record<string, string> = {
+  'General Audiences': 'General',
+  'Teen And Up Audiences': 'Teen+',
+  'Mature': 'Mature',
+  'Explicit': 'Explicit',
+  'Not Rated': 'Not Rated',
+};
 const CATEGORIES = ['F/F', 'F/M', 'Gen', 'M/M', 'Multi', 'Other'];
 const STATUSES = ['Complete', 'In Progress'];
 const WARNINGS = [
@@ -159,9 +173,17 @@ export function FilterPanel({
   const [presets, setPresets] = useState<Preset[]>([]);
   const [saveFormOpen, setSaveFormOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
-  // Save bar (appears inline next to "clear all")
+  // Inline save bar
   const [saveBarOpen, setSaveBarOpen] = useState(false);
   const [saveBarName, setSaveBarName] = useState('');
+  // Flip animation
+  const [flippedPills, setFlippedPills] = useState<Set<string>>(new Set());
+  // Custom expanders
+  const [wordsCustomOpen, setWordsCustomOpen] = useState(false);
+  const [dateCustomOpen, setDateCustomOpen] = useState(false);
+  // Saved filters polish
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [deletingIdx, setDeletingIdx] = useState<number | null>(null);
   const wordDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync word inputs with URL params
@@ -191,6 +213,37 @@ export function FilterPanel({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Pre-open custom expanders if custom values already in URL
+  useEffect(() => {
+    const hasCustomWords = !!(currentFilters.min_words || currentFilters.max_words);
+    const isWordPreset = WORD_PRESETS.some(
+      (p) =>
+        String(p.min ?? '') === (currentFilters.min_words ?? '') &&
+        String(p.max ?? '') === (currentFilters.max_words ?? '')
+    );
+    if (hasCustomWords && !isWordPreset) setWordsCustomOpen(true);
+
+    const hasCustomDate = !!(currentFilters.date_from || currentFilters.date_to);
+    if (hasCustomDate) setDateCustomOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Click-away handler for drawer (desktop — no backdrop)
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const handler = (e: MouseEvent) => {
+      const drawer = document.querySelector('[data-filter-drawer]');
+      if (drawer && !drawer.contains(e.target as Node)) {
+        setDrawerOpen(false);
+      }
+    };
+    const t = setTimeout(() => document.addEventListener('mousedown', handler), 100);
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener('mousedown', handler);
+    };
+  }, [drawerOpen]);
 
   // F key toggles drawer; Esc closes drawer
   useEffect(() => {
@@ -240,8 +293,20 @@ export function FilterPanel({
     (value: string, incKey: string, exKey: string) => {
       const cf = currentFilters as Record<string, string | undefined>;
       const state = getPillState(value, cf[incKey], cf[exKey]);
-      const params = new URLSearchParams(searchParams.toString());
 
+      // Trigger flip animation on include → exclude
+      if (state === 'include') {
+        setFlippedPills((prev) => new Set([...prev, value]));
+        setTimeout(() => {
+          setFlippedPills((prev) => {
+            const n = new Set(prev);
+            n.delete(value);
+            return n;
+          });
+        }, 220);
+      }
+
+      const params = new URLSearchParams(searchParams.toString());
       if (state === 'neutral') {
         params.set(incKey, addToCommaList(cf[incKey], value));
       } else if (state === 'include') {
@@ -257,6 +322,16 @@ export function FilterPanel({
       router.push(`/?${params.toString()}`);
     },
     [router, searchParams, currentFilters]
+  );
+
+  // Section-level clear
+  const clearSection = useCallback(
+    (keys: string[]) => {
+      const params = new URLSearchParams(searchParams.toString());
+      keys.forEach((k) => params.delete(k));
+      router.push(`/?${params.toString()}`);
+    },
+    [router, searchParams]
   );
 
   // Word count presets
@@ -334,6 +409,14 @@ export function FilterPanel({
     savePresetsToStorage(updated);
   };
 
+  const handleDeletePreset = (idx: number) => {
+    setDeletingIdx(idx);
+    setTimeout(() => {
+      deletePreset(idx);
+      setDeletingIdx(null);
+    }, 200);
+  };
+
   const toggleDefault = (idx: number) => {
     const updated = presets.map((p, i) => ({
       ...p,
@@ -346,6 +429,8 @@ export function FilterPanel({
   const applyPreset = (preset: Preset) => {
     router.push(`/?${preset.params}`);
     setDrawerOpen(false);
+    setToastMessage(`'${preset.name}' loaded`);
+    setTimeout(() => setToastMessage(null), 2000);
   };
 
   const clearAll = () => router.push('/');
@@ -361,29 +446,43 @@ export function FilterPanel({
     currentFilters.date_preset || currentFilters.date_from || currentFilters.date_to
   );
 
+  // Active filter count for badge
+  const activeFilterCount = [
+    currentFilters.fandom, currentFilters.relationship, currentFilters.tag,
+    currentFilters.character, currentFilters.rating, currentFilters.status,
+    currentFilters.category, currentFilters.warning, currentFilters.q,
+    currentFilters.min_words, currentFilters.max_words, currentFilters.date_preset,
+    currentFilters.date_from, currentFilters.date_to,
+    currentFilters.ex_fandom, currentFilters.ex_tag, currentFilters.ex_relationship,
+    currentFilters.ex_character, currentFilters.ex_rating, currentFilters.ex_status,
+    currentFilters.ex_category, currentFilters.ex_warning,
+  ].filter(Boolean).length;
+
   const currentSortValue = `${currentFilters.sort ?? 'updated'}:${currentFilters.order ?? 'desc'}`;
 
   // Build active/exclude pills for bar display
-  const activePills: { key: string; label: string }[] = [];
-  if (currentFilters.fandom) activePills.push({ key: 'fandom', label: currentFilters.fandom });
-  if (currentFilters.relationship) activePills.push({ key: 'relationship', label: currentFilters.relationship });
-  if (currentFilters.tag) activePills.push({ key: 'tag', label: currentFilters.tag });
-  if (currentFilters.character) activePills.push({ key: 'character', label: currentFilters.character });
-  if (currentFilters.rating) activePills.push({ key: 'rating', label: currentFilters.rating });
-  if (currentFilters.status) activePills.push({ key: 'status', label: currentFilters.status });
-  if (currentFilters.category) activePills.push({ key: 'category', label: currentFilters.category });
-  if (currentFilters.warning) activePills.push({ key: 'warning', label: currentFilters.warning });
-  if (currentFilters.q) activePills.push({ key: 'q', label: `"${currentFilters.q}"` });
+  const activePills: { key: string; label: string; isExclude: boolean }[] = [];
+  if (currentFilters.fandom) activePills.push({ key: 'fandom', label: currentFilters.fandom, isExclude: false });
+  if (currentFilters.relationship) activePills.push({ key: 'relationship', label: currentFilters.relationship, isExclude: false });
+  if (currentFilters.tag) activePills.push({ key: 'tag', label: currentFilters.tag, isExclude: false });
+  if (currentFilters.character) activePills.push({ key: 'character', label: currentFilters.character, isExclude: false });
+  if (currentFilters.rating) activePills.push({ key: 'rating', label: currentFilters.rating, isExclude: false });
+  if (currentFilters.status) activePills.push({ key: 'status', label: currentFilters.status, isExclude: false });
+  if (currentFilters.category) activePills.push({ key: 'category', label: currentFilters.category, isExclude: false });
+  if (currentFilters.warning) activePills.push({ key: 'warning', label: currentFilters.warning, isExclude: false });
+  if (currentFilters.q) activePills.push({ key: 'q', label: `"${currentFilters.q}"`, isExclude: false });
+  if (currentFilters.ex_fandom) activePills.push({ key: 'ex_fandom', label: currentFilters.ex_fandom, isExclude: true });
+  if (currentFilters.ex_tag) activePills.push({ key: 'ex_tag', label: currentFilters.ex_tag, isExclude: true });
+  if (currentFilters.ex_relationship) activePills.push({ key: 'ex_relationship', label: currentFilters.ex_relationship, isExclude: true });
+  if (currentFilters.ex_character) activePills.push({ key: 'ex_character', label: currentFilters.ex_character, isExclude: true });
+  if (currentFilters.ex_rating) activePills.push({ key: 'ex_rating', label: currentFilters.ex_rating, isExclude: true });
+  if (currentFilters.ex_status) activePills.push({ key: 'ex_status', label: currentFilters.ex_status, isExclude: true });
+  if (currentFilters.ex_category) activePills.push({ key: 'ex_category', label: currentFilters.ex_category, isExclude: true });
+  if (currentFilters.ex_warning) activePills.push({ key: 'ex_warning', label: currentFilters.ex_warning, isExclude: true });
 
-  const excludePills: { key: string; label: string }[] = [];
-  if (currentFilters.ex_fandom) excludePills.push({ key: 'ex_fandom', label: currentFilters.ex_fandom });
-  if (currentFilters.ex_tag) excludePills.push({ key: 'ex_tag', label: currentFilters.ex_tag });
-  if (currentFilters.ex_relationship) excludePills.push({ key: 'ex_relationship', label: currentFilters.ex_relationship });
-  if (currentFilters.ex_character) excludePills.push({ key: 'ex_character', label: currentFilters.ex_character });
-  if (currentFilters.ex_rating) excludePills.push({ key: 'ex_rating', label: currentFilters.ex_rating });
-  if (currentFilters.ex_status) excludePills.push({ key: 'ex_status', label: currentFilters.ex_status });
-  if (currentFilters.ex_category) excludePills.push({ key: 'ex_category', label: currentFilters.ex_category });
-  if (currentFilters.ex_warning) excludePills.push({ key: 'ex_warning', label: currentFilters.ex_warning });
+  // Chip overflow: show max 3, then "+N more"
+  const visiblePills = activePills.slice(0, 3);
+  const overflowCount = activePills.length - 3;
 
   // Active word preset detection
   const activeWordPreset = WORD_PRESETS.find(
@@ -395,12 +494,28 @@ export function FilterPanel({
   return (
     <>
       <div className={styles.bar}>
-        {/* Left: active pills + add/clear */}
+        {/* Left: Filters button + active chips + clear/save */}
         <div className={styles.barLeft}>
-          {activePills.map((pill) => (
+          {/* Solid filter button — peers with sort */}
+          <button
+            className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open filters"
+          >
+            <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true">
+              <path d="M1 1.5h10M3 5h6M5 8.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            Filters
+            {activeFilterCount > 0 && (
+              <span className={styles.filterBtnCount}>· {activeFilterCount}</span>
+            )}
+          </button>
+
+          {/* Active chip pills (max 3) */}
+          {visiblePills.map((pill) => (
             <button
               key={pill.key}
-              className={styles.pill}
+              className={`${styles.pill} ${pill.isExclude ? styles.excludePill : ''}`}
               onClick={() => updateFilter(pill.key, '')}
               title={`Remove filter: ${pill.label}`}
             >
@@ -408,24 +523,18 @@ export function FilterPanel({
               <span className={styles.pillX} aria-hidden="true">×</span>
             </button>
           ))}
-          {excludePills.map((pill) => (
+
+          {/* Overflow chip */}
+          {overflowCount > 0 && (
             <button
-              key={pill.key}
-              className={`${styles.pill} ${styles.excludePill}`}
-              onClick={() => updateFilter(pill.key, '')}
-              title={`Remove exclude filter: ${pill.label}`}
+              className={`${styles.pill} ${styles.pillOverflow}`}
+              onClick={() => setDrawerOpen(true)}
+              aria-label={`${overflowCount} more filters`}
             >
-              {pill.label}
-              <span className={styles.pillX} aria-hidden="true">×</span>
+              +{overflowCount} more
             </button>
-          ))}
-          <button
-            className={styles.addFilterBtn}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Add filter"
-          >
-            + filter
-          </button>
+          )}
+
           {hasActiveFilters && (
             <>
               <button className={styles.clearAllBtn} onClick={clearAll}>
@@ -470,7 +579,7 @@ export function FilterPanel({
           )}
         </div>
 
-        {/* Right: view toggle + count + sort */}
+        {/* Right: view toggle + rolling count + sort */}
         <div className={styles.barRight}>
           {onViewChange && (
             <div className={styles.viewToggle} aria-label="View layout">
@@ -504,9 +613,11 @@ export function FilterPanel({
             </div>
           )}
           <span className={styles.workCount}>
-            {filteredCount === totalCount
-              ? `${totalCount} works`
-              : `${filteredCount} of ${totalCount}`}
+            <span key={filteredCount} className={styles.countRoll}>
+              {filteredCount === totalCount
+                ? `${totalCount} works`
+                : `${filteredCount} of ${totalCount}`}
+            </span>
           </span>
           <CustomSelect
             value={currentSortValue}
@@ -516,15 +627,23 @@ export function FilterPanel({
         </div>
       </div>
 
-      {/* Filter Drawer — right-side slide panel */}
+      {/* Filter Drawer — right-side slide panel, non-blocking on desktop */}
       {drawerOpen && (
         <>
+          {/* Backdrop: transparent on desktop (click-away), dimmed on mobile */}
           <div
             className={styles.drawerBackdrop}
             onClick={() => setDrawerOpen(false)}
             aria-hidden="true"
           />
-          <div className={styles.drawer} role="dialog" aria-label="Filter options">
+          <div
+            className={styles.drawer}
+            data-filter-drawer
+            role="dialog"
+            aria-label="Filter options"
+          >
+            {/* Drag handle (mobile only) */}
+            <div className={styles.dragHandle} aria-hidden="true" />
 
             {/* Header */}
             <div className={styles.drawerHeader}>
@@ -541,20 +660,36 @@ export function FilterPanel({
             {/* Scrollable body */}
             <div className={styles.drawerBody}>
 
-              {/* Rating */}
+              {/* Rating — cards with per-tier color fill */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Rating</span>
-                <div className={styles.drawerPills}>
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Rating</span>
+                  {(currentFilters.rating || currentFilters.ex_rating) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => clearSection(['rating', 'ex_rating'])}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className={styles.ratingCards}>
                   {RATINGS.map((r) => {
                     const state = getPillState(r, currentFilters.rating, currentFilters.ex_rating);
+                    const ratingKey = RATING_KEYS[r];
                     return (
                       <button
                         key={r}
-                        className={`${styles.dPill} ${state === 'include' ? styles.dPillInclude : state === 'exclude' ? styles.dPillExclude : ''}`}
+                        className={`${styles.ratingCard} ${
+                          state === 'include' ? styles.ratingCardInclude :
+                          state === 'exclude' ? styles.ratingCardExclude : ''
+                        } ${flippedPills.has(r) ? styles.dPillFlipping : ''}`}
+                        data-rating={ratingKey}
                         onClick={() => cyclePill(r, 'rating', 'ex_rating')}
                         title={state === 'neutral' ? `Include: ${r}` : state === 'include' ? `Exclude: ${r}` : `Remove: ${r}`}
                       >
-                        {RATING_LABELS[r] ?? r}
+                        <span className={styles.ratingCardLetter}>{RATING_LABELS[r]}</span>
+                        <span className={styles.ratingCardName}>{RATING_SHORT_NAMES[r]}</span>
                       </button>
                     );
                   })}
@@ -563,14 +698,30 @@ export function FilterPanel({
 
               {/* Warnings */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Warnings</span>
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Warnings</span>
+                  {(currentFilters.warning || currentFilters.ex_warning) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => clearSection(['warning', 'ex_warning'])}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <p className={styles.warningsNote}>
+                  Selecting a warning includes works tagged with it.
+                </p>
                 <div className={styles.drawerPills}>
                   {WARNINGS.map((w) => {
                     const state = getPillState(w, currentFilters.warning, currentFilters.ex_warning);
                     return (
                       <button
                         key={w}
-                        className={`${styles.dPill} ${state === 'include' ? styles.dPillInclude : state === 'exclude' ? styles.dPillExclude : ''}`}
+                        className={`${styles.dPill} ${
+                          state === 'include' ? styles.dPillInclude :
+                          state === 'exclude' ? styles.dPillExclude : ''
+                        } ${flippedPills.has(w) ? styles.dPillFlipping : ''}`}
                         onClick={() => cyclePill(w, 'warning', 'ex_warning')}
                       >
                         {WARNING_LABELS[w] ?? w}
@@ -582,14 +733,27 @@ export function FilterPanel({
 
               {/* Category */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Category</span>
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Category</span>
+                  {(currentFilters.category || currentFilters.ex_category) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => clearSection(['category', 'ex_category'])}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
                 <div className={styles.drawerPills}>
                   {CATEGORIES.map((c) => {
                     const state = getPillState(c, currentFilters.category, currentFilters.ex_category);
                     return (
                       <button
                         key={c}
-                        className={`${styles.dPill} ${state === 'include' ? styles.dPillInclude : state === 'exclude' ? styles.dPillExclude : ''}`}
+                        className={`${styles.dPill} ${
+                          state === 'include' ? styles.dPillInclude :
+                          state === 'exclude' ? styles.dPillExclude : ''
+                        } ${flippedPills.has(c) ? styles.dPillFlipping : ''}`}
                         onClick={() => cyclePill(c, 'category', 'ex_category')}
                       >
                         {c}
@@ -599,19 +763,34 @@ export function FilterPanel({
                 </div>
               </div>
 
-              {/* Status */}
+              {/* Status — cards */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Status</span>
-                <div className={styles.drawerPills}>
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Status</span>
+                  {(currentFilters.status || currentFilters.ex_status) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => clearSection(['status', 'ex_status'])}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <div className={styles.statusCards}>
                   {STATUSES.map((s) => {
                     const state = getPillState(s, currentFilters.status, currentFilters.ex_status);
                     return (
                       <button
                         key={s}
-                        className={`${styles.dPill} ${state === 'include' ? styles.dPillInclude : state === 'exclude' ? styles.dPillExclude : ''}`}
+                        className={`${styles.statusCard} ${
+                          state === 'include' ? styles.statusCardInclude :
+                          state === 'exclude' ? styles.statusCardExclude : ''
+                        } ${flippedPills.has(s) ? styles.dPillFlipping : ''}`}
                         onClick={() => cyclePill(s, 'status', 'ex_status')}
+                        title={state === 'neutral' ? `Include: ${s}` : state === 'include' ? `Exclude: ${s}` : `Remove: ${s}`}
                       >
-                        {s}
+                        <span className={styles.statusIcon}>{s === 'Complete' ? '✓' : '~'}</span>
+                        <span className={styles.statusLabel}>{s}</span>
                       </button>
                     );
                   })}
@@ -620,99 +799,144 @@ export function FilterPanel({
 
               <hr className={styles.drawerDivider} />
 
-              {/* Words */}
+              {/* Words — preset pills + custom expander */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Words</span>
-                <div className={styles.drawerRightCol}>
-                  <div className={styles.drawerPills}>
-                    {WORD_PRESETS.map((p) => {
-                      const isActive = activeWordPreset?.label === p.label;
-                      return (
-                        <button
-                          key={p.label}
-                          className={`${styles.dPill} ${isActive ? styles.dPillInclude : ''}`}
-                          onClick={() =>
-                            isActive
-                              ? applyWordPreset(undefined, undefined)
-                              : applyWordPreset(p.min, p.max)
-                          }
-                        >
-                          {p.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.wcRange}>
-                    <input
-                      type="number"
-                      className={styles.wcInput}
-                      placeholder="min"
-                      value={wordMin}
-                      onChange={(e) => handleWordInput(e.target.value, wordMax)}
-                    />
-                    <span className={styles.wcSep}>–</span>
-                    <input
-                      type="number"
-                      className={styles.wcInput}
-                      placeholder="max"
-                      value={wordMax}
-                      onChange={(e) => handleWordInput(wordMin, e.target.value)}
-                    />
-                  </div>
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Words</span>
+                  {(currentFilters.min_words || currentFilters.max_words) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => {
+                        clearSection(['min_words', 'max_words']);
+                        setWordsCustomOpen(false);
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
+                <div className={styles.drawerPills}>
+                  {WORD_PRESETS.map((p) => {
+                    const isActive = activeWordPreset?.label === p.label;
+                    return (
+                      <button
+                        key={p.label}
+                        className={`${styles.dPill} ${isActive ? styles.dPillInclude : ''}`}
+                        onClick={() =>
+                          isActive
+                            ? applyWordPreset(undefined, undefined)
+                            : applyWordPreset(p.min, p.max)
+                        }
+                      >
+                        {p.label}
+                      </button>
+                    );
+                  })}
+                  <button
+                    className={`${styles.dPill} ${styles.customPill} ${wordsCustomOpen ? styles.customPillOpen : ''}`}
+                    onClick={() => setWordsCustomOpen((o) => !o)}
+                  >
+                    Custom <span className={styles.customChevron}>›</span>
+                  </button>
+                </div>
+                {wordsCustomOpen && (
+                  <div className={styles.customInputSlide}>
+                    <div className={styles.wcRange}>
+                      <input
+                        type="number"
+                        className={styles.wcInput}
+                        placeholder="min"
+                        value={wordMin}
+                        onChange={(e) => handleWordInput(e.target.value, wordMax)}
+                      />
+                      <span className={styles.wcSep}>–</span>
+                      <input
+                        type="number"
+                        className={styles.wcInput}
+                        placeholder="max"
+                        value={wordMax}
+                        onChange={(e) => handleWordInput(wordMin, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Updated */}
+              {/* Updated — preset pills + custom date expander */}
               <div className={styles.drawerSection}>
-                <span className={styles.drawerLabel}>Updated</span>
-                <div className={styles.drawerRightCol}>
-                  <div className={styles.drawerPills}>
-                    {DATE_PRESETS.map((d) => {
-                      const isActive = currentFilters.date_preset === d.value;
-                      return (
-                        <button
-                          key={d.value}
-                          className={`${styles.dPill} ${isActive ? styles.dPillInclude : ''}`}
-                          onClick={() => applyDatePreset(isActive ? '' : d.value)}
-                        >
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.dateCustom}>
-                    <input
-                      type="date"
-                      className={styles.dateInput}
-                      value={dateFrom}
-                      onChange={(e) => {
-                        setDateFrom(e.target.value);
-                        applyDateCustom(e.target.value, dateTo);
+                <div className={styles.drawerSectionHeader}>
+                  <span className={styles.drawerLabel}>Updated</span>
+                  {(currentFilters.date_preset || currentFilters.date_from || currentFilters.date_to) && (
+                    <button
+                      className={styles.sectionClear}
+                      onClick={() => {
+                        clearSection(['date_preset', 'date_from', 'date_to']);
+                        setDateCustomOpen(false);
                       }}
-                    />
-                    <span className={styles.wcSep}>–</span>
-                    <input
-                      type="date"
-                      className={styles.dateInput}
-                      value={dateTo}
-                      onChange={(e) => {
-                        setDateTo(e.target.value);
-                        applyDateCustom(dateFrom, e.target.value);
-                      }}
-                    />
-                  </div>
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
+                <div className={styles.drawerPills}>
+                  {DATE_PRESETS.map((d) => {
+                    const isActive = currentFilters.date_preset === d.value;
+                    return (
+                      <button
+                        key={d.value}
+                        className={`${styles.dPill} ${isActive ? styles.dPillInclude : ''}`}
+                        onClick={() => applyDatePreset(isActive ? '' : d.value)}
+                      >
+                        {d.label}
+                      </button>
+                    );
+                  })}
+                  <button
+                    className={`${styles.dPill} ${styles.customPill} ${dateCustomOpen ? styles.customPillOpen : ''}`}
+                    onClick={() => setDateCustomOpen((o) => !o)}
+                  >
+                    Custom <span className={styles.customChevron}>›</span>
+                  </button>
+                </div>
+                {dateCustomOpen && (
+                  <div className={styles.customInputSlide}>
+                    <div className={styles.dateCustom}>
+                      <input
+                        type="date"
+                        className={styles.dateInput}
+                        value={dateFrom}
+                        onChange={(e) => {
+                          setDateFrom(e.target.value);
+                          applyDateCustom(e.target.value, dateTo);
+                        }}
+                      />
+                      <span className={styles.wcSep}>–</span>
+                      <input
+                        type="date"
+                        className={styles.dateInput}
+                        value={dateTo}
+                        onChange={(e) => {
+                          setDateTo(e.target.value);
+                          applyDateCustom(dateFrom, e.target.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Saved filters — always visible, no toggle */}
-              {(presets.length > 0 || true) && (
-                <>
-                  <hr className={styles.drawerDivider} />
+              {/* Saved filters — always visible, polished section */}
+              <>
+                <hr className={styles.drawerDivider} />
+                <div className={styles.savedSectionWrap}>
                   <div className={styles.drawerSection}>
                     <span className={styles.drawerLabel}>Saved</span>
                     <div className={styles.savedBody}>
                       {presets.map((preset, idx) => (
-                        <div key={idx} className={styles.presetRow}>
+                        <div
+                          key={idx}
+                          className={`${styles.presetRow} ${deletingIdx === idx ? styles.presetRowDeleting : ''}`}
+                        >
                           <button className={styles.presetName} onClick={() => applyPreset(preset)}>
                             {preset.name}
                           </button>
@@ -725,13 +949,16 @@ export function FilterPanel({
                           </button>
                           <button
                             className={styles.presetDeleteBtn}
-                            onClick={() => deletePreset(idx)}
+                            onClick={() => handleDeletePreset(idx)}
                             aria-label={`Delete ${preset.name}`}
                           >
                             ×
                           </button>
                         </div>
                       ))}
+                      {toastMessage && (
+                        <div className={styles.presetToast}>{toastMessage}</div>
+                      )}
                       <div className={styles.savePresetRow}>
                         {!saveFormOpen ? (
                           <button
@@ -764,8 +991,8 @@ export function FilterPanel({
                       </div>
                     </div>
                   </div>
-                </>
-              )}
+                </div>
+              </>
 
             </div>
 
@@ -774,12 +1001,21 @@ export function FilterPanel({
               <button className={styles.drawerFooterClear} onClick={clearAll}>
                 Clear all
               </button>
-              <button
-                className={styles.drawerShowBtn}
-                onClick={() => setDrawerOpen(false)}
-              >
-                Show {filteredCount} work{filteredCount !== 1 ? 's' : ''}
-              </button>
+              <div className={styles.drawerFooterActions}>
+                {/* Apply button — visible on mobile only */}
+                <button
+                  className={styles.applyBtn}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Apply filters
+                </button>
+                <button
+                  className={styles.drawerShowBtn}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Show {filteredCount} work{filteredCount !== 1 ? 's' : ''}
+                </button>
+              </div>
             </div>
 
           </div>

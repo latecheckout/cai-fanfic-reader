@@ -13,7 +13,7 @@
   flex-wrap: wrap;
 }
 
-/* Left zone: pills + add button */
+/* Left zone: filter button + pills + clear/save */
 .barLeft {
   display: flex;
   align-items: center;
@@ -31,7 +31,46 @@
   flex-shrink: 0;
 }
 
+/* ── Solid filter button — visual peer to sort dropdown ── */
+.filterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--secondary);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 5px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: color var(--transition-micro), border-color var(--transition-micro), background var(--transition-micro);
+  flex-shrink: 0;
+}
+
+.filterBtn:hover {
+  color: var(--text);
+  border-color: var(--border-active);
+}
+
+.filterBtnActive {
+  color: var(--text);
+  border-color: var(--border-active);
+}
+
+.filterBtnCount {
+  color: var(--accent);
+  font-weight: 500;
+}
+
 /* ── Active filter pill — filled dark ── */
+@keyframes chipIn {
+  from { transform: scale(0.82); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -48,8 +87,9 @@
   max-width: 220px;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity var(--transition-micro);
   line-height: 1.5;
+  animation: chipIn 180ms var(--ease-out-expo) both;
+  transition: opacity var(--transition-micro);
 }
 
 .pill:hover {
@@ -67,6 +107,23 @@
   opacity: 1;
 }
 
+/* ── Overflow "+N more" chip ── */
+.pillOverflow {
+  background: transparent;
+  color: var(--secondary);
+  border: 1px dashed var(--border-strong);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  transition: color var(--transition-micro), border-color var(--transition-micro);
+}
+
+.pillOverflow:hover {
+  color: var(--text);
+  border-color: var(--border-active);
+  opacity: 1;
+}
+
 /* ── Exclude pill — strikethrough, dashed border ── */
 .excludePill {
   background: transparent;
@@ -81,32 +138,22 @@
   opacity: 0.7;
 }
 
-/* ── Add filter button — pill shape, dashed border ── */
-.addFilterBtn {
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  color: var(--secondary);
-  background: transparent;
-  border: 1px dashed var(--border-strong);
-  border-radius: 20px;
-  padding: 3px 12px;
-  cursor: pointer;
-  white-space: nowrap;
-  line-height: 1.5;
-  transition: color var(--transition-micro), border-color var(--transition-micro);
-}
-
-.addFilterBtn:hover {
-  color: var(--text);
-  border-color: var(--border-active);
-}
-
-/* ── Work count ── */
+/* ── Work count with rolling number ── */
 .workCount {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--secondary);
   white-space: nowrap;
+}
+
+@keyframes countIn {
+  from { transform: translateY(-4px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.countRoll {
+  display: inline-block;
+  animation: countIn 200ms var(--ease-out-expo);
 }
 
 /* ── View toggle ── */
@@ -255,12 +302,22 @@
    FILTER DRAWER — right-side slide panel
    ===================================================== */
 
-/* Full-page backdrop */
+/* Backdrop: invisible on desktop (click-away handles close), dimmed on mobile */
 .drawerBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(26, 24, 22, 0.35);
   z-index: 300;
+  background: transparent;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .drawerBackdrop {
+    background: rgba(26, 24, 22, 0.45);
+    pointer-events: auto;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
 }
 
 /* Right-side panel */
@@ -286,6 +343,23 @@
   to   { transform: translateX(0); }
 }
 
+/* ── Drag handle (mobile only) ── */
+.dragHandle {
+  display: none;
+  width: 40px;
+  height: 4px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .dragHandle {
+    display: block;
+  }
+}
+
 /* ── Drawer header ── */
 .drawerHeader {
   display: flex;
@@ -294,6 +368,12 @@
   padding: 20px 20px 18px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .drawerHeader {
+    padding-top: 12px;
+  }
 }
 
 .drawerHeaderTitle {
@@ -328,12 +408,19 @@
   padding: 4px 0 8px;
 }
 
-/* Section: label stacked above pills (Airbnb-style) */
+/* Section: label stacked above content */
 .drawerSection {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 16px 20px;
+}
+
+/* Section header: label left, Clear right */
+.drawerSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .drawerLabel {
@@ -346,20 +433,185 @@
   white-space: nowrap;
 }
 
+/* ── Section-level clear button ── */
+@keyframes sectionClearIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sectionClear {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  animation: sectionClearIn 200ms ease both;
+  transition: color var(--transition-micro);
+}
+
+.sectionClear:hover {
+  color: var(--text);
+}
+
 .drawerPills {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-/* Right-side column for sections with stacked content (Words, Updated) */
-.drawerRightCol {
+/* ── Rating cards — stacked, per-tier color ── */
+.ratingCards {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 6px;
+  width: 100%;
 }
 
-/* Drawer pill — 3 states */
+.ratingCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--transition-micro), border-color var(--transition-micro), color var(--transition-micro);
+}
+
+.ratingCard:hover {
+  border-color: var(--border-active);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.ratingCardLetter {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.ratingCardName {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  line-height: 1;
+}
+
+/* Include: fill with rating color, white text */
+.ratingCardInclude[data-rating="g"] { background: var(--rating-g); border-color: var(--rating-g); }
+.ratingCardInclude[data-rating="t"] { background: var(--rating-t); border-color: var(--rating-t); }
+.ratingCardInclude[data-rating="m"] { background: var(--rating-m); border-color: var(--rating-m); }
+.ratingCardInclude[data-rating="e"] { background: var(--rating-e); border-color: var(--rating-e); }
+.ratingCardInclude[data-rating="nr"] { background: var(--rating-nr); border-color: var(--rating-nr); }
+
+.ratingCardInclude .ratingCardLetter,
+.ratingCardInclude .ratingCardName { color: #fff; }
+
+/* Exclude: red tint + strikethrough letter */
+.ratingCardExclude {
+  background: rgba(140, 30, 30, 0.08);
+  border-color: rgba(140, 30, 30, 0.25);
+}
+
+.ratingCardExclude .ratingCardLetter {
+  color: #7A1A1A;
+  text-decoration: line-through;
+}
+
+.ratingCardExclude .ratingCardName {
+  color: rgba(122, 26, 26, 0.7);
+}
+
+/* ── Include → Exclude flip animation ── */
+@keyframes pillFlip {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.1) rotate(2deg); }
+  65%  { transform: scale(0.92) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.dPillFlipping {
+  animation: pillFlip 220ms var(--spring) both;
+}
+
+/* ── Status cards ── */
+.statusCards {
+  display: flex;
+  gap: 8px;
+}
+
+.statusCard {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--transition-micro), border-color var(--transition-micro);
+}
+
+.statusCard:hover {
+  border-color: var(--border-active);
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.statusIcon {
+  font-size: 14px;
+  color: var(--secondary);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.statusLabel {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.statusCardInclude {
+  background: rgba(30, 100, 40, 0.10);
+  border-color: rgba(30, 100, 40, 0.30);
+}
+
+.statusCardInclude .statusIcon,
+.statusCardInclude .statusLabel {
+  color: #1A5A24;
+}
+
+.statusCardExclude {
+  background: rgba(140, 30, 30, 0.10);
+  border-color: rgba(140, 30, 30, 0.30);
+}
+
+.statusCardExclude .statusIcon { color: #7A1A1A; }
+
+.statusCardExclude .statusLabel {
+  text-decoration: line-through;
+  color: #7A1A1A;
+}
+
+/* ── Warnings contextual note ── */
+.warningsNote {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--secondary);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Drawer pill — 3 states ── */
 .dPill {
   font-family: var(--font-sans);
   font-size: 12px;
@@ -397,6 +649,32 @@
 
 .dPillExclude:hover {
   background: rgba(140, 30, 30, 0.16);
+}
+
+/* ── Custom pill expanders ── */
+.customPill {
+  border-style: dashed;
+}
+
+.customChevron {
+  display: inline-block;
+  font-size: 12px;
+  margin-left: 3px;
+  transition: transform 200ms var(--ease-out-expo);
+}
+
+.customPillOpen .customChevron {
+  transform: rotate(90deg);
+}
+
+@keyframes customSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.customInputSlide {
+  animation: customSlide 200ms var(--ease-out-expo) both;
+  overflow: hidden;
 }
 
 /* ── Word count range inputs ── */
@@ -464,7 +742,13 @@
   border-top: 1px solid var(--border);
 }
 
-/* ── Saved filters section ── */
+/* ── Saved filters section — slightly elevated bg ── */
+.savedSectionWrap {
+  background: var(--card-bg);
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+
 .savedBody {
   display: flex;
   flex-direction: column;
@@ -482,6 +766,15 @@
 
 .presetRow:first-child {
   border-top: none;
+}
+
+/* Delete slide-out animation */
+@keyframes presetSlideOut {
+  to { transform: translateX(20px); opacity: 0; }
+}
+
+.presetRowDeleting {
+  animation: presetSlideOut 200ms var(--collapse) both;
 }
 
 .presetName {
@@ -540,6 +833,23 @@
 .presetDeleteBtn:hover {
   opacity: 1;
   color: var(--text);
+}
+
+/* ── Preset loaded toast ── */
+@keyframes toastSlide {
+  0%   { opacity: 0; transform: translateY(4px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-2px); }
+}
+
+.presetToast {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  color: var(--secondary);
+  padding: 6px 0 2px;
+  animation: toastSlide 2000ms ease both;
+  font-style: italic;
 }
 
 .savePresetRow {
@@ -630,6 +940,32 @@
   color: var(--text);
 }
 
+.drawerFooterActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Apply button — mobile only (hidden on desktop) */
+.applyBtn {
+  display: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: opacity var(--transition-micro);
+  white-space: nowrap;
+}
+
+.applyBtn:hover {
+  opacity: 0.8;
+}
+
 .drawerShowBtn {
   font-family: var(--font-sans);
   font-size: 13px;
@@ -646,4 +982,33 @@
 
 .drawerShowBtn:hover {
   opacity: 0.85;
+}
+
+/* =====================================================
+   MOBILE BOTTOM SHEET — max-width 768px
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .drawer {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 85vh;
+    border-radius: 16px 16px 0 0;
+    border-left: none;
+    border-top: 1px solid var(--border-strong);
+    animation: sheetSlideUp 250ms var(--ease-out-expo) both;
+  }
+
+  @keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .applyBtn {
+    display: flex;
+  }
 }
