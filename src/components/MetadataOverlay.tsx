@@ -68,7 +68,7 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.tagLabel}>Warnings</span>
                   <div className={styles.tagGroup}>
                     {workMeta.warnings.map((w) => (
-                      <TagChip key={w} tag={w} category="warning" />
+                      <TagChip key={w} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
                     ))}
                   </div>
                 </div>
@@ -78,7 +78,7 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.tagLabel}>Fandom</span>
                   <div className={styles.tagGroup}>
                     {workMeta.fandom.map((f) => (
-                      <TagChip key={f} tag={f} category="fandom" />
+                      <TagChip key={f} tag={f} category="fandom" clickable href={`/?fandom=${encodeURIComponent(f)}`} />
                     ))}
                   </div>
                 </div>
@@ -88,7 +88,7 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.tagLabel}>Ships</span>
                   <div className={styles.tagGroup}>
                     {workMeta.relationships.map((r) => (
-                      <TagChip key={r} tag={r} category="relationship" />
+                      <TagChip key={r} tag={r} category="relationship" clickable href={`/?relationship=${encodeURIComponent(r)}`} />
                     ))}
                   </div>
                 </div>
@@ -98,7 +98,7 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.tagLabel}>Characters</span>
                   <div className={styles.tagGroup}>
                     {workMeta.characters.map((c) => (
-                      <TagChip key={c} tag={c} category="character" />
+                      <TagChip key={c} tag={c} category="character" clickable href={`/?character=${encodeURIComponent(c)}`} />
                     ))}
                   </div>
                 </div>
@@ -108,7 +108,7 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   <span className={styles.tagLabel}>Tags</span>
                   <div className={styles.tagGroup}>
                     {workMeta.tags.map((t) => (
-                      <TagChip key={t} tag={t} category="additional" />
+                      <TagChip key={t} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
                     ))}
                   </div>
                 </div>

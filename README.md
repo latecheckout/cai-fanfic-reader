@@ -1,4 +1,4 @@
-# C.AI Fanfic Reader
+# c.ai Fanfic Reader
 
 A front-end exploration for reading AI-generated fanfiction, built for Character.ai. Inspired by AO3's information density and reading experience — rebuilt with intentional typography, a rich metadata system, and a book-like reading view.
 
@@ -91,9 +91,9 @@ fanfic-reader/
 
 ## Content Format
 
-Each work is a single markdown file at `content/works/{slug}.md`.
+Each work is a single markdown file at `content/works/{slug}.md`. The slug is derived from the filename.
 
-**YAML frontmatter:**
+**YAML frontmatter — required fields:**
 
 ```yaml
 ---
@@ -103,7 +103,7 @@ fandom:
   - Original Work
 rating: General Audiences       # General Audiences | Teen And Up Audiences | Mature | Explicit | Not Rated
 category:
-  - F/M
+  - F/M                         # F/F | F/M | Gen | M/M | Multi | Other
 status: Complete                # Complete | In Progress
 words: 1200
 language: English
@@ -115,13 +115,77 @@ relationships:
 characters:
   - Iris
   - Kai
+warnings: []                    # Archive warnings e.g. 'Major Character Death'
 published: "2024-01-15"
 updated: "2024-04-25"
+kudos: 0
+bookmarks: 0
+hits: 0
+comments: 0
 summary: "A painter who sees music as color meets a composer..."
 ---
 ```
 
+**Optional frontmatter fields:**
+
+```yaml
+chaptersPosted: 3               # For WIPs — how many chapters are currently posted
+series:
+  name: "Series Name"
+  position: 1
+  total: 3                      # Optional series total
+```
+
 **Chapters** are delimited by `## Chapter Title` headings in the markdown body. The works loader splits on these headings and builds a `chapters` array (title + content) for each work.
+
+---
+
+## Filtering System
+
+All filter state lives in URL params — no local React state. Filters are bookmarkable and back-button safe.
+
+### URL params reference
+
+| Param | Type | Description |
+|---|---|---|
+| `q` | string | Text search — title, author, summary, tags, fandom |
+| `fandom` | string | Exact fandom match |
+| `rating` | comma-sep | OR: `?rating=Mature,Explicit` |
+| `category` | comma-sep | OR: `?category=F/F,M/M` |
+| `status` | comma-sep | `Complete` or `In+Progress` |
+| `tag` | comma-sep | OR: works must have at least one |
+| `character` | string | Exact character match |
+| `relationship` | string | Exact ship match |
+| `warning` | comma-sep | OR: works must have at least one |
+| `minWords` / `maxWords` | number | Word count range |
+| `datePreset` | string | `last_week` / `last_month` / `last_year` / `custom` |
+| `dateFrom` / `dateTo` | ISO date | Custom date range |
+| `sort` | string | `updated` (default) / `published` / `words` / `kudos` / `hits` / `bookmarks` / `comments` |
+| `order` | string | `desc` (default) / `asc` |
+
+**Exclude params** — prefix any filter with `ex_` to hide matching works instead of showing them: `ex_rating`, `ex_tag`, `ex_category`, `ex_status`, `ex_warning`, `ex_fandom`, `ex_relationship`, `ex_character`.
+
+### Filter logic
+
+- **Within a param** (comma-separated): OR — `?rating=Mature,Explicit` shows Mature or Explicit
+- **Across params**: AND — `?rating=Mature&status=Complete` shows only Mature + Complete
+- **Exclude params**: always remove, regardless of includes
+
+### 3-state pills (filter drawer)
+
+Clicking a pill in the filter drawer cycles: neutral → include (green) → exclude (red) → neutral. State is read from the URL on every render.
+
+### Vibe search
+
+Descriptive queries in the search overlay (⌘K) are intercepted before falling through to `?q=` text search. Example queries:
+
+- `"cozy no deaths"` → includes Fluff, Hurt/Comfort, Happy Ending; excludes Major Character Death warning
+- `"slow burn pining"` → includes Slow Burn, Pining
+- `"short funny"` → includes Humor, Crack; maxWords 15000; ratings G + Teen
+
+### Saved presets
+
+Stored in `localStorage` key `cai_fanfic_presets`. One preset can be marked as default — it auto-applies on first load when the URL has no active params.
 
 ---
 

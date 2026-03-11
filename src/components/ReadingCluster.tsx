@@ -21,11 +21,11 @@ function getTargetRect(
   const vh = window.innerHeight;
 
   if (name === 'metadata') {
-    const w = Math.min(640, vw - 48);
-    const h = Math.min(480, vh - 120);
-    const midX = pillRect.left + pillRect.width / 2;
-    const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
-    return { left, top: pillRect.bottom + 8, width: w, height: h };
+    const w = Math.min(540, vw - 48);
+    const h = Math.min(600, vh - 80);
+    const top  = Math.round((vh - h) / 2);
+    const left = Math.round((vw - w) / 2);
+    return { left, top, width: w, height: h };
   }
 
   if (name === 'chapter') {
@@ -199,7 +199,8 @@ export function ReadingCluster() {
         const headerEl = panelEl.firstElementChild?.firstElementChild as HTMLElement | null;
         const listEl   = panelEl.firstElementChild?.children[1] as HTMLElement | null;
         if (!headerEl || !listEl) return;
-        const neededH = headerEl.offsetHeight + listEl.scrollHeight;
+        const borderH = panelEl.offsetHeight - panelEl.clientHeight;
+        const neededH = headerEl.offsetHeight + listEl.scrollHeight + borderH;
         const maxH    = Math.floor(window.innerHeight * 0.7);
         const finalH  = Math.min(neededH, maxH);
         panelEl.style.transition = 'height 100ms ease';

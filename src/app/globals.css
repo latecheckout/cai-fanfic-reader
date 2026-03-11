@@ -31,7 +31,18 @@ body {
   background-color: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  transition: background-color var(--transition-chrome), color var(--transition-chrome);
+  transition: background-color var(--transition-chrome), color var(--transition-chrome),
+    margin-right 240ms var(--ease-out-expo);
+}
+
+@media (min-width: 1080px) {
+  body.filter-open {
+    margin-right: 380px;
+  }
+  /* Keep header full-width so nav items don't move */
+  body.filter-open header {
+    width: 100vw;
+  }
 }
 
 a {

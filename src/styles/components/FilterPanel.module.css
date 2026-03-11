@@ -41,7 +41,7 @@
   color: var(--secondary);
   background: transparent;
   border: 1px solid var(--border-strong);
-  border-radius: 6px;
+  border-radius: 999px;
   padding: 5px 11px;
   cursor: pointer;
   white-space: nowrap;
@@ -60,9 +60,34 @@
   border-color: var(--border-active);
 }
 
+/* Inverted state when drawer is open */
+.filterBtnOpen {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.filterBtnOpen:hover {
+  opacity: 0.85;
+}
+
 .filterBtnCount {
   color: var(--accent);
   font-weight: 500;
+}
+
+.filterBtnOpen .filterBtnCount {
+  color: var(--bg);
+  opacity: 0.8;
+}
+
+/* Keyboard shortcut hint */
+.filterBtnKbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  opacity: 0.6;
+  letter-spacing: 0.02em;
+  margin-left: 1px;
 }
 
 /* ── Active filter pill — filled dark ── */
@@ -323,18 +348,17 @@
 /* Right-side panel */
 .drawer {
   position: fixed;
-  top: 0;
+  top: 56px;
   right: 0;
   bottom: 0;
   width: min(380px, 90vw);
   background: var(--bg);
-  border-left: 1px solid var(--border-strong);
-  border-radius: 12px 0 0 12px;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
   z-index: 310;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 40px rgba(26, 24, 22, 0.12);
   animation: drawerSlideIn 220ms var(--ease-out-expo) both;
 }
 
@@ -506,10 +530,10 @@
 }
 
 /* Include: fill with rating color, white text */
-.ratingCardInclude[data-rating="g"] { background: var(--rating-g); border-color: var(--rating-g); }
-.ratingCardInclude[data-rating="t"] { background: var(--rating-t); border-color: var(--rating-t); }
-.ratingCardInclude[data-rating="m"] { background: var(--rating-m); border-color: var(--rating-m); }
-.ratingCardInclude[data-rating="e"] { background: var(--rating-e); border-color: var(--rating-e); }
+.ratingCardInclude[data-rating="g"]  { background: var(--rating-g);  border-color: var(--rating-g);  }
+.ratingCardInclude[data-rating="t"]  { background: var(--rating-t);  border-color: var(--rating-t);  }
+.ratingCardInclude[data-rating="m"]  { background: var(--rating-m);  border-color: var(--rating-m);  }
+.ratingCardInclude[data-rating="e"]  { background: var(--rating-e);  border-color: var(--rating-e);  }
 .ratingCardInclude[data-rating="nr"] { background: var(--rating-nr); border-color: var(--rating-nr); }
 
 .ratingCardInclude .ratingCardLetter,
@@ -967,6 +991,7 @@
 }
 
 .drawerShowBtn {
+  display: none;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
@@ -1009,6 +1034,10 @@
   }
 
   .applyBtn {
+    display: flex;
+  }
+
+  .drawerShowBtn {
     display: flex;
   }
 }

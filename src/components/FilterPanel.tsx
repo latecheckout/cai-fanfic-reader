@@ -229,9 +229,22 @@ export function FilterPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Click-away handler for drawer (desktop — no backdrop)
+  // Body class for push-panel effect on desktop
+  useEffect(() => {
+    const isDesktop = window.matchMedia('(min-width: 1080px)').matches;
+    if (isDesktop) {
+      document.body.classList.toggle('filter-open', drawerOpen);
+    }
+    return () => {
+      document.body.classList.remove('filter-open');
+    };
+  }, [drawerOpen]);
+
+  // Click-away handler for drawer — mobile only (desktop uses push panel, no click-away)
   useEffect(() => {
     if (!drawerOpen) return;
+    const isDesktop = window.matchMedia('(min-width: 1080px)').matches;
+    if (isDesktop) return;
     const handler = (e: MouseEvent) => {
       const drawer = document.querySelector('[data-filter-drawer]');
       if (drawer && !drawer.contains(e.target as Node)) {
@@ -498,9 +511,12 @@ export function FilterPanel({
         <div className={styles.barLeft}>
           {/* Solid filter button — peers with sort */}
           <button
-            className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open filters"
+            className={`${styles.filterBtn} ${
+              drawerOpen ? styles.filterBtnOpen :
+              activeFilterCount > 0 ? styles.filterBtnActive : ''
+            }`}
+            onClick={() => setDrawerOpen((d) => !d)}
+            aria-label={drawerOpen ? 'Close filters' : 'Open filters'}
           >
             <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true">
               <path d="M1 1.5h10M3 5h6M5 8.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -509,6 +525,7 @@ export function FilterPanel({
             {activeFilterCount > 0 && (
               <span className={styles.filterBtnCount}>· {activeFilterCount}</span>
             )}
+            <kbd className={styles.filterBtnKbd}>F</kbd>
           </button>
 
           {/* Active chip pills (max 3) */}
