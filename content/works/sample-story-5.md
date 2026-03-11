@@ -10,9 +10,14 @@ tags: ["Horror", "Experimental", "Atmospheric", "Creepy", "Radio", "Mystery"]
 summary: "You find an old radio at a yard sale. At night, it picks up a station that shouldn't exist."
 language: "English"
 published: "2024-01-28"
+updated: "2024-01-28"
 status: "Complete"
 chapters: 3
 words: 950
+kudos: 412
+bookmarks: 89
+hits: 8200
+comments: 47
 ---
 
 :::chapter Static

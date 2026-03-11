@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { WorkMeta } from '@/types';
-import { formatWords, formatCount, readingTime } from '@/lib/utils';
+import { formatWords, formatCount, formatChapters, readingTime } from '@/lib/utils';
 import styles from '@/styles/components/WorkHeader.module.css';
 
 interface Props {
@@ -31,11 +31,17 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
   const z2 = 1 - clamp((scrollPx - 40) / 80, 0, 1);       // signals fades 40→120px
   const z1 = 1 - clamp((scrollPx - 80) / 80, 0, 1);       // identity fades 80→160px
 
+  const chaptersStr = formatChapters(meta.chaptersPosted, meta.chapters);
+  const seriesStr = meta.series
+    ? `Part ${meta.series.position} of ${meta.series.name}`
+    : null;
+
   const statsLine = [
     meta.status,
     formatWords(meta.words),
     readingTime(meta.words),
-    totalChapters > 1 ? `${totalChapters} chapters` : null,
+    totalChapters > 1 ? chaptersStr : null,
+    seriesStr,
     meta.language !== 'English' ? meta.language : null,
     meta.kudos > 0 ? `\u2665 ${formatCount(meta.kudos)}` : null,
     meta.bookmarks > 0 ? `\u2691 ${formatCount(meta.bookmarks)}` : null,

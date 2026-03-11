@@ -14,6 +14,7 @@ published: "2024-02-20"
 updated: "2024-02-20"
 status: "In Progress"
 chapters: 8
+chaptersPosted: 8
 words: 45200
 kudos: 15800
 bookmarks: 4300

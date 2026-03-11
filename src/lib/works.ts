@@ -26,7 +26,18 @@ function normalizeWorkMeta(data: Record<string, unknown>): WorkMeta {
     summary: String(data.summary ?? ''),
     language: String(data.language ?? 'English'),
     status: String(data.status ?? 'Complete'),
-    chapters: Number(data.chapters ?? 1),
+    // chapters: 0 is sentinel for "unknown total" (YAML null → 0)
+    chapters: data.chapters == null ? 0 : Number(data.chapters),
+    chaptersPosted: data.chaptersPosted != null ? Number(data.chaptersPosted) : undefined,
+    series: data.series && typeof data.series === 'object' && !Array.isArray(data.series)
+      ? {
+          name: String((data.series as Record<string, unknown>).name ?? ''),
+          position: Number((data.series as Record<string, unknown>).position ?? 1),
+          total: (data.series as Record<string, unknown>).total != null
+            ? Number((data.series as Record<string, unknown>).total)
+            : undefined,
+        }
+      : undefined,
     words: Number(data.words ?? 0),
     published: String(data.published ?? ''),
     updated: String(data.updated ?? ''),

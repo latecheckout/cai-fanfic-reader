@@ -1,0 +1,12 @@
+.workList {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  padding: var(--space-12) 0;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--secondary);
+}

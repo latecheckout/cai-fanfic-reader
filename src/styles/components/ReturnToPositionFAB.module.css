@@ -1,0 +1,45 @@
+/* ============================================================
+   RETURN TO POSITION FAB — Fixed bottom-right
+   Only visible when scrolled above the furthest read position
+   ============================================================ */
+
+.fab {
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  z-index: 200;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 11px;
+
+  background: var(--bubble-bg);
+  box-shadow: var(--bubble-shadow);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--text);
+
+  transition: box-shadow 120ms var(--ease-out-expo), opacity 180ms ease;
+  animation: fabIn 220ms var(--ease-out-expo) both;
+}
+
+.fab:hover {
+  box-shadow: var(--bubble-shadow-hover);
+}
+
+@keyframes fabIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

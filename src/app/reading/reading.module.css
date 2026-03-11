@@ -8,7 +8,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
 }
 
 .heading {
@@ -19,12 +19,48 @@
   letter-spacing: -0.015em;
 }
 
-.count {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--secondary);
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-8);
 }
 
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0 var(--space-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+  transition: color 120ms, border-color 120ms;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.tabCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* ── Empty states ── */
 .empty {
   font-family: var(--font-sans);
   font-size: 14px;
@@ -38,6 +74,11 @@
   text-underline-offset: 2px;
 }
 
+.emptyBookmarkIcon {
+  font-size: 11px;
+}
+
+/* ── List ── */
 .list {
   list-style: none;
   padding: 0;
@@ -54,7 +95,7 @@
 
 .itemLink {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-6);
   padding: var(--space-4) 0;
@@ -95,4 +136,10 @@
   font-size: 11px;
   color: var(--secondary);
   flex-shrink: 0;
+}
+
+.itemBookmarkIcon {
+  color: var(--secondary);
+  flex-shrink: 0;
+  opacity: 0.5;
 }

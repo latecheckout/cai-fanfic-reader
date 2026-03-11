@@ -5,6 +5,8 @@ import { WorkHeader } from '@/components/WorkHeader';
 import { ReadingCluster } from '@/components/ReadingCluster';
 import { ChapterList } from '@/components/ChapterList';
 import { ReadingHUD } from '@/components/ReadingHUD';
+import { ReadingActions } from '@/components/ReadingActions';
+import { ReturnToPositionFAB } from '@/components/ReturnToPositionFAB';
 import { FocusEffect } from '@/components/FocusEffect';
 import { ReadingProvider } from '@/context/ReadingContext';
 import { WorkSummary } from '@/types';
@@ -71,8 +73,10 @@ export default async function ReaderPage({ params }: PageProps) {
         totalChapters={chapters.length}
         slug={slug}
       >
-        {/* Always-visible floating HUD */}
+        {/* Always-visible floating HUD — left: back, right: bookmark */}
         <ReadingHUD />
+        <ReadingActions />
+        <ReturnToPositionFAB />
 
         {/* Main reading content */}
         <main className={styles.main}>

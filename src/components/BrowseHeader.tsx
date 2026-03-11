@@ -8,7 +8,7 @@ import styles from '@/styles/components/BrowseHeader.module.css';
 
 const NAV_LINKS = [
   { href: '/', label: 'Stories' },
-  { href: '/reading', label: 'Reading List' },
+  { href: '/reading', label: 'Library' },
   { href: '/fandoms', label: 'Fandoms' },
 ];
 

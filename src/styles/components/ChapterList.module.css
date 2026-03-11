@@ -8,3 +8,35 @@
   margin: 0 auto;
   padding: var(--space-8) var(--space-6) 0;
 }
+
+/* ── Last read position marker ── */
+.lastReadMarker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+  z-index: 10;
+}
+
+.lastReadMarker::before,
+.lastReadMarker::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--secondary);
+  opacity: 0.2;
+}
+
+.lastReadLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--secondary);
+  opacity: 0.35;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

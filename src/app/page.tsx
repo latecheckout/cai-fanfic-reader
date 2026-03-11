@@ -6,8 +6,7 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { WorkCard } from '@/components/WorkCard';
-import { FilterPanel } from '@/components/FilterPanel';
+import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { ContinueReadingSection } from '@/components/ContinueReadingSection';
 import styles from './browse.module.css';
@@ -20,6 +19,11 @@ interface PageProps {
     character?: string;
     rating?: string;
     status?: string;
+    category?: string;
+    language?: string;
+    warning?: string;
+    min_words?: string;
+    max_words?: string;
     sort?: string;
     order?: string;
     q?: string;
@@ -29,6 +33,8 @@ interface PageProps {
     ex_character?: string;
     ex_rating?: string;
     ex_status?: string;
+    ex_category?: string;
+    ex_warning?: string;
   }>;
 }
 
@@ -42,6 +48,11 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     character: params.character,
     rating: params.rating,
     status: params.status,
+    category: params.category,
+    language: params.language,
+    warning: params.warning,
+    minWords: params.min_words ? Number(params.min_words) : undefined,
+    maxWords: params.max_words ? Number(params.max_words) : undefined,
     sort: params.sort as FilterState['sort'],
     order: params.order as FilterState['order'],
     q: params.q,
@@ -51,6 +62,8 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     exCharacter: params.ex_character,
     exRating: params.ex_rating,
     exStatus: params.ex_status,
+    exCategory: params.ex_category,
+    exWarning: params.ex_warning,
   };
 
   const allWorks = getWorkSummaries();
@@ -62,8 +75,11 @@ export default async function BrowsePage({ searchParams }: PageProps) {
   const hasActiveFilters = !!(
     params.fandom || params.relationship || params.tag || params.character ||
     params.rating || params.status || params.q ||
+    params.category || params.language || params.warning ||
+    params.min_words || params.max_words ||
     params.ex_fandom || params.ex_relationship || params.ex_tag ||
-    params.ex_character || params.ex_rating || params.ex_status
+    params.ex_character || params.ex_rating || params.ex_status ||
+    params.ex_category || params.ex_warning
   );
 
   return (
@@ -75,7 +91,8 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {!hasActiveFilters && <ContinueReadingSection />}
 
         <Suspense>
-          <FilterPanel
+          <BrowseShell
+            works={filteredWorks}
             options={filterOptions}
             searchOptions={searchOptions}
             currentFilters={params}
@@ -83,18 +100,6 @@ export default async function BrowsePage({ searchParams }: PageProps) {
             filteredCount={filteredWorks.length}
           />
         </Suspense>
-
-        <div className={styles.workList}>
-          {filteredWorks.length === 0 ? (
-            <div className={styles.empty}>
-              <p>No works match your filters.</p>
-            </div>
-          ) : (
-            filteredWorks.map((work) => (
-              <WorkCard key={work.slug} work={work} />
-            ))
-          )}
-        </div>
       </main>
     </div>
   );

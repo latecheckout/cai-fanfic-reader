@@ -30,6 +30,20 @@ export function ratingClass(rating: string): string {
   return 'ratingNR';
 }
 
+/**
+ * Format chapters as AO3-style "X/Y" or "X/?" string.
+ * chaptersPosted: how many are available; chaptersTotal: 0 = unknown/open-ended.
+ */
+export function formatChapters(
+  chaptersPosted: number | undefined,
+  chaptersTotal: number
+): string {
+  const posted = chaptersPosted ?? chaptersTotal;
+  if (chaptersTotal === 0) return `${posted}/?`;
+  if (posted === chaptersTotal) return `${chaptersTotal} ch.`;
+  return `${posted}/${chaptersTotal}`;
+}
+
 /** Word tier 1–4 for length bars (< 5k / 5k–25k / 25k–75k / 75k+) */
 export function wordTier(words: number): 1 | 2 | 3 | 4 {
   if (words < 5000) return 1;

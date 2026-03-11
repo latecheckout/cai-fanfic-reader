@@ -110,6 +110,38 @@
   white-space: nowrap;
 }
 
+/* ── View toggle ── */
+.viewToggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.viewBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--secondary);
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity var(--transition-micro), background var(--transition-micro);
+}
+
+.viewBtn:hover {
+  opacity: 1;
+  background: var(--border);
+}
+
+.viewBtnActive {
+  opacity: 1;
+  color: var(--text);
+}
+
 /* ── Page load animation ── */
 @media (prefers-reduced-motion: no-preference) {
   .bar {

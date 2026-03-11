@@ -62,6 +62,36 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
     );
   }
 
+  // Category filter
+  if (filters.category) {
+    const cat = filters.category.toLowerCase();
+    result = result.filter((w) =>
+      w.meta.category.some((c) => c.toLowerCase() === cat)
+    );
+  }
+
+  // Language filter
+  if (filters.language) {
+    const lang = filters.language.toLowerCase();
+    result = result.filter((w) => w.meta.language.toLowerCase() === lang);
+  }
+
+  // Warning filter (include only works with this warning)
+  if (filters.warning) {
+    const warn = filters.warning.toLowerCase();
+    result = result.filter((w) =>
+      w.meta.warnings.some((wn) => wn.toLowerCase() === warn)
+    );
+  }
+
+  // Word count range
+  if (filters.minWords != null) {
+    result = result.filter((w) => w.meta.words >= filters.minWords!);
+  }
+  if (filters.maxWords != null) {
+    result = result.filter((w) => w.meta.words <= filters.maxWords!);
+  }
+
   // ── Exclude filters — remove works that match these values ────────────────
   if (filters.exFandom) {
     const ex = filters.exFandom.toLowerCase();
@@ -97,6 +127,18 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
       (w) => w.meta.status.toLowerCase() !== filters.exStatus!.toLowerCase()
     );
   }
+  if (filters.exCategory) {
+    const ex = filters.exCategory.toLowerCase();
+    result = result.filter((w) =>
+      !w.meta.category.some((c) => c.toLowerCase() === ex)
+    );
+  }
+  if (filters.exWarning) {
+    const ex = filters.exWarning.toLowerCase();
+    result = result.filter((w) =>
+      !w.meta.warnings.some((wn) => wn.toLowerCase() === ex)
+    );
+  }
 
   // Sort
   const sortKey = filters.sort ?? 'updated';
@@ -118,6 +160,18 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
       case 'kudos':
         aVal = a.meta.kudos;
         bVal = b.meta.kudos;
+        break;
+      case 'hits':
+        aVal = a.meta.hits;
+        bVal = b.meta.hits;
+        break;
+      case 'bookmarks':
+        aVal = a.meta.bookmarks;
+        bVal = b.meta.bookmarks;
+        break;
+      case 'comments':
+        aVal = a.meta.comments;
+        bVal = b.meta.comments;
         break;
       default: // 'updated'
         aVal = a.meta.updated || a.meta.published;

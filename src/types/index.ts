@@ -12,6 +12,8 @@ export interface WorkMeta {
   language: string;
   status: string;
   chapters: number;
+  chaptersPosted?: number;  // posted count for WIPs; if absent, assume all chapters posted
+  series?: { name: string; position: number; total?: number };
   words: number;
   published: string;
   updated: string;
@@ -49,7 +51,12 @@ export interface FilterState {
   rating?: string;
   status?: string;
   warnings?: string;
-  sort?: 'updated' | 'published' | 'words' | 'kudos';
+  category?: string;
+  language?: string;
+  warning?: string;
+  minWords?: number;
+  maxWords?: number;
+  sort?: 'updated' | 'published' | 'words' | 'kudos' | 'hits' | 'bookmarks' | 'comments';
   order?: 'asc' | 'desc';
   q?: string;
   // Exclude filters — remove works matching these values
@@ -59,4 +66,6 @@ export interface FilterState {
   exCharacter?: string;
   exRating?: string;
   exStatus?: string;
+  exCategory?: string;
+  exWarning?: string;
 }

@@ -10,9 +10,14 @@ tags: ["Science Fiction", "Space Station", "Friendship", "Coming of Age"]
 summary: "On a space station at the edge of known space, two young engineers discover that the greatest distances aren't measured in light years."
 language: "English"
 published: "2024-04-10"
+updated: "2024-04-10"
 status: "Complete"
 chapters: 3
 words: 1150
+kudos: 287
+bookmarks: 54
+hits: 5100
+comments: 31
 ---
 
 :::chapter Gravity's Edge

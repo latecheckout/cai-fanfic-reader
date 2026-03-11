@@ -29,6 +29,8 @@ interface Props {
   };
   totalCount: number;
   filteredCount: number;
+  view?: 'default' | 'split';
+  onViewChange?: (v: 'default' | 'split') => void;
 }
 
 const EMPTY_SEARCH_OPTIONS: SearchOptions = { tags: [], fandoms: [] };
@@ -47,6 +49,8 @@ export function FilterPanel({
   currentFilters,
   totalCount,
   filteredCount,
+  view,
+  onViewChange,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -135,8 +139,39 @@ export function FilterPanel({
           </button>
         </div>
 
-        {/* Right: count + sort */}
+        {/* Right: view toggle + count + sort */}
         <div className={styles.barRight}>
+          {onViewChange && (
+            <div className={styles.viewToggle} aria-label="View layout">
+              <button
+                type="button"
+                className={`${styles.viewBtn} ${view === 'default' ? styles.viewBtnActive : ''}`}
+                onClick={() => onViewChange('default')}
+                aria-label="Default view"
+                aria-pressed={view === 'default'}
+                title="Default view"
+              >
+                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
+                  <rect x="0" y="0" width="14" height="1.5" fill="currentColor" />
+                  <rect x="0" y="5.25" width="14" height="1.5" fill="currentColor" />
+                  <rect x="0" y="10.5" width="14" height="1.5" fill="currentColor" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={`${styles.viewBtn} ${view === 'split' ? styles.viewBtnActive : ''}`}
+                onClick={() => onViewChange('split')}
+                aria-label="Split view"
+                aria-pressed={view === 'split'}
+                title="Split view"
+              >
+                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
+                  <rect x="0" y="0" width="6" height="12" fill="currentColor" />
+                  <rect x="8" y="0" width="6" height="12" fill="currentColor" />
+                </svg>
+              </button>
+            </div>
+          )}
           <span className={styles.workCount}>
             {filteredCount === totalCount
               ? `${totalCount} works`

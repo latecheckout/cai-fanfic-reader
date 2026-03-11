@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { WorkSummary } from '@/types';
-import { formatWords, formatCount, ratingClass, wordTier, categoryLabel } from '@/lib/utils';
+import { formatWords, formatCount, formatChapters, ratingClass, wordTier, categoryLabel } from '@/lib/utils';
 import styles from '@/styles/components/WorkCard.module.css';
 
 interface Props {
@@ -31,7 +31,7 @@ export function WorkCard({ work }: Props) {
 
   const statsItems = [
     formatWords(meta.words),
-    meta.chapters > 1 ? `${meta.chapters} ch.` : '1 ch.',
+    formatChapters(meta.chaptersPosted, meta.chapters),
     (meta.updated || meta.published) ? `updated ${meta.updated || meta.published}` : null,
     meta.kudos > 0 ? `\u2665 ${formatCount(meta.kudos)}` : null,
     meta.bookmarks > 0 ? `\u2691 ${formatCount(meta.bookmarks)}` : null,
@@ -108,11 +108,30 @@ export function WorkCard({ work }: Props) {
           )}
         </div>
 
-        {/* 3. Tags: decision core (chip style) */}
-        {meta.tags.length > 0 && (
+        {/* 3. Characters: cast list (plain text links) */}
+        {meta.characters.length > 0 && (
+          <div className={`${styles.characters} ${styles.interactive}`}>
+            {meta.characters.map((c, i) => (
+              <span key={`char-${i}`}>
+                {i > 0 && <span className={styles.charSeparator}>, </span>}
+                <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.charLink}>
+                  {c}
+                </Link>
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* 4. Tags: warnings (inverted) first, then freeform tags */}
+        {(meta.warnings.length > 0 || meta.tags.length > 0) && (
           <div className={`${styles.tags} ${styles.interactive}`}>
+            {meta.warnings.filter(w => w !== 'No Archive Warnings Apply').map((w) => (
+              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className={styles.warnChip}>
+                {w}
+              </Link>
+            ))}
             {visibleTags.map((t) => (
-              <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>
+              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>
                 {t}
               </Link>
             ))}

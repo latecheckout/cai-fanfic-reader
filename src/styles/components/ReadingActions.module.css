@@ -1,0 +1,41 @@
+/* ============================================================
+   READING ACTIONS — Fixed top-right bookmark button
+   Mirrors ReadingHUD's back button (same bubble system)
+   ============================================================ */
+
+.bookmarkBubble {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 250;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bubble-bg);
+  box-shadow: var(--bubble-shadow);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 120ms var(--ease-out-expo), color 100ms;
+  padding: 0;
+}
+
+.bookmarkBubble:hover {
+  box-shadow: var(--bubble-shadow-hover);
+}
+
+.outline {
+  opacity: 0.55;
+  transition: opacity 100ms;
+}
+
+.bookmarkBubble:hover .outline {
+  opacity: 1;
+}
+
+.filled {
+  opacity: 1;
+}
