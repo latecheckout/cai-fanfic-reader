@@ -489,7 +489,8 @@
   inset: 0;
   z-index: 400;
   background: var(--bg);
-  padding: calc(8px + var(--safe-top)) var(--space-4) 0;
+  /* no horizontal padding — input row handles its own, dropdown goes edge-to-edge */
+  padding: calc(8px + var(--safe-top)) 0 0;
   display: flex;
   flex-direction: column;
 }
@@ -499,6 +500,7 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
+  background: transparent; /* inherit --bg from wrapper, no card-bg block */
   margin-top: 0;
   flex: 1;
   overflow-y: auto;
@@ -506,13 +508,14 @@
   overscroll-behavior: contain;
 }
 
-/* inputRow — back button + inputWrap in mobileFS mode */
+/* inputRow — inputWrap + close button in mobileFS mode */
 .inputRowMobileFS {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  margin-bottom: 4px;
+  padding: 0 var(--space-4);
+  margin-bottom: 8px;
 }
 
 .inputRowMobileFS .inputWrap {
@@ -525,15 +528,25 @@
   /* no desktop styles needed */
 }
 
+/* Close × button — right of input in mobileFS */
 .mobileBackBtn {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
   color: var(--secondary);
-  transition: color var(--transition-micro);
+  cursor: pointer;
+  transition: color var(--transition-micro), background var(--transition-micro);
+}
+
+.mobileBackBtn:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
 }
 
 @media (max-width: 480px) {

@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
+import { PRESETS_KEY, HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 import styles from '@/styles/components/BrowseSearchBar.module.css';
 
-const PRESETS_KEY = 'cai_fanfic_presets';
-const HISTORY_KEY = 'cai_search_history';
 const HISTORY_LIMIT = 5;
 
 interface Preset {
@@ -57,14 +56,7 @@ function addToCommaList(current: string | undefined, value: string): string {
   return [...parts, value].join(',');
 }
 
-// Static filter AC data
-const RATINGS = ['General Audiences', 'Teen And Up Audiences', 'Mature', 'Explicit', 'Not Rated'];
-const WARNINGS = [
-  'Major Character Death', 'Graphic Depictions Of Violence', 'Non-Con',
-  'Underage', 'Creator Chose Not To Use Archive Warnings',
-];
-const CATEGORIES = ['F/F', 'F/M', 'Gen', 'M/M', 'Multi', 'Other'];
-const STATUSES = ['Complete', 'In Progress'];
+// Static filter AC data — imported from constants
 
 interface ACItem {
   kind: 'ac';
@@ -144,6 +136,11 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
     }
   }, [focused]);
 
+  // @LOADING — vibeLoading + vibeTimerRef below simulate a 1.5s async delay.
+  //            buildVibeFilters() is synchronous regex matching — no real async op occurs.
+  //            Remove the setTimeout if/when vibe is upgraded to a real search API call
+  //            (the fetch itself will provide the async delay).
+  //            See: .claude/docs/wiring-guide.md#6-vibe-search-optional-upgrade
   // Async vibe: start 1.5s timer on any query change > 2 chars
   useEffect(() => {
     if (vibeTimerRef.current) {
@@ -381,20 +378,8 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
 
   return (
     <div ref={containerRef} className={`${styles.wrap} ${isMobileFS ? styles.wrapMobileFS : ''}`}>
-      {/* inputRow: back button (mobileFS only) + inputWrap side by side */}
+      {/* inputRow: inputWrap + close × button (mobileFS only) */}
       <div className={`${styles.inputRow} ${isMobileFS ? styles.inputRowMobileFS : ''}`}>
-        {/* Back button — mobile fullscreen only, outside inputWrap so it doesn't interfere with absolute-positioned children */}
-        {isMobileFS && (
-          <button
-            className={styles.mobileBackBtn}
-            onMouseDown={(e) => { e.preventDefault(); close(); }}
-            aria-label="Close search"
-          >
-            <svg width="8" height="14" viewBox="0 0 8 14" fill="none" aria-hidden="true">
-              <path d="M6.5 1.5L1.5 7L6.5 12.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        )}
         <div className={styles.inputWrap}>
           {/* Search icon */}
           <svg className={styles.searchIcon} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -414,7 +399,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
             }}
             onFocus={() => {
               setFocused(true);
-              if (window.innerWidth <= 480) setIsMobileFS(true);
+              if (window.matchMedia('(max-width: 480px)').matches) setIsMobileFS(true);
             }}
             onKeyDown={handleKeyDown}
             aria-label="Search"
@@ -455,6 +440,18 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
             </>
           )}
         </div>
+        {/* Close × — mobile fullscreen only, right of input */}
+        {isMobileFS && (
+          <button
+            className={styles.mobileBackBtn}
+            onMouseDown={(e) => { e.preventDefault(); close(); }}
+            aria-label="Close search"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M1.5 1.5L10.5 10.5M10.5 1.5L1.5 10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {focused && (

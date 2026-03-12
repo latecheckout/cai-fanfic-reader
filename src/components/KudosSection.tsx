@@ -20,6 +20,11 @@ export function KudosSection({ slug, totalKudos }: Props) {
   const [animating, setAnimating] = useState(false);
   const [displayCount, setDisplayCount] = useState(totalKudos);
 
+  // @WIRE  — Add to handleKudos(): POST /works/:slug/kudos after optimistic update.
+  //          On error: roll back setGiven(false) + setDisplayCount(c => c - 1).
+  //          localStorage write can remain as client-side cache.
+  // @AUTH  — Requires authentication. Show login nudge if no session (before optimistic update).
+  //          See: .claude/docs/wiring-guide.md#4-kudos
   function handleKudos() {
     if (given) return;
     setGiven(true);

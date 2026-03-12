@@ -10,6 +10,11 @@ export interface Comment {
 
 export type CommentsData = Record<string, Comment[]>;
 
+// @DUMMY — Entire object below is hardcoded placeholder data (~1100 lines).
+// @WIRE  — Replace with: GET /works/:slug/comments?chapter=:index
+//          Wire point: ChapterComments.tsx line 60 (getComments call).
+//          Delete this file once the API is live.
+//          See: .claude/docs/wiring-guide.md#3-comments
 // Keys are `${slug}-${chapterIndex}` (0-based chapter index)
 const comments: CommentsData = {
   'work-01-0': [

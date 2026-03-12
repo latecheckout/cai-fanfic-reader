@@ -1,5 +1,25 @@
 # CLAUDE.md
 
+## Handover Status
+
+> Handover documentation is complete. The following docs live in `.claude/docs/` and are the primary resource for any developer wiring this frontend to a real backend:
+
+| Doc | Purpose |
+|-----|---------|
+| [`architecture.md`](.claude/docs/architecture.md) | Full codebase map: components, state layers, route map, all dummy data locations |
+| [`wiring-guide.md`](.claude/docs/wiring-guide.md) | Integration checklist — 6 surfaces, current vs real impl, env vars needed |
+| [`api-contracts.md`](.claude/docs/api-contracts.md) | TypeScript interfaces + REST endpoint shapes for all data models |
+
+**Dummy data locations** (files that must be replaced before production):
+- `src/data/comments.ts` — `@DUMMY` hardcoded comment threads (~1100 lines)
+- `src/lib/library.ts` — `@DUMMY` `MOCK_LIBRARY` reading state (no auth)
+- `src/app/works/[slug]/page.tsx` — `@TODO-DEV` recommendations fallback
+
+**Fake loading state** (not real async):
+- `src/components/BrowseSearchBar.tsx` — `@LOADING` setTimeout on vibe search (synchronous, fake delay)
+
+---
+
 ## Project Overview
 
 Static Next.js 15 fanfic reader for Character.ai. Two surfaces: Browse page (filterable work list) and Reading page (editorial reader with morph-animated HUD panels). No database, no API — all content is statically generated from markdown files.
@@ -36,6 +56,9 @@ npm run build     # Production build
 - `src/lib/filters.ts` — `applyFilters`, `buildVibeFilters`, search option builders
 - `src/lib/markdown.ts` — remark/rehype pipeline for chapter HTML
 - `src/lib/utils.ts` — Formatters, rating helpers, word tier
+- `src/lib/constants.ts` — Canonical filter taxonomy (`RATINGS`, `WARNINGS`, `CATEGORIES`, `STATUSES`) + localStorage keys (`PRESETS_KEY`, `HISTORY_KEY`)
+- `src/lib/library.ts` — `@DUMMY` — `MOCK_LIBRARY` simulates logged-in user reading state
+- `src/data/comments.ts` — `@DUMMY` — hardcoded comment threads (~1100 lines)
 - `src/styles/globals.css` — Design tokens (CSS custom properties)
 - `src/styles/components/` — One `.module.css` per component
 - `src/types/index.ts` — WorkMeta, WorkSummary, Chapter, FilterState types

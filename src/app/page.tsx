@@ -98,6 +98,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
       <BrowseHeader />
 
       <main className={styles.main}>
+        {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
+        <h1 className="visually-hidden">Browse Works</h1>
+
         {/* Continue Reading — hidden when filters are active */}
         {!hasActiveFilters && <ContinueReadingSection />}
 

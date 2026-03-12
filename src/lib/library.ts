@@ -1,3 +1,8 @@
+// @DUMMY — MOCK_LIBRARY below simulates a logged-in user's reading state.
+// @WIRE  — Replace with: GET /user/library (requires auth)
+//          Wire point: src/app/reading/page.tsx (imports getTabSlugs).
+//          Keep LibraryTab type + LIBRARY_REMOVED_KEY constant when replacing.
+//          See: .claude/docs/wiring-guide.md#2-library--reading-state
 // Mock user library data — simulates a logged-in user's reading state.
 // In production this would come from a user API; for the prototype it's static.
 

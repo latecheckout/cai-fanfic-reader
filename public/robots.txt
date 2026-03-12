@@ -1,0 +1,8 @@
+# robots.txt — c.ai Fanfic
+# @TODO-DEV — Update the Sitemap URL to the production domain once deployed.
+#              Add a Disallow: /api/ rule if API routes are added.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://fanfic.character.ai/sitemap.xml

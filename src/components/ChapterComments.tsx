@@ -57,11 +57,17 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   const [localComments, setLocalComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
 
+  // @WIRE — Replace getComments() with: GET /works/:slug/comments?chapter=:chapterIndex
+  //         Add useEffect + fetch, loading skeleton, and error state.
+  //         localComments can merge with API response on submit.
+  //         See: .claude/docs/wiring-guide.md#3-comments
   const seededComments = getComments(slug, chapterIndex);
   const allComments = [...seededComments, ...localComments];
   const visibleComments = expanded ? allComments : allComments.slice(0, PREVIEW_COUNT);
   const hiddenCount = allComments.length - PREVIEW_COUNT;
 
+  // @WIRE  — Wire handleSubmit to: POST /works/:slug/comments
+  // @AUTH  — Requires authentication. Show login prompt if no session.
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const text = commentText.trim();
@@ -120,6 +126,9 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
         )}
 
         {/* Add comment form — always visible */}
+        {/* @TODO-DEV — When wiring to a real API, add a submission error state and
+            announce it via role="alert" so screen readers pick it up:
+            {error && <p role="alert" className={styles.formError}>{error}</p>} */}
         <form className={styles.commentForm} onSubmit={handleSubmit}>
           <textarea
             className={styles.commentInput}

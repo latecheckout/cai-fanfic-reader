@@ -1,6 +1,22 @@
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .list {
   /* The outer container — focus effect pseudo-elements attach here */
   position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .list {
+    animation: fadeIn 800ms var(--ease-out-expo) 300ms both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .list {
+    animation: fadeIn 200ms ease 100ms both;
+  }
 }
 
 .chapter {

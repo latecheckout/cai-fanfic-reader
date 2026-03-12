@@ -352,6 +352,11 @@ export function buildSearchOptions(works: WorkSummary[]): SearchOptions {
 }
 
 // ── Vibe engine ────────────────────────────────────────────────────────────
+// @TODO-DEV — VIBE_RULES below are hardcoded editorial keyword patterns.
+//             This works well for the demo. Optional upgrade: replace buildVibeFilters()
+//             with a semantic search API call for personalised / ML-powered matching.
+//             If upgrading, remove the fake setTimeout in BrowseSearchBar.tsx (~line 147).
+//             See: .claude/docs/wiring-guide.md#6-vibe-search-optional-upgrade
 
 interface VibeRule {
   kw: string[];

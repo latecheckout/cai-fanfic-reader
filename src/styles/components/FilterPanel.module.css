@@ -509,9 +509,14 @@ span.pillToggleArea {
 }
 
 /* ── Page load animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .toolbar {
-    animation: fadeUp 340ms var(--ease-out-expo) 175ms both;
+    animation: fadeUp 650ms var(--ease-out-expo) 175ms both;
   }
 }
 
@@ -699,13 +704,14 @@ span.pillToggleArea {
   font-size: 14px;
   color: var(--secondary);
   display: inline-block;
-  transform: rotate(0deg);
+  transform: rotate(-90deg);
   transition: transform 200ms var(--ease-out-expo);
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .sectionChevronOpen {
-  transform: rotate(90deg);
+  transform: rotate(0deg);
 }
 
 /* ── Section-level clear button ── */

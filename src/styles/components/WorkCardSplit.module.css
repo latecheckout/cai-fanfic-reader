@@ -9,7 +9,7 @@
   gap: 20px;
   padding: var(--space-5) 0;
   border-bottom: 1px solid var(--border);
-  transition: background var(--transition-micro), transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+  transition: background var(--transition-micro);
 }
 
 .card:last-child {
@@ -18,13 +18,10 @@
 
 .card:hover {
   background: rgba(26, 24, 22, 0.025);
-  transform: translateY(-2px);
-  box-shadow: 0 3px 14px rgba(26, 24, 22, 0.07);
 }
 
 [data-theme="dark"] .card:hover {
   background: rgba(229, 225, 216, 0.03);
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
 }
 
 /* ── Left signal strip ── */
@@ -420,22 +417,31 @@
 }
 
 /* ── Page load stagger animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .card {
-    animation: fadeUp 280ms var(--ease-out-expo) both;
+    animation: fadeUp 600ms var(--ease-out-expo) both;
   }
 
   .card:nth-child(1)  { animation-delay: 0ms; }
-  .card:nth-child(2)  { animation-delay: 20ms; }
-  .card:nth-child(3)  { animation-delay: 40ms; }
-  .card:nth-child(4)  { animation-delay: 60ms; }
-  .card:nth-child(5)  { animation-delay: 80ms; }
-  .card:nth-child(6)  { animation-delay: 100ms; }
-  .card:nth-child(7)  { animation-delay: 120ms; }
-  .card:nth-child(8)  { animation-delay: 140ms; }
-  .card:nth-child(9)  { animation-delay: 160ms; }
-  .card:nth-child(10) { animation-delay: 180ms; }
-  .card:nth-child(n+11) { animation-delay: 200ms; }
+  .card:nth-child(2)  { animation-delay: 30ms; }
+  .card:nth-child(3)  { animation-delay: 60ms; }
+  .card:nth-child(4)  { animation-delay: 90ms; }
+  .card:nth-child(5)  { animation-delay: 120ms; }
+  .card:nth-child(6)  { animation-delay: 150ms; }
+  .card:nth-child(7)  { animation-delay: 180ms; }
+  .card:nth-child(8)  { animation-delay: 210ms; }
+  .card:nth-child(9)  { animation-delay: 240ms; }
+  .card:nth-child(10) { animation-delay: 270ms; }
+  .card:nth-child(n+11) { animation-delay: 300ms; }
 }
 
 @media (prefers-reduced-motion: reduce) {

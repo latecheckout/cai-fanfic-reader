@@ -8,6 +8,7 @@ import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
 import { FilterPanel } from './FilterPanel';
 import { WorkCard } from './WorkCard';
 import styles from '@/styles/components/LibraryShell.module.css';
+import { SkeletonCard } from './SkeletonCard';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -54,21 +55,6 @@ interface Props {
 }
 
 const SKELETON_COUNT = 3;
-
-function SkeletonCard({ index }: { index: number }) {
-  return (
-    <div className={styles.skeletonCard} style={{ animationDelay: `${index * 40}ms` }}>
-      <div className={styles.skeletonStrip} />
-      <div className={styles.skeletonContent}>
-        <div className={styles.skeletonLine} style={{ width: '45%', height: '10px', marginBottom: '10px' }} />
-        <div className={styles.skeletonLine} style={{ width: '80%', height: '15px', marginBottom: '6px' }} />
-        <div className={styles.skeletonLine} style={{ width: '30%', height: '11px', marginBottom: '12px' }} />
-        <div className={styles.skeletonLine} style={{ width: '65%', height: '12px', marginTop: '14px' }} />
-        <div className={styles.skeletonLine} style={{ width: '40%', height: '10px', marginTop: '12px' }} />
-      </div>
-    </div>
-  );
-}
 
 export function LibraryShell({
   works,
@@ -175,7 +161,7 @@ export function LibraryShell({
       <div className={styles.workList}>
         {isFiltering ? (
           Array.from({ length: SKELETON_COUNT }, (_, i) => (
-            <SkeletonCard key={i} index={i} />
+            <SkeletonCard key={i} index={i} styles={styles} variant="library" />
           ))
         ) : displayedWorks.length === 0 ? (
           <div className={styles.empty}>

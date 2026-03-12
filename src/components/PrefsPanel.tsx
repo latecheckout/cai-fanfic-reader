@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import styles from '@/styles/components/ReadingPrefsPanel.module.css';
+import styles from '@/styles/components/PrefsPanel.module.css';
 
 interface Props {
   onClose: () => void;

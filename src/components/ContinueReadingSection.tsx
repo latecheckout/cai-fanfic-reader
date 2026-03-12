@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
+
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 interface Bookmark {
   slug: string;
@@ -25,7 +28,7 @@ export function ContinueReadingSection() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     try {
       const raw = localStorage.getItem('fanfic-bookmarks');
       if (raw) {

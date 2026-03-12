@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
 import { BrowseSearchBar } from './BrowseSearchBar';
 import styles from '@/styles/components/FilterPanel.module.css';
+import { PRESETS_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 
 interface Props {
   options: FilterOptions;
@@ -46,8 +47,6 @@ interface Props {
   basePath?: string;
 }
 
-// Standard AO3 filter values
-const RATINGS = ['General Audiences', 'Teen And Up Audiences', 'Mature', 'Explicit', 'Not Rated'];
 const RATING_LABELS: Record<string, string> = {
   'General Audiences': 'G',
   'Teen And Up Audiences': 'T',
@@ -69,15 +68,6 @@ const RATING_SHORT_NAMES: Record<string, string> = {
   'Explicit': 'Explicit',
   'Not Rated': 'Not Rated',
 };
-const CATEGORIES = ['F/F', 'F/M', 'Gen', 'M/M', 'Multi', 'Other'];
-const STATUSES = ['Complete', 'In Progress'];
-const WARNINGS = [
-  'Major Character Death',
-  'Graphic Depictions Of Violence',
-  'Non-Con',
-  'Underage',
-  'Creator Chose Not To Use Archive Warnings',
-];
 const WARNING_LABELS: Record<string, string> = {
   'Major Character Death': 'Major Death',
   'Graphic Depictions Of Violence': 'Graphic Violence',
@@ -139,8 +129,6 @@ const INC_EX_MAP: Record<string, { incKey: string; exKey: string } | null> = {
   ex_warning: { incKey: 'warning', exKey: 'ex_warning' },
   q: null,
 };
-
-const PRESETS_KEY = 'cai_fanfic_presets';
 
 function parsePresetParams(params: string): string {
   const p = new URLSearchParams(params);
@@ -930,7 +918,7 @@ export function FilterPanel({
 
         {/* Subrow: always visible — work count (left) + view toggle (right) */}
         <div className={styles.subrow}>
-          <span className={styles.workCount}>
+          <span className={styles.workCount} aria-live="polite" aria-atomic="true">
             <span key={filteredCount} className={styles.countRoll}>
               {filteredCount === totalCount
                 ? `${totalCount} works`
@@ -1027,17 +1015,17 @@ export function FilterPanel({
                     onClick={() => toggleSection('sort')}
                     aria-expanded={isSectionOpen('sort')}
                   >
-                    <span className={styles.sectionLabel}>Sort</span>
-                    <svg className={`${styles.chevron} ${isSectionOpen('sort') ? styles.chevronOpen : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                    <svg className={`${styles.sectionChevron} ${isSectionOpen('sort') ? styles.sectionChevronOpen : ''}`} width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
                       <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
+                    <span className={styles.drawerLabel}>Sort</span>
                   </button>
                   {isSectionOpen('sort') && (
-                    <div className={styles.pillRow}>
+                    <div className={styles.drawerPills}>
                       {SORT_OPTIONS.map((opt) => (
                         <button
                           key={opt.value}
-                          className={`${styles.drawerPill} ${currentSortValue === opt.value ? styles.drawerPillInclude : ''}`}
+                          className={`${styles.dPill} ${currentSortValue === opt.value ? styles.dPillInclude : ''}`}
                           onClick={() => { handleSortChange(opt.value); }}
                         >
                           {opt.label}

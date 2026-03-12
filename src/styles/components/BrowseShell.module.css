@@ -1,7 +1,18 @@
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 .workList {
   display: flex;
   flex-direction: column;
   transition: opacity 180ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .workList {
+    animation: fadeIn 650ms var(--ease-out-expo) 400ms both;
+  }
 }
 
 /* ── Back link (e.g. "← Characters" when navigating from characters page) ── */

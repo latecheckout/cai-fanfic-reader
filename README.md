@@ -1,4 +1,4 @@
-# Cai Fanfic Reader
+# c.ai Fanfic Reader
 
 A front-end exploration for reading AI-generated fanfiction, built for Character.ai. Inspired by AO3's information density and reading experience — rebuilt with intentional typography, a rich metadata system, and a book-like reading view.
 
@@ -29,6 +29,21 @@ Content lives entirely in markdown files with YAML frontmatter — no database, 
 
 ---
 
+## Integration Status
+
+This frontend is a complete static prototype — no API calls exist. All interactive surfaces use local dummy data.
+
+**Before shipping to production, wire up:**
+- Content API (`GET /works`, `GET /works/:slug`) — replaces static markdown files
+- User library / reading state — replaces `src/lib/library.ts` `MOCK_LIBRARY`
+- Comments — replaces `src/data/comments.ts` hardcoded object
+- Kudos — extends `src/components/KudosSection.tsx` localStorage to a real `POST`
+- Recommendations — replaces same-fandom fallback in `src/app/works/[slug]/page.tsx`
+
+Full integration checklist, API contracts, and TypeScript interfaces: **`.claude/docs/`**
+
+---
+
 ## Project Structure
 
 ```
@@ -47,30 +62,40 @@ fanfic-reader/
 │   │
 │   ├── components/
 │   │   ├── BrowseHeader.tsx        # Logo + nav tabs
-│   │   ├── ContinueReading.tsx     # In-progress works strip
-│   │   ├── FilterPanel.tsx         # Filter bar + active filter pills
-│   │   ├── SearchOverlay.tsx       # Full-screen search/filter overlay
-│   │   ├── SortDropdown.tsx        # Sort menu
-│   │   ├── WorkCard.tsx            # Browse list item
+│   │   ├── BrowseSearchBar.tsx     # Always-visible search bar (⌘K focuses it)
+│   │   ├── BrowseShell.tsx         # Browse page client shell (view toggle, count)
+│   │   ├── ContinueReadingSection.tsx  # In-progress works strip
+│   │   ├── FilterPanel.tsx         # Filter bar + active filter pills + filter drawer
+│   │   ├── SkeletonCard.tsx        # Shared loading skeleton (browse + library)
+│   │   ├── WorkCard.tsx            # Browse list item (default layout)
+│   │   ├── WorkCardSplit.tsx       # Browse list item (split layout)
 │   │   ├── WorkHeader.tsx          # Reading page editorial header
 │   │   ├── ReadingHUD.tsx          # Fixed back button (reading page)
 │   │   ├── ReadingCluster.tsx      # Sticky pill cluster + morph panels
 │   │   ├── MetadataOverlay.tsx     # Work details panel (morphs from title pill)
-│   │   ├── ChapterPanel.tsx        # Chapter nav panel (morphs from chapter pill)
+│   │   ├── ChapterDrawer.tsx       # Chapter nav panel (morphs from chapter pill)
 │   │   ├── PrefsPanel.tsx          # Reading preferences panel (morphs from settings pill)
 │   │   ├── ChapterList.tsx         # Renders all chapters in one scroll
 │   │   ├── ChapterContent.tsx      # Single chapter with header
+│   │   ├── ChapterComments.tsx     # Per-chapter comments (dummy data — see @WIRE)
+│   │   ├── KudosSection.tsx        # Kudos button (localStorage — see @WIRE)
 │   │   ├── ChapterBreak.tsx        # Full-width divider between chapters
 │   │   ├── RatingBadge.tsx         # Rating square (G/T/M/E/NR)
 │   │   ├── FocusEffect.tsx         # Ambient scroll focus (dims edges)
-│   │   └── Recommendations.tsx     # End-of-work recommendations
+│   │   └── EndOfStory.tsx          # End-of-work recommendations
 │   │
 │   ├── context/
 │   │   └── ReadingContext.tsx      # Reading state (chapter index, preferences, scroll)
 │   │
+│   ├── data/
+│   │   └── comments.ts             # @DUMMY — hardcoded comment threads (~1100 lines)
+│   │
 │   ├── lib/
 │   │   ├── works.ts                # Loads and parses all works from content/
+│   │   ├── library.ts              # @DUMMY — MOCK_LIBRARY reading state
+│   │   ├── filters.ts              # applyFilters, buildVibeFilters, filter helpers
 │   │   ├── markdown.ts             # remark/rehype pipeline for chapter HTML
+│   │   ├── constants.ts            # Shared constants (RATINGS, WARNINGS, CATEGORIES, etc.)
 │   │   └── utils.ts                # Formatters, rating class helpers, word tier
 │   │
 │   ├── styles/
@@ -78,13 +103,18 @@ fanfic-reader/
 │   │   └── components/             # One .module.css per component
 │   │
 │   └── types/
-│       └── index.ts                # WorkMeta, WorkSummary, Chapter types
+│       └── index.ts                # WorkMeta, WorkSummary, Chapter, FilterState types
 │
 ├── public/
-│   └── fonts/                      # Self-hosted web fonts
+│   ├── fonts/                      # Self-hosted web fonts
+│   └── robots.txt                  # @TODO-DEV — update Sitemap URL before deploying
 │
 └── .claude/
-    └── launch.json                 # Dev server config (uses Node 22 binary)
+    ├── launch.json                 # Dev server config (uses Node 22 binary)
+    └── docs/
+        ├── architecture.md         # Full codebase map: components, state, routes
+        ├── wiring-guide.md         # Integration checklist with current vs real impl
+        └── api-contracts.md        # TypeScript interfaces + REST endpoint shapes
 ```
 
 ---
@@ -177,7 +207,7 @@ Clicking a pill in the filter drawer cycles: neutral → include (green) → exc
 
 ### Vibe search
 
-Descriptive queries in the search overlay (⌘K) are intercepted before falling through to `?q=` text search. Example queries:
+Descriptive queries in the search bar are intercepted before falling through to `?q=` text search. When a query matches a vibe keyword, a **✦ Vibe** row appears at the top of the dropdown with a preview of the inferred filters — selecting it applies them immediately. Example queries:
 
 - `"cozy no deaths"` → includes Fluff, Hurt/Comfort, Happy Ending; excludes Major Character Death warning
 - `"slow burn pining"` → includes Slow Burn, Pining

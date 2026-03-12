@@ -26,11 +26,24 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const work = getWork(slug);
   if (!work) return { title: 'Not Found' };
+  const description = work.meta.summary
+    ? work.meta.summary.slice(0, 160)
+    : `A ${work.meta.rating} fanfic by ${work.meta.author} · ${work.meta.words.toLocaleString()} words`;
   return {
     title: `${work.meta.title} by ${work.meta.author}`,
+    description,
+    openGraph: {
+      title: `${work.meta.title} by ${work.meta.author}`,
+      description,
+      siteName: 'c.ai Fanfic',
+    },
   };
 }
 
+// @TODO-DEV — getRecommendations() is a local fallback: same fandom, different slug.
+//             Replace with: GET /works/:slug/recommendations once the API is available.
+//             Fails silently (returns []) — EndOfStory handles empty gracefully.
+//             See: .claude/docs/wiring-guide.md#5-recommendations
 function getRecommendations(slug: string, fandom: string[]): WorkSummary[] {
   try {
     const allWorks = getWorkSummaries();

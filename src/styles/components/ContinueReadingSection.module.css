@@ -3,9 +3,24 @@
    From localStorage bookmarks. Hidden when no bookmarks.
    ============================================================ */
 
+@keyframes expandIn {
+  from { max-height: 0; opacity: 0; }
+  to   { max-height: 400px; opacity: 1; }
+}
+
 .section {
   margin-bottom: var(--space-8);
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .section {
+    animation: expandIn 200ms var(--ease-out-expo) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section { overflow: visible; }
 }
 
 /* ── Section header band ── */
@@ -119,15 +134,20 @@
 }
 
 /* ── Page load stagger ── */
+@keyframes fadeUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .card:nth-child(1) {
-    animation: fadeUp 340ms var(--ease-out-expo) 25ms both;
+    animation: fadeUp 650ms var(--ease-out-expo) 30ms both;
   }
   .card:nth-child(2) {
-    animation: fadeUp 340ms var(--ease-out-expo) 50ms both;
+    animation: fadeUp 650ms var(--ease-out-expo) 60ms both;
   }
   .card:nth-child(3) {
-    animation: fadeUp 340ms var(--ease-out-expo) 75ms both;
+    animation: fadeUp 650ms var(--ease-out-expo) 90ms both;
   }
 }
 

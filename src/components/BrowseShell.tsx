@@ -10,6 +10,7 @@ import { FilterPanel } from './FilterPanel';
 import { WorkCard } from './WorkCard';
 import { WorkCardSplit } from './WorkCardSplit';
 import styles from '@/styles/components/BrowseShell.module.css';
+import { SkeletonCard } from './SkeletonCard';
 
 interface Props {
   works: WorkSummary[];
@@ -49,28 +50,9 @@ interface Props {
   from?: string;
 }
 
+// @TODO-DEV — SkeletonCard is shown during filter changes. Once content comes from an API,
+//             trigger it from a real loading/fetch state. See src/components/SkeletonCard.tsx.
 const SKELETON_COUNT = 6;
-
-function SkeletonCard({ index }: { index: number }) {
-  return (
-    <div className={styles.skeletonCard} style={{ animationDelay: `${index * 40}ms` }}>
-      <div className={styles.skeletonStrip} />
-      <div className={styles.skeletonContent}>
-        <div className={styles.skeletonLine} style={{ width: '45%', height: '10px', marginBottom: '10px' }} />
-        <div className={styles.skeletonLine} style={{ width: '85%', height: '15px', marginBottom: '6px' }} />
-        <div className={styles.skeletonLine} style={{ width: '30%', height: '11px', marginBottom: '12px' }} />
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' as const }}>
-          <div className={styles.skeletonChip} />
-          <div className={styles.skeletonChip} style={{ width: '64px' }} />
-          <div className={styles.skeletonChip} style={{ width: '80px' }} />
-        </div>
-        <div className={styles.skeletonLine} style={{ width: '70%', height: '12px', marginTop: '14px' }} />
-        <div className={styles.skeletonLine} style={{ width: '55%', height: '12px', marginTop: '5px' }} />
-        <div className={styles.skeletonLine} style={{ width: '40%', height: '10px', marginTop: '12px' }} />
-      </div>
-    </div>
-  );
-}
 
 const FROM_LABELS: Record<string, { href: string; label: string }> = {
   characters: { href: '/characters', label: '← Characters' },
@@ -144,7 +126,7 @@ export function BrowseShell({
       <div className={styles.workList}>
         {isFiltering ? (
           Array.from({ length: SKELETON_COUNT }, (_, i) => (
-            <SkeletonCard key={i} index={i} />
+            <SkeletonCard key={i} index={i} styles={styles} />
           ))
         ) : works.length === 0 ? (
           <div className={styles.empty}>
