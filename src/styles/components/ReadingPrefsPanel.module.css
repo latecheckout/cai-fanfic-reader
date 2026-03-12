@@ -3,10 +3,10 @@
    Opens from prefs button. Rounded panel with no header rule.
    ============================================================ */
 
-/* ── Morph container — z-300, no CSS transition (set inline by JS) ── */
+/* ── Morph container — z-panel, no CSS transition (set inline by JS) ── */
 .panel {
   position: fixed;
-  z-index: 300;
+  z-index: var(--z-panel);
   overflow: hidden;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -18,6 +18,25 @@
   width: 0;
   height: 0;
   /* transition is set inline by JS during open/close */
+}
+
+/* ── Sheet context — overrides morph defaults when used in a bottom sheet ── */
+.panelInSheet {
+  position: static !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+}
+
+.panelInSheet .panelContent {
+  opacity: 1 !important;
 }
 
 .panel[data-state="open"] {
@@ -240,6 +259,64 @@
 .segActive:hover {
   background: var(--text);
   color: var(--bg);
+}
+
+/* ── Font picker — 3 full-width preview blocks ── */
+.fontPicker {
+  display: flex;
+  border: 1px solid var(--border-chip);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fontBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 4px 10px;
+  cursor: pointer;
+  border-right: 1px solid var(--border-chip);
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  background: none;
+  color: var(--secondary);
+  transition: background var(--transition-micro), color var(--transition-micro);
+}
+
+.fontBlock:last-child {
+  border-right: none;
+}
+
+.fontBlock:hover {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  color: var(--text);
+}
+
+.fontBlockActive {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.fontBlockActive:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.fontPreview {
+  font-size: 26px;
+  line-height: 1;
+  display: block;
+}
+
+.fontLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  display: block;
 }
 
 /* ── Theme swatches — swatch circle + label ── */

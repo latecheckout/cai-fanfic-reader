@@ -142,7 +142,10 @@
   border-radius: 50%;
   background: var(--rating-t);
   flex-shrink: 0;
-  animation: pulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulseDot { animation: pulse 2s ease-in-out infinite; }
 }
 
 @keyframes pulse {

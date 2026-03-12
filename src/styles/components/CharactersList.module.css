@@ -1,0 +1,161 @@
+/* ============================================================
+   CHARACTERS LIST — Live-search alphabetical character directory
+   ============================================================ */
+
+/* ── Search row ── */
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.inputWrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  height: 36px;
+  padding: 0 36px 0 34px;
+  border: 1px solid var(--border-chip);
+  border-radius: 999px;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.input::placeholder {
+  color: var(--secondary);
+  opacity: 0.6;
+}
+
+.input:focus {
+  border-color: var(--text);
+}
+
+.clearBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--secondary);
+  padding: 0;
+  transition: color 120ms ease;
+}
+
+.clearBtn:hover {
+  color: var(--text);
+}
+
+.resultCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+/* ── Groups ── */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.group {
+  display: flex;
+  gap: var(--space-6);
+  border-top: 1px solid var(--border);
+  padding: var(--space-5) 0;
+}
+
+.group:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.groupLetter {
+  width: 24px;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--secondary);
+  opacity: 0.5;
+  padding-top: 3px;
+}
+
+/* ── Character list ── */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.item {
+  display: block;
+}
+
+.charLink {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-2) 0;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity var(--transition-micro);
+}
+
+.charLink:hover {
+  opacity: 0.65;
+}
+
+.charName {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text);
+  min-width: 0;
+}
+
+.charCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--secondary);
+  flex-shrink: 0;
+}
+
+/* ── Empty state ── */
+.empty {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--secondary);
+  padding: var(--space-8) 0;
+}

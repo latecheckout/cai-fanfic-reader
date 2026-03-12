@@ -1,4 +1,4 @@
-# C.ai Fanfic Reader
+# c.ai Fanfic Reader
 
 A front-end exploration for reading AI-generated fanfiction, built for Character.ai. Inspired by AO3's information density and reading experience — rebuilt with intentional typography, a rich metadata system, and a book-like reading view.
 

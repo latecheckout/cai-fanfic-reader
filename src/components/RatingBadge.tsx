@@ -28,7 +28,7 @@ export function RatingBadge({ rating }: Props) {
   return (
     <span
       className={`${styles.badge} ${styles[cls as keyof typeof styles] ?? ''}`}
-      title={rating}
+      data-tooltip={rating}
       aria-label={`Rating: ${rating}`}
     >
       {label}

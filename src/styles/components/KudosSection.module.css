@@ -63,7 +63,9 @@
   92%  { transform: scale(0.98); }
   100% { transform: scale(1); }
 }
-.pop { animation: kudobounce 580ms var(--spring) forwards; }
+@media (prefers-reduced-motion: no-preference) {
+  .pop { animation: kudobounce 580ms var(--spring) forwards; }
+}
 
 /* ── Count ──────────────────────────────────────────────────────────── */
 .count {
@@ -81,8 +83,10 @@
   40%       { transform: scale(1.22); }
 }
 .countPop {
-  animation: countpop 380ms ease-out;
   opacity: 0.85 !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .countPop { animation: countpop 380ms ease-out; }
 }
 
 /* ── Heart particles ────────────────────────────────────────────────── */
@@ -112,15 +116,17 @@
 @keyframes h11 { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1);        } 100% { opacity: 0; transform: translate(calc(-50% - 51px), calc(-50% - 36px)) scale(.5) rotate( 45deg); } }
 @keyframes h12 { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1);        } 100% { opacity: 0; transform: translate(calc(-50% - 23px), calc(-50% - 56px)) scale(.3) rotate(-30deg); } }
 
-.pop .heart:nth-child(1)  { animation: h1  520ms ease-out forwards   0ms; font-size: 12px; }
-.pop .heart:nth-child(2)  { animation: h2  480ms ease-out forwards  20ms; font-size:  9px; }
-.pop .heart:nth-child(3)  { animation: h3  550ms ease-out forwards  10ms; font-size: 14px; }
-.pop .heart:nth-child(4)  { animation: h4  500ms ease-out forwards  40ms; font-size:  8px; }
-.pop .heart:nth-child(5)  { animation: h5  530ms ease-out forwards  15ms; font-size: 11px; }
-.pop .heart:nth-child(6)  { animation: h6  490ms ease-out forwards  55ms; font-size: 10px; }
-.pop .heart:nth-child(7)  { animation: h7  560ms ease-out forwards   5ms; font-size: 13px; }
-.pop .heart:nth-child(8)  { animation: h8  510ms ease-out forwards  35ms; font-size:  9px; }
-.pop .heart:nth-child(9)  { animation: h9  540ms ease-out forwards  25ms; font-size: 12px; }
-.pop .heart:nth-child(10) { animation: h10 480ms ease-out forwards  60ms; font-size:  8px; }
-.pop .heart:nth-child(11) { animation: h11 520ms ease-out forwards  45ms; font-size: 11px; }
-.pop .heart:nth-child(12) { animation: h12 500ms ease-out forwards  30ms; font-size: 10px; }
+@media (prefers-reduced-motion: no-preference) {
+  .pop .heart:nth-child(1)  { animation: h1  520ms ease-out forwards   0ms; font-size: 12px; }
+  .pop .heart:nth-child(2)  { animation: h2  480ms ease-out forwards  20ms; font-size:  9px; }
+  .pop .heart:nth-child(3)  { animation: h3  550ms ease-out forwards  10ms; font-size: 14px; }
+  .pop .heart:nth-child(4)  { animation: h4  500ms ease-out forwards  40ms; font-size:  8px; }
+  .pop .heart:nth-child(5)  { animation: h5  530ms ease-out forwards  15ms; font-size: 11px; }
+  .pop .heart:nth-child(6)  { animation: h6  490ms ease-out forwards  55ms; font-size: 10px; }
+  .pop .heart:nth-child(7)  { animation: h7  560ms ease-out forwards   5ms; font-size: 13px; }
+  .pop .heart:nth-child(8)  { animation: h8  510ms ease-out forwards  35ms; font-size:  9px; }
+  .pop .heart:nth-child(9)  { animation: h9  540ms ease-out forwards  25ms; font-size: 12px; }
+  .pop .heart:nth-child(10) { animation: h10 480ms ease-out forwards  60ms; font-size:  8px; }
+  .pop .heart:nth-child(11) { animation: h11 520ms ease-out forwards  45ms; font-size: 11px; }
+  .pop .heart:nth-child(12) { animation: h12 500ms ease-out forwards  30ms; font-size: 10px; }
+}

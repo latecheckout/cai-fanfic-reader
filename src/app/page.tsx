@@ -38,6 +38,9 @@ interface PageProps {
     date_preset?: string;
     date_from?: string;
     date_to?: string;
+    preset?: string;
+    /** Navigation source — used to show a back link ('characters') */
+    from?: string;
   }>;
 }
 
@@ -86,12 +89,13 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     params.ex_fandom || params.ex_relationship || params.ex_tag ||
     params.ex_character || params.ex_rating || params.ex_status ||
     params.ex_category || params.ex_warning ||
-    params.date_preset || params.date_from || params.date_to
+    params.date_preset || params.date_from || params.date_to ||
+    params.preset
   );
 
   return (
     <div className={styles.page}>
-      <BrowseHeader searchOptions={searchOptions} />
+      <BrowseHeader />
 
       <main className={styles.main}>
         {/* Continue Reading — hidden when filters are active */}
@@ -105,6 +109,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
             currentFilters={params}
             totalCount={allWorks.length}
             filteredCount={filteredWorks.length}
+            from={params.from}
           />
         </Suspense>
       </main>

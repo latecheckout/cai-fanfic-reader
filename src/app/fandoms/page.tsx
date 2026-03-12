@@ -26,7 +26,7 @@ export default function FandomsPage() {
 
   return (
     <div>
-      <BrowseHeader searchOptions={searchOptions} />
+      <BrowseHeader />
       <main className={styles.main}>
         <div className={styles.titleRow}>
           <h2 className={styles.heading}>Fandoms</h2>

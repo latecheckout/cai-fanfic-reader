@@ -38,9 +38,9 @@ function getTargetRect(
     return { left, top: pillRect.bottom + 8, width: w, height: h };
   }
 
-  // prefs — 260×314, hugs content (header 48 + sections 266)
+  // prefs — 260×420, hugs content (header 48 + font section 86 + gap 20 + 3 existing sections 266)
   const w = 260;
-  const h = 314;
+  const h = 420;
   const midX = pillRect.left + pillRect.width / 2;
   const left = Math.max(12, Math.min(midX - w / 2, vw - w - 12));
   return { left, top: pillRect.bottom + 10, width: w, height: h };

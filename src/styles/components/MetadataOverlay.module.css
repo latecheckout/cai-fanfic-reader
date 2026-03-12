@@ -4,10 +4,10 @@
    JS sets inline styles during open/close animation.
    ============================================================ */
 
-/* ── Morph container — z-300, no CSS transition (set inline by JS) ── */
+/* ── Morph container — z-panel, no CSS transition (set inline by JS) ── */
 .panel {
   position: fixed;
-  z-index: 300;
+  z-index: var(--z-panel);
   overflow: hidden;
   background: var(--card-bg);
   border: 1px solid var(--card-border);

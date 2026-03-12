@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Chapter, WorkMeta, WorkSummary } from '@/types';
 import { ChapterContent } from './ChapterContent';
 import { ChapterBreak } from './ChapterBreak';
@@ -21,13 +21,17 @@ interface Props {
 const HUD_OFFSET = 90;
 
 export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta }: Props) {
-  const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex } = useReading();
+  const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex, activeChapterIndex, chapterTitles, scrollToChapter } = useReading();
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didRestoreRef = useRef(false);
   const activeRef = useRef(0);
   const furthestPctRef = useRef(0);
   const listRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const [flashChapter, setFlashChapter] = useState<number | null>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Restore scroll position on mount; also load furthest position for marker
   useEffect(() => {
@@ -130,6 +134,42 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
     };
   }, [saveScrollPosition]);
 
+  // Swipe left/right to jump chapters (mobile)
+  useEffect(() => {
+    function onTouchStart(e: TouchEvent) {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+    }
+    function onTouchEnd(e: TouchEvent) {
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+      if (Math.abs(dx) > 50 && dy < 40) {
+        const current = activeRef.current;
+        if (dx < 0 && current < totalChapters - 1) {
+          const next = current + 1;
+          scrollToChapter(next);
+          showFlash(next);
+        } else if (dx > 0 && current > 0) {
+          const prev = current - 1;
+          scrollToChapter(prev);
+          showFlash(prev);
+        }
+      }
+    }
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [totalChapters, scrollToChapter]);
+
+  function showFlash(idx: number) {
+    setFlashChapter(idx);
+    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    flashTimerRef.current = setTimeout(() => setFlashChapter(null), 1500);
+  }
+
   const setRef = useCallback(
     (i: number) => (el: HTMLElement | null) => {
       sectionRefs.current[i] = el;
@@ -139,6 +179,13 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
   );
 
   return (
+    <>
+    {/* Chapter flash toast — shown briefly after swipe navigation */}
+    <div className={`${styles.chapterFlash} ${flashChapter !== null ? styles.chapterFlashVisible : ''}`} aria-live="polite" aria-atomic="true">
+      {flashChapter !== null && (
+        <>Ch. {flashChapter + 1}{chapterTitles[flashChapter] ? `: ${chapterTitles[flashChapter]}` : ''}</>
+      )}
+    </div>
     <div ref={listRef} className={`${styles.list} prose-outer`}>
       {chapters.map((chapter, i) => (
         <div key={i}>
@@ -186,5 +233,6 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
 
       <EndOfStory slug={slug} recommendations={recommendations} />
     </div>
+    </>
   );
 }

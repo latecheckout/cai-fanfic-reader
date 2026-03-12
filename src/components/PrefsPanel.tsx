@@ -5,8 +5,11 @@ import styles from '@/styles/components/ReadingPrefsPanel.module.css';
 
 interface Props {
   onClose: () => void;
+  /** When true, overrides the morph-animation defaults for use inside a bottom sheet */
+  inSheet?: boolean;
 }
 
+type FontFamily = 'serif' | 'sans' | 'dyslexic';
 type Theme = 'default' | 'light' | 'paper' | 'dark';
 type LineWidth = 'narrow' | 'default' | 'wide';
 
@@ -15,6 +18,12 @@ const LINE_WIDTH_VALUES: Record<LineWidth, string> = {
   default: 'var(--line-width-default)',
   wide: 'var(--line-width-wide)',
 };
+
+const FONT_OPTIONS: { value: FontFamily; label: string; fontFamily: string }[] = [
+  { value: 'serif',    label: 'Serif',    fontFamily: '"Lora", Georgia, serif' },
+  { value: 'sans',     label: 'Sans',     fontFamily: '"Character Sans", system-ui, sans-serif' },
+  { value: 'dyslexic', label: 'Dyslexic', fontFamily: '"OpenDyslexic", cursive' },
+];
 
 const THEME_SWATCHES: { value: Theme; color: string | null; label: string }[] = [
   { value: 'default', color: null,      label: 'System' },
@@ -49,7 +58,8 @@ const WIDTH_ICONS: Record<LineWidth, React.ReactNode> = {
 };
 
 export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
-  function PrefsPanel({ onClose }, ref) {
+  function PrefsPanel({ onClose, inSheet }, ref) {
+    const [fontFamily, setFontFamily] = useState<FontFamily>('serif');
     const [fontSize, setFontSize] = useState(19);
     const [lineWidth, setLineWidth] = useState<LineWidth>('default');
     const [theme, setTheme] = useState<Theme>(() => {
@@ -61,14 +71,41 @@ export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
     // Load saved prefs from localStorage
     useEffect(() => {
       try {
-        const savedFont = localStorage.getItem('fanfic-font-size');
-        if (savedFont) setFontSize(Number(savedFont));
+        const savedSize = localStorage.getItem('fanfic-font-size');
+        if (savedSize) setFontSize(Number(savedSize));
         const savedWidth = localStorage.getItem('fanfic-line-width') as LineWidth | null;
         if (savedWidth) setLineWidth(savedWidth);
+        const savedFamily = localStorage.getItem('fanfic-font') as FontFamily | null;
+        if (savedFamily) setFontFamily(savedFamily);
       } catch {
         // Fail silently
       }
     }, []);
+
+    function setBackdropAdjusting(active: boolean) {
+      const el = document.querySelector('[data-panel-backdrop]');
+      if (active) {
+        el?.setAttribute('data-adjusting', 'true');
+      } else {
+        el?.removeAttribute('data-adjusting');
+      }
+    }
+
+    function handleAdjustStart() {
+      setIsDragging(true);
+      setBackdropAdjusting(true);
+    }
+
+    function handleAdjustEnd() {
+      setIsDragging(false);
+      setBackdropAdjusting(false);
+    }
+
+    function applyFontFamily(f: FontFamily) {
+      setFontFamily(f);
+      document.documentElement.setAttribute('data-font', f);
+      try { localStorage.setItem('fanfic-font', f); } catch { /**/ }
+    }
 
     function applyFontSize(size: number) {
       setFontSize(size);
@@ -102,23 +139,13 @@ export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
       }
     }
 
-    function handleDragStart() {
-      setIsDragging(true);
-      document.querySelector('[data-panel-backdrop]')?.setAttribute('data-dragging', 'true');
-    }
-
-    function handleDragEnd() {
-      setIsDragging(false);
-      document.querySelector('[data-panel-backdrop]')?.removeAttribute('data-dragging');
-    }
-
     // Thumb ratio 0–1 for tooltip CSS positioning
     const thumbRatio = (fontSize - 16) / 8;
 
     return (
       <div
         ref={ref}
-        className={styles.panel}
+        className={`${styles.panel} ${inSheet ? styles.panelInSheet : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label="Reading preferences"
@@ -134,7 +161,35 @@ export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
             </button>
           </div>
 
-          <div className={styles.sections}>
+          <div
+            className={styles.sections}
+            onPointerDown={handleAdjustStart}
+            onPointerUp={handleAdjustEnd}
+          >
+            {/* Font family */}
+            <div className={styles.section}>
+              <span className={styles.sectionLabel}>Font</span>
+              <div className={styles.fontPicker}>
+                {FONT_OPTIONS.map((f) => (
+                  <button
+                    key={f.value}
+                    className={`${styles.fontBlock} ${fontFamily === f.value ? styles.fontBlockActive : ''}`}
+                    onClick={() => applyFontFamily(f.value)}
+                    aria-pressed={fontFamily === f.value}
+                  >
+                    <span
+                      className={styles.fontPreview}
+                      style={{ fontFamily: f.fontFamily }}
+                      aria-hidden="true"
+                    >
+                      Aa
+                    </span>
+                    <span className={styles.fontLabel}>{f.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Font size */}
             <div className={styles.section}>
               <label className={styles.sectionLabel} htmlFor="prefs-font-size">
@@ -159,8 +214,6 @@ export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
                     step={1}
                     value={fontSize}
                     onChange={(e) => applyFontSize(Number(e.target.value))}
-                    onPointerDown={handleDragStart}
-                    onPointerUp={handleDragEnd}
                     className={styles.range}
                   />
                 </div>

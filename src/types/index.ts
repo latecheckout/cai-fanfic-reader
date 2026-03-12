@@ -41,6 +41,7 @@ export interface Work {
 export interface WorkSummary {
   meta: WorkMeta;
   slug: string;
+  textChunks?: { chapter: string; text: string }[];
 }
 
 export interface FilterState {

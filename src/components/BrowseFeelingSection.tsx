@@ -45,7 +45,7 @@ export function BrowseFeelingSection({ data }: Props) {
             href={`/?fandom=${encodeURIComponent(activeFandom.name)}`}
             className={`${styles.block} ${styles.blockFandom}`}
           >
-            <span className={styles.fandomEyebrow}>Active fandom</span>
+            <span className={styles.fandomEyebrow}>Active character</span>
             <h3 className={styles.fandomName}>{activeFandom.name}</h3>
             <div className={styles.fandomPulse}>
               <span className={styles.pulseDot} aria-hidden="true" />

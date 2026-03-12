@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import React from 'react';
 import styles from '@/styles/components/CustomSelect.module.css';
 
 export interface SelectOption {
@@ -14,9 +15,10 @@ interface Props {
   options: SelectOption[];
   placeholder?: string;
   id?: string;
+  icon?: React.ReactNode;
 }
 
-export function CustomSelect({ value, onChange, options, placeholder = 'Select...', id }: Props) {
+export function CustomSelect({ value, onChange, options, placeholder = 'Select...', id, icon }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -83,6 +85,7 @@ export function CustomSelect({ value, onChange, options, placeholder = 'Select..
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
+        {icon && <span className={styles.triggerIcon}>{icon}</span>}
         <span className={styles.triggerLabel}>{currentLabel}</span>
         <svg
           className={`${styles.arrow} ${isOpen ? styles.arrowOpen : ''}`}

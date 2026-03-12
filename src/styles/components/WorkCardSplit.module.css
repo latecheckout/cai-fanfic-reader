@@ -1,9 +1,6 @@
 /* ============================================================
    WORK CARD SPLIT — Two-column content layout
-   Left strip (identical to WorkCard) + dual content columns:
-   colLeft: title, author, summary, stats (identity)
-   colRight: fandom, ships, tags (discovery / scan targets)
-   Stretched link pattern identical to WorkCard.
+   Left strip (identical to WorkCard) + dual content columns
    ============================================================ */
 
 .card {
@@ -12,7 +9,7 @@
   gap: 20px;
   padding: var(--space-5) 0;
   border-bottom: 1px solid var(--border);
-  transition: background var(--transition-micro);
+  transition: background var(--transition-micro), transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
 }
 
 .card:last-child {
@@ -21,13 +18,16 @@
 
 .card:hover {
   background: rgba(26, 24, 22, 0.025);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 14px rgba(26, 24, 22, 0.07);
 }
 
 [data-theme="dark"] .card:hover {
   background: rgba(229, 225, 216, 0.03);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.18);
 }
 
-/* ── Left signal strip — identical to WorkCard ── */
+/* ── Left signal strip ── */
 .strip {
   width: 48px;
   flex-shrink: 0;
@@ -36,6 +36,9 @@
   align-items: center;
   gap: 8px;
   padding-top: 4px;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .ratingLetter {
@@ -51,6 +54,9 @@
   letter-spacing: 0.02em;
   flex-shrink: 0;
   color: #fff;
+  position: relative;
+  pointer-events: auto;
+  cursor: default;
 }
 
 .ratingG  { background: var(--rating-g); }
@@ -58,28 +64,6 @@
 .ratingM  { background: var(--rating-m); }
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
-
-.lengthBars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-}
-
-.bar {
-  width: 3px;
-  border-radius: 1px;
-  background: var(--secondary);
-  opacity: 0.2;
-}
-
-.bar1 { height: 4px; }
-.bar2 { height: 6px; }
-.bar3 { height: 9px; }
-.bar4 { height: 12px; }
-
-.barFilled {
-  opacity: 1;
-}
 
 .statusPill {
   font-family: var(--font-sans);
@@ -89,6 +73,9 @@
   white-space: nowrap;
   color: var(--secondary);
   line-height: 1.4;
+  position: relative;
+  pointer-events: auto;
+  cursor: default;
 }
 
 .statusDone {
@@ -103,16 +90,80 @@
 }
 
 .statusWip {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  border-radius: 2px;
   border: 1px dashed var(--border-chip);
 }
 
 .catLabel {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
   font-size: 9px;
   color: var(--secondary);
   opacity: 0.75;
   letter-spacing: 0.04em;
-  text-align: center;
+  position: relative;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Tooltip bubbles */
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tooltipTitle {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.tooltipDesc {
+  font-size: 9px;
+  font-weight: 400;
+  opacity: 0.65;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.ratingLetter:hover .tooltip,
+.catLabel:hover .tooltip,
+.statusPill:hover .tooltip {
+  opacity: 1;
+}
+
+.catLabel:hover,
+.statusPill:hover {
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-radius: 2px;
+  opacity: 1;
 }
 
 /* ── Dual-column content area ── */
@@ -125,7 +176,6 @@
   gap: 0;
 }
 
-/* Left column: ~37% — title, author, summary, stats */
 .colLeft {
   flex: 0 0 37%;
   min-width: 0;
@@ -135,7 +185,6 @@
   padding-right: 20px;
 }
 
-/* Vertical divider */
 .divider {
   width: 1px;
   flex-shrink: 0;
@@ -143,7 +192,6 @@
   align-self: stretch;
 }
 
-/* Right column: remainder — fandom, ships, tags */
 .colRight {
   flex: 1;
   min-width: 0;
@@ -153,13 +201,21 @@
   padding-left: 20px;
 }
 
-/* Lift right column above stretched link so its links are clickable */
 .interactive {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* ── Title row (left column) ── */
+.fandomLink,
+.shipLink,
+.charLink,
+.tagChip,
+.warnChip,
+.tagsMore {
+  pointer-events: auto;
+}
+
 .titleRow {
   display: flex;
   align-items: baseline;
@@ -172,7 +228,6 @@
   color: inherit;
 }
 
-/* Stretched link — covers entire card at z-index 0 */
 .titleLink::after {
   content: '';
   position: absolute;
@@ -180,7 +235,6 @@
   z-index: 0;
 }
 
-/* Title: 15px — slightly promoted vs default 14px */
 .title {
   font-family: var(--font-serif);
   font-size: 15px;
@@ -202,7 +256,6 @@
   white-space: nowrap;
 }
 
-/* Summary: full text — no line clamp, dedicated column has the space */
 .summary {
   font-family: var(--font-serif);
   font-style: italic;
@@ -211,7 +264,6 @@
   color: var(--secondary);
 }
 
-/* Stats: pins to bottom of colLeft */
 .statsBottom {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -228,7 +280,6 @@
   color: var(--text);
 }
 
-/* ── Right column elements ── */
 .fandom {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -330,7 +381,6 @@
   opacity: 0.75;
 }
 
-/* ── Characters ── */
 .characters {
   font-family: var(--font-sans);
   font-size: 11px;
@@ -356,30 +406,38 @@
   opacity: 0.4;
 }
 
+/* ── Active filter chip highlighting ── */
+.tagChipActive {
+  color: #7A5500;
+  background: rgba(200, 140, 0, 0.14);
+  outline: 1px solid rgba(200, 140, 0, 0.30);
+}
+
+.warnChipActive {
+  background: var(--text);
+  outline: 2px solid rgba(200, 140, 0, 0.55);
+  outline-offset: 1px;
+}
+
 /* ── Page load stagger animation ── */
 @media (prefers-reduced-motion: no-preference) {
   .card {
-    animation: fadeUp 340ms var(--ease-out-expo) both;
+    animation: fadeUp 280ms var(--ease-out-expo) both;
   }
 
-  .card:nth-child(1)  { animation-delay: 200ms; }
-  .card:nth-child(2)  { animation-delay: 220ms; }
-  .card:nth-child(3)  { animation-delay: 240ms; }
-  .card:nth-child(4)  { animation-delay: 260ms; }
-  .card:nth-child(5)  { animation-delay: 280ms; }
-  .card:nth-child(6)  { animation-delay: 300ms; }
-  .card:nth-child(7)  { animation-delay: 320ms; }
-  .card:nth-child(8)  { animation-delay: 340ms; }
-  .card:nth-child(9)  { animation-delay: 360ms; }
-  .card:nth-child(10) { animation-delay: 380ms; }
-  .card:nth-child(11) { animation-delay: 400ms; }
-  .card:nth-child(12) { animation-delay: 420ms; }
-  .card:nth-child(13) { animation-delay: 440ms; }
-  .card:nth-child(14) { animation-delay: 460ms; }
-  .card:nth-child(15) { animation-delay: 480ms; }
-  .card:nth-child(16) { animation-delay: 500ms; }
-  .card:nth-child(17) { animation-delay: 500ms; }
-  .card:nth-child(18) { animation-delay: 500ms; }
-  .card:nth-child(19) { animation-delay: 500ms; }
-  .card:nth-child(20) { animation-delay: 500ms; }
+  .card:nth-child(1)  { animation-delay: 0ms; }
+  .card:nth-child(2)  { animation-delay: 20ms; }
+  .card:nth-child(3)  { animation-delay: 40ms; }
+  .card:nth-child(4)  { animation-delay: 60ms; }
+  .card:nth-child(5)  { animation-delay: 80ms; }
+  .card:nth-child(6)  { animation-delay: 100ms; }
+  .card:nth-child(7)  { animation-delay: 120ms; }
+  .card:nth-child(8)  { animation-delay: 140ms; }
+  .card:nth-child(9)  { animation-delay: 160ms; }
+  .card:nth-child(10) { animation-delay: 180ms; }
+  .card:nth-child(n+11) { animation-delay: 200ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: fadeIn 150ms ease both; }
 }

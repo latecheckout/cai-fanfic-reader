@@ -1,4 +1,5 @@
 .badge {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12,6 +13,30 @@
   border-radius: 2px;
   color: #fff;
   flex-shrink: 0;
+}
+
+.badge[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+  z-index: 20;
+}
+
+.badge[data-tooltip]:hover::after {
+  opacity: 1;
 }
 
 .ratingG  { background: var(--rating-g); }

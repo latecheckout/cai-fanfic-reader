@@ -30,7 +30,7 @@ npm run build     # Production build
 - `src/app/works/[slug]/page.tsx` — Reader page (`/works/{slug}`)
 - `src/app/layout.tsx` — Root layout with metadata (title: "c.ai Fanfic")
 - `src/app/icon.png` — Favicon (auto-detected by Next.js App Router)
-- `src/components/` — All UI components
+- `src/components/` — All UI components (`SearchOverlay` deleted; `BrowseSearchBar` replaces it)
 - `src/context/ReadingContext.tsx` — Reading state (chapter index, preferences, scroll)
 - `src/lib/works.ts` — Loads and parses works from `content/`
 - `src/lib/filters.ts` — `applyFilters`, `buildVibeFilters`, search option builders
@@ -185,13 +185,13 @@ Searches across: title, author, summary, tags, fandom. Case-insensitive substrin
 
 ### Vibe engine
 
-`buildVibeFilters(query)` intercepts descriptive search queries and converts them to structured filter params. Runs before the `?q=` fallback in the search overlay's submit handler.
+`buildVibeFilters(query)` intercepts descriptive search queries and converts them to structured filter params. Called synchronously inside `BrowseSearchBar`'s `buildItems()` on every render — when matched, injects a ✦ Vibe row at the top of the dropdown. Selecting it calls `router.push` with vibe params immediately (no delay, no confirmation panel).
 
 **How it works:**
 1. Query is lowercased and matched against `VIBE_RULES` keyword arrays
 2. Matched rules contribute include tags, exclude tags, exclude warnings, ratings, and word limits
 3. Multiple rules can match and stack (e.g. "cozy short" → fluff tags + `maxWords: 15000`)
-4. Returns a `VibeResult` with `filters` (partial FilterState), `desc` (human label), and `pills` (for the confirmation panel)
+4. Returns a `VibeResult` with `filters` (partial FilterState), `desc` (human label), and `pills` (for the vibe row preview — deduplicated via Sets before building the array)
 
 **Current VIBE_RULES keywords:**
 - `cozy / comfort / fluffy` → includes Fluff, Hurt/Comfort, Happy Ending; excludes Major Character Death
@@ -214,6 +214,10 @@ Stored in `localStorage` key `cai_fanfic_presets` as:
 { name: string; params: string; isDefault?: boolean }[]
 ```
 `params` is a serialized URLSearchParams string. One preset can be marked as default (★) — it auto-applies on first load when the URL has no active filter params.
+
+**Two surfaces:**
+- **Search bar dropdown** (default/empty state) — shows all presets as clickable rows; applying one calls `router.push('/?{params}')` + closes dropdown. Read from localStorage on each focus.
+- **Filter drawer Saved section** — management only: star to set default, × to delete.
 
 ---
 
@@ -251,3 +255,6 @@ Drop a `.md` file into `content/works/` with the frontmatter format. The slug co
 - **Git pushes fail from iCloud Drive** — `mmap failed: Operation timed out`. Workaround: `rsync` project to `/tmp`, push from there
 - **Filter panel is a push panel on desktop** — `body.filter-open` adds `margin-right: 380px` to shift content left; header is held at `width: 100vw` via a counterfix rule to prevent nav items shifting
 - **"Show X works" footer button is hidden on desktop** — results update live; button only shown on mobile where an explicit Apply is needed
+- **`SearchOverlay` has been deleted** — do not recreate. ⌘K focuses `BrowseSearchBar` input. All search/vibe/preset logic lives in `BrowseSearchBar.tsx`.
+- **Preset and AC item handlers use `onMouseDown` not `onClick`** — prevents input blur before handler fires. In tests, dispatch `mousedown` events not `click`.
+- **Do not use `window.location.href =` in eval/preview contexts** — crashes the Next.js dev server. Use `router.push()` inside components.

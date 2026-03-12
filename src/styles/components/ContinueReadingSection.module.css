@@ -130,3 +130,40 @@
     animation: fadeUp 340ms var(--ease-out-expo) 75ms both;
   }
 }
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  /* Fix 2: hide center meta count, keep label + link at opposite ends */
+  .bandMeta {
+    display: none;
+  }
+
+  .bandLink {
+    color: var(--secondary);
+    opacity: 0.7;
+  }
+
+  .bandLink:hover {
+    opacity: 1;
+  }
+
+  /* Fix 3: horizontal scroll row with min-width cards */
+  .cards {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: var(--space-2);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .cards::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card {
+    min-width: 160px;
+    width: 160px;
+    flex-shrink: 0;
+  }
+}

@@ -10,7 +10,7 @@
 .clusterOuter {
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: var(--z-dropdown);
   display: flex;
   justify-content: center;
   /* 24px top padding so bubbles are 24px from viewport top — matches fixed back button */
@@ -21,7 +21,7 @@
 .cluster {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   pointer-events: auto;
 }
 
@@ -172,7 +172,7 @@
   z-index: 100;
   opacity: 0;
   pointer-events: none;
-  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  background: color-mix(in srgb, var(--bg) 25%, transparent);
   /* No backdrop-filter — it creates compositor stacking issues that can obscure panels */
   transition: opacity 280ms ease;
 }
@@ -182,8 +182,12 @@
   pointer-events: auto;
 }
 
-/* Fade backdrop fully away while dragging font slider — lets user see text */
-.backdrop[data-dragging] {
+/* Fade fully away while adjusting prefs — lets user see reading content */
+.backdrop[data-adjusting] {
   opacity: 0 !important;
   transition: opacity 160ms ease;
+}
+
+@media (max-width: 768px) {
+  .clusterOuter { display: none; }
 }

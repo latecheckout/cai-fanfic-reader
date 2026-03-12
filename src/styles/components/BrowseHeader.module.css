@@ -7,7 +7,7 @@
 .header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
   border-bottom: 1px solid var(--border);
   background: var(--bg);
 }
@@ -88,7 +88,7 @@
 .searchBtn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   height: 28px;
   padding: 0 8px 0 7px;
   color: var(--secondary);
@@ -138,4 +138,38 @@
   justify-content: center;
   flex-shrink: 0;
   opacity: 0.8;
+}
+
+/* Hamburger — hidden on desktop, shown on mobile */
+.hamburgerBtn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+  .inner {
+    padding: 0 var(--space-4);
+    /* Replace 3-col grid with flex — logo left, hamburger right */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .zoneCenter {
+    display: none;
+  }
+
+  .avatar {
+    display: none;
+  }
+
+  .hamburgerBtn {
+    display: flex;
+  }
 }

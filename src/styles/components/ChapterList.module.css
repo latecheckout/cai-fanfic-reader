@@ -50,3 +50,41 @@
   margin: 56px auto 0;
   padding: 0 var(--space-6);
 }
+
+/* ── Chapter flash toast — swipe navigation hint ── */
+.chapterFlash {
+  position: fixed;
+  top: calc(16px + var(--safe-top));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bubble-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--secondary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+  z-index: 300;
+  box-shadow: var(--bubble-shadow);
+}
+
+.chapterFlashVisible {
+  opacity: 1;
+}
+
+/* ── Mobile breakpoint ── */
+@media (max-width: 768px) {
+  .chapter {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .chapterEndLabel {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}

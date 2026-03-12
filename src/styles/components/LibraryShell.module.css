@@ -1,0 +1,224 @@
+/* ============================================================
+   LIBRARY SHELL — Tab nav + work list with remove action
+   ============================================================ */
+
+/* ── Page heading ── */
+.pageHeader {
+  margin-bottom: var(--space-5);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* ── Tab bar ── */
+.tabs {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-2);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-2) 0 var(--space-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+  transition: color 120ms ease, border-color 120ms ease;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tabActive {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.tabCount {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.55;
+}
+
+/* ── Work list ── */
+.workList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Card wrapper (for bookmarked tab — adds remove button) ── */
+.cardWrapper {
+  position: relative;
+}
+
+/* Bookmark button — filled ribbon icon, always visible; fades on hover to signal removal */
+.bookmarkBtn {
+  position: absolute;
+  top: 16px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.75;
+  transition: opacity 150ms ease;
+  z-index: 3;
+}
+
+.bookmarkBtn:hover {
+  opacity: 0.3;
+}
+
+/* ── Empty states ── */
+.empty {
+  padding: var(--space-12) 0;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--secondary);
+}
+
+.emptyHeading {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.emptyHint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+.emptyClearLink {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.emptyClearLink:hover {
+  opacity: 0.7;
+}
+
+/* ── Skeleton loader ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeletonCard {
+  display: flex;
+  gap: 20px;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeletonCard { animation: skeletonFadeIn 200ms var(--ease-out-expo) forwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeletonCard { opacity: 1; }
+}
+
+.skeletonCard:last-child {
+  border-bottom: none;
+}
+
+@keyframes skeletonFadeIn {
+  to { opacity: 1; }
+}
+
+.skeletonStrip {
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.skeletonStrip::before,
+.skeletonStrip::after {
+  content: '';
+  display: block;
+  border-radius: 2px;
+}
+
+.skeletonStrip::before {
+  width: 20px;
+  height: 20px;
+  background: var(--border-strong);
+  opacity: 0.5;
+}
+
+.skeletonStrip::after {
+  width: 20px;
+  height: 20px;
+  background: var(--border);
+  opacity: 0.5;
+}
+
+.skeletonContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.skeletonLine {
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--border) 0px,
+    var(--border-strong) 80px,
+    var(--border) 160px
+  );
+  background-size: 400px 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeletonLine { animation: shimmer 1.4s ease infinite; }
+}
+
+/* ── Page load stagger ── */
+@media (prefers-reduced-motion: no-preference) {
+  .cardWrapper {
+    animation: fadeUp 280ms var(--ease-out-expo) both;
+  }
+  .cardWrapper:nth-child(1)  { animation-delay: 0ms; }
+  .cardWrapper:nth-child(2)  { animation-delay: 20ms; }
+  .cardWrapper:nth-child(3)  { animation-delay: 40ms; }
+  .cardWrapper:nth-child(4)  { animation-delay: 60ms; }
+  .cardWrapper:nth-child(5)  { animation-delay: 80ms; }
+  .cardWrapper:nth-child(6)  { animation-delay: 100ms; }
+  .cardWrapper:nth-child(7)  { animation-delay: 120ms; }
+  .cardWrapper:nth-child(8)  { animation-delay: 140ms; }
+  .cardWrapper:nth-child(n+9) { animation-delay: 160ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cardWrapper { animation: fadeIn 150ms ease both; }
+}

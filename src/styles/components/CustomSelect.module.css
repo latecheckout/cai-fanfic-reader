@@ -42,6 +42,14 @@
   flex: 1;
 }
 
+.triggerIcon {
+  display: flex;
+  align-items: center;
+  color: var(--secondary);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
 /* Chevron arrow */
 .arrow {
   color: var(--secondary);
@@ -63,7 +71,7 @@
   background: var(--bg);
   border: 1px solid var(--border-strong);
   border-radius: 4px;
-  z-index: 200;
+  z-index: var(--z-dropdown);
   max-height: 240px;
   overflow-y: auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);

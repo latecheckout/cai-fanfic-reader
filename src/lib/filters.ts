@@ -8,7 +8,7 @@ function splitFilter(val: string): string[] {
 export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSummary[] {
   let result = [...works];
 
-  // Text search across title, author, summary, tags, fandom
+  // Text search across title, author, summary, tags, fandom, and chapter text
   if (filters.q) {
     const q = filters.q.toLowerCase();
     result = result.filter((w) => {
@@ -17,7 +17,8 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
         w.meta.author.toLowerCase().includes(q) ||
         w.meta.summary.toLowerCase().includes(q) ||
         w.meta.tags.some((t) => t.toLowerCase().includes(q)) ||
-        w.meta.fandom.some((f) => f.toLowerCase().includes(q))
+        w.meta.fandom.some((f) => f.toLowerCase().includes(q)) ||
+        w.textChunks?.some((c) => c.text.toLowerCase().includes(q))
       );
     });
   }
@@ -415,10 +416,18 @@ export interface VibeResult {
   pills: { label: string; mode: 'include' | 'exclude' }[];
 }
 
-export function buildVibeFilters(query: string): VibeResult | null {
+export function buildVibeFilters(query: string): VibeResult {
   const q = query.toLowerCase();
   const matched = VIBE_RULES.filter((rule) => rule.kw.some((kw) => q.includes(kw)));
-  if (matched.length === 0) return null;
+
+  // No keyword match — fall back to a plain text search vibe
+  if (matched.length === 0) {
+    return {
+      filters: { q: query.trim() },
+      desc: `searching for "${query.trim()}"`,
+      pills: [{ label: query.trim(), mode: 'include' }],
+    };
+  }
 
   const filters: Partial<FilterState> = {};
   const descs: string[] = [];
@@ -431,9 +440,9 @@ export function buildVibeFilters(query: string): VibeResult | null {
 
   for (const rule of matched) {
     descs.push(rule.desc);
-    rule.tags?.forEach((t) => { incTags.add(t); pills.push({ label: t, mode: 'include' }); });
-    rule.exTags?.forEach((t) => { exTagsSet.add(t); pills.push({ label: t, mode: 'exclude' }); });
-    rule.exWarnings?.forEach((w) => { exWarns.add(w); pills.push({ label: w, mode: 'exclude' }); });
+    rule.tags?.forEach((t) => incTags.add(t));
+    rule.exTags?.forEach((t) => exTagsSet.add(t));
+    rule.exWarnings?.forEach((w) => exWarns.add(w));
     rule.ratings?.forEach((r) => incRatings.add(r));
     if (rule.maxWords) filters.maxWords = rule.maxWords;
   }
@@ -442,6 +451,11 @@ export function buildVibeFilters(query: string): VibeResult | null {
   if (exTagsSet.size > 0) filters.exTag = Array.from(exTagsSet).join(',');
   if (exWarns.size > 0) filters.exWarning = Array.from(exWarns).join(',');
   if (incRatings.size > 0) filters.rating = Array.from(incRatings).join(',');
+
+  // Build deduplicated pills from the sets (no duplicates when multiple rules match)
+  incTags.forEach((t) => pills.push({ label: t, mode: 'include' }));
+  exTagsSet.forEach((t) => pills.push({ label: t, mode: 'exclude' }));
+  exWarns.forEach((w) => pills.push({ label: w, mode: 'exclude' }));
 
   return { filters, desc: descs.join(', '), pills };
 }

@@ -56,15 +56,55 @@ export function getAllSlugs(): string[] {
     .map(slugFromFilename);
 }
 
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/^#{1,6}\s+/gm, '')      // headings
+    .replace(/\*{1,3}([^*]+)\*{1,3}/g, '$1')  // bold/italic
+    .replace(/_([^_]+)_/g, '$1')      // italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // links
+    .replace(/`[^`]+`/g, '')          // inline code
+    .replace(/^\s*[-*+>]\s*/gm, '')   // list items, blockquotes
+    .replace(/\n{2,}/g, ' ')         // multi-newlines → space
+    .replace(/\s+/g, ' ')            // normalize whitespace
+    .trim();
+}
+
 export function getWorkSummaries(): WorkSummary[] {
   const slugs = getAllSlugs();
   return slugs.map((slug) => {
     const filePath = path.join(WORKS_DIR, `${slug}.md`);
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const { data } = matter(fileContent);
+    const { data, content } = matter(fileContent);
+
+    // Extract text chunks: split on :::chapter markers, strip markdown, take first 800 chars
+    const textChunks = content
+      .split(/:::chapter\s*/)
+      .filter(Boolean)
+      .map((section) => {
+        const lines = section.split('\n');
+        const chapterTitle = lines[0].trim();
+        // Take body up to :::end-chapter
+        const body = lines.slice(1).join('\n');
+        const endIdx = body.indexOf(':::end-chapter');
+        const chapterBody = endIdx >= 0 ? body.slice(0, endIdx) : body;
+        // Strip DSL blocks (summary, notes)
+        const stripped = stripMarkdown(
+          chapterBody
+            .replace(/:::summary[\s\S]*?:::end-summary/g, '')
+            .replace(/:::notes-begin[\s\S]*?:::notes-end/g, '')
+            .replace(/:::notes-bottom[\s\S]*?:::notes-bottom-end/g, '')
+        );
+        return {
+          chapter: chapterTitle,
+          text: stripped.slice(0, 3000),
+        };
+      })
+      .filter((c) => c.text.length > 0);
+
     return {
       slug,
       meta: normalizeWorkMeta(data),
+      textChunks: textChunks.length > 0 ? textChunks : undefined,
     };
   });
 }

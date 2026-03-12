@@ -33,13 +33,13 @@
 }
 
 .kudosGiven {
-  color: #b02828;
+  color: var(--rating-e);
   border-color: rgba(176, 40, 40, 0.25);
   cursor: default;
 }
 
 .kudosGiven:hover {
-  color: #b02828 !important;
+  color: var(--rating-e) !important;
   border-color: rgba(176, 40, 40, 0.25) !important;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .kudosGiven .heart {
-  color: #b02828;
+  color: var(--rating-e);
 }
 
 @keyframes heartPulse {
@@ -58,8 +58,8 @@
   100% { transform: scale(1); }
 }
 
-.kudosAnimate .heart {
-  animation: heartPulse 300ms var(--ease-out-expo);
+@media (prefers-reduced-motion: no-preference) {
+  .kudosAnimate .heart { animation: heartPulse 300ms var(--ease-out-expo); }
 }
 
 .kudosCount {

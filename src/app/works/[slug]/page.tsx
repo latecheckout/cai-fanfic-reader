@@ -8,6 +8,7 @@ import { ReadingHUD } from '@/components/ReadingHUD';
 import { ReadingActions } from '@/components/ReadingActions';
 import { ReturnToPositionFAB } from '@/components/ReturnToPositionFAB';
 import { FocusEffect } from '@/components/FocusEffect';
+import { MobileReadingBar } from '@/components/MobileReadingBar';
 import { ReadingProvider } from '@/context/ReadingContext';
 import { WorkSummary } from '@/types';
 import styles from './reader.module.css';
@@ -77,6 +78,7 @@ export default async function ReaderPage({ params }: PageProps) {
         <ReadingHUD />
         <ReadingActions />
         <ReturnToPositionFAB />
+        <MobileReadingBar />
 
         {/* Main reading content */}
         <main className={styles.main}>

@@ -25,3 +25,7 @@
 .backBubble:hover {
   box-shadow: var(--bubble-shadow-hover);
 }
+
+@media (max-width: 768px) {
+  .backBubble { display: none; }
+}

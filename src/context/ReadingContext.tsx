@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useRef, useCallback, useState } from 'react';
+import { createContext, useContext, useRef, useCallback, useState, useEffect } from 'react';
 import { WorkMeta } from '@/types';
 
 interface ReadingContextValue {
@@ -44,6 +44,21 @@ export function ReadingProvider({
 }: Props) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
   const [lastReadChapterIndex, setLastReadChapterIndex] = useState<number | null>(null);
+
+  // Ensure data-theme is always a recognized value on reading page mount.
+  // ThemeScript handles initial load, but something can clobber it after paint
+  // when no user preference is stored. This guard mirrors ThemeScript's fallback logic.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('fanfic-reader-theme');
+      if (!saved || saved === 'default') {
+        const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    } catch { /* fail silently */ }
+  }, []);
   const chapterRefsMap = useRef<Map<number, HTMLElement>>(new Map());
 
   // Prefs wiring refs — identity never changes, no re-renders on write
