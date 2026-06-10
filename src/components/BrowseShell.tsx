@@ -113,7 +113,8 @@ export function BrowseShell({
     // Brief skeleton in the new layout, then cards fade/stagger in (character-brain feel).
     setViewSwitching(true);
     if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 260);
+    // 500ms so the skeleton dust-particle moment reads on mode switches.
+    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 500);
   };
 
   const activeFilterLabels = Object.entries(currentFilters)

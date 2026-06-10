@@ -109,7 +109,8 @@ export function LibraryShell({
     localStorage.setItem(VIEW_PREF_KEY, v);
     setViewSwitching(true);
     if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 260);
+    // 500ms so the skeleton dust-particle moment reads on mode switches.
+    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 500);
   };
 
   // Show skeleton briefly when filters change (skip initial mount)
