@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import styles from '@/styles/components/BrowseHeader.module.css';
 import { MobileNav } from './MobileNav';
-import { SiteModeToggle } from './SiteModeToggle';
+import { Ao4TurboFab } from './Ao4TurboFab';
 
 const NAV_LINKS = [
   { href: '/', label: 'Stories' },
@@ -67,10 +67,9 @@ export function BrowseHeader({ search }: Props = {}) {
           ))}
         </nav>
 
-        {/* ── Right zone: search slot + mode toggle + avatar (desktop) + hamburger (mobile) ── */}
+        {/* ── Right zone: search slot + avatar (desktop) + hamburger (mobile) ── */}
         <div className={styles.zoneRight}>
           {search && <div className={styles.zoneSearch}>{search}</div>}
-          <SiteModeToggle />
           <div className={styles.avatar} aria-hidden="true">
             P
           </div>
@@ -90,6 +89,9 @@ export function BrowseHeader({ search }: Props = {}) {
         </div>
       </header>
       <MobileNav open={navOpen} onClose={() => setNavOpen(false)} pathname={pathname} navLinks={NAV_LINKS} />
+
+      {/* Global mode switch: floating bottom-right on every browse surface */}
+      <Ao4TurboFab />
     </>
   );
 }
