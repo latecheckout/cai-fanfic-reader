@@ -4,6 +4,17 @@
    change). E-ink restrained: tiny secondary-tone dots, no color.
    ============================================================ */
 
+/* The parent strip is dimmed to 50% opacity, which would crush the dots
+   (opacity inherits, there is no escape). The strip itself goes transparent
+   inline; this fill reproduces its dimmed look underneath the particles. */
+.stripFill {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: var(--border-strong);
+  opacity: 0.5;
+}
+
 .particles {
   position: absolute;
   inset: 0;
@@ -18,7 +29,7 @@
   width: var(--s);
   height: var(--s);
   border-radius: 50%;
-  background: var(--secondary);
+  background: var(--text);
   opacity: 0;
   will-change: transform, opacity;
   animation: dustRise var(--dur) ease-out var(--delay) infinite;
@@ -30,10 +41,10 @@
     opacity: 0;
   }
   18% {
-    opacity: 0.55;
+    opacity: 0.5;
   }
   70% {
-    opacity: 0.25;
+    opacity: 0.22;
   }
   100% {
     transform: translate3d(var(--dx), -72px, 0) scale(1);

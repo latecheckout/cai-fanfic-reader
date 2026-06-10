@@ -53,6 +53,46 @@
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ============================================================
+   DUST BURST: one-shot viewport wash fired on every mode
+   switch, while the surfaces remount underneath.
+   ============================================================ */
+
+.dustOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.dustMote {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: turboDust var(--dur) ease-out var(--delay) forwards;
+}
+
+@keyframes turboDust {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate3d(var(--dx), -130px, 0) scale(1);
+    opacity: 0;
+  }
+}
+
 /* ── Mobile: clear the bottom reading bar territory ── */
 @media (max-width: 768px) {
   .fab {

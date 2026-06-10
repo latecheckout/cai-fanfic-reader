@@ -43,7 +43,7 @@ function makeParticles(): ParticleSpec[] {
   return Array.from({ length: PARTICLE_COUNT }, () => ({
     x: `${(Math.random() * 92 + 4).toFixed(1)}%`,
     y: `${(Math.random() * 70).toFixed(1)}%`,
-    s: `${(Math.random() * 2.5 + 1.5).toFixed(1)}px`,
+    s: `${(Math.random() * 3 + 2).toFixed(1)}px`,
     dx: `${(Math.random() * 28 - 14).toFixed(1)}px`,
     dur: `${(Math.random() * 700 + 700).toFixed(0)}ms`,
     delay: `${(Math.random() * 350).toFixed(0)}ms`,
@@ -56,7 +56,13 @@ export function SkeletonCard({ index, styles, variant = 'browse' }: Props) {
 
   return (
     <div className={styles.skeletonCard} style={{ animationDelay: `${index * 40}ms` }}>
-      <div className={styles.skeletonStrip} style={{ position: 'relative' }}>
+      {/* Strip opacity moves to an inner fill so the particles render at
+          full strength above it (opacity inherits; children can't escape). */}
+      <div
+        className={styles.skeletonStrip}
+        style={{ position: 'relative', opacity: 1, background: 'transparent' }}
+      >
+        <span className={particleStyles.stripFill} aria-hidden="true" />
         <span className={particleStyles.particles} aria-hidden="true">
           {particles.map((p, i) => (
             <span
