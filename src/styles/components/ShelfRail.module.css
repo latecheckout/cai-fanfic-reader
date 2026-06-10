@@ -1,0 +1,161 @@
+/* ============================================================
+   SHELF RAIL: horizontal cover shelf on the browse-first home.
+   One shelf = one pre-canned filter query. Cards stay minimal;
+   full metadata lives on the results layer.
+   ============================================================ */
+
+.section {
+  margin-bottom: var(--space-10);
+}
+
+/* ── Header: editorial title, taxonomy subtitle, view-all link ── */
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.titleWrap {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+.viewAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color var(--transition-micro);
+}
+
+.viewAll:hover {
+  color: var(--text);
+}
+
+/* ── Cover row ── */
+.row {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Gradual fade on the trailing edge so the scroll cutoff is not harsh */
+  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  flex-shrink: 0;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.coverWrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.coverImg {
+  object-fit: cover;
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.card:hover .coverImg {
+  transform: scale(1.04);
+}
+
+.cardTitle {
+  margin-top: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card:hover .cardTitle {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cardMeta {
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary);
+}
+
+/* ── Page load stagger ── */
+@keyframes shelfFadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: shelfFadeUp 500ms var(--ease-out-expo) both; }
+  .card:nth-child(1) { animation-delay: 25ms; }
+  .card:nth-child(2) { animation-delay: 50ms; }
+  .card:nth-child(3) { animation-delay: 75ms; }
+  .card:nth-child(4) { animation-delay: 100ms; }
+  .card:nth-child(5) { animation-delay: 125ms; }
+  .card:nth-child(6) { animation-delay: 150ms; }
+  .card:nth-child(7) { animation-delay: 175ms; }
+  .card:nth-child(8) { animation-delay: 200ms; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: var(--space-8);
+  }
+
+  .title {
+    font-size: 19px;
+  }
+
+  .card {
+    width: 124px;
+  }
+}

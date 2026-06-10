@@ -6,11 +6,10 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
+import { buildShelves, buildFandomTiles, MOOD_CHIPS } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
-import { ContinueReadingSection } from '@/components/ContinueReadingSection';
-// import { OriginalsSection } from '@/components/OriginalsSection';
-import { HeroCarousel } from '@/components/HeroCarousel';
+import { BrowseHome } from '@/components/BrowseHome';
 import styles from './browse.module.css';
 
 interface PageProps {
@@ -82,7 +81,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
   const filterOptions = buildFilterOptions(allWorks);
   const searchOptions = buildSearchOptions(allWorks);
 
-  // Only show editorial sections when no active filters (include or exclude)
+  // Layer split: any filter, search, or sort param means the visitor has
+  // expressed intent, so they get the full results surface (layer one).
+  // A bare / gets the browse-first home (layer zero).
   const hasActiveFilters = !!(
     params.fandom || params.relationship || params.tag || params.character ||
     params.rating || params.status || params.q ||
@@ -92,7 +93,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     params.ex_character || params.ex_rating || params.ex_status ||
     params.ex_category || params.ex_warning ||
     params.date_preset || params.date_from || params.date_to ||
-    params.preset
+    params.preset || params.sort || params.order
   );
 
   return (
@@ -103,28 +104,28 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 
-        {/* {!hasActiveFilters && <OriginalsSection works={allWorks.slice(0, 8)} />} */}
-
-        {!hasActiveFilters && <HeroCarousel />}
-
-        {/* Continue Reading — thumbnail rail under the hero, hidden when filters are active */}
-        {!hasActiveFilters && (
-          <ContinueReadingSection
+        {!hasActiveFilters ? (
+          <BrowseHome
+            totalCount={allWorks.length}
+            searchOptions={searchOptions}
+            shelves={buildShelves(allWorks)}
+            fandoms={buildFandomTiles(allWorks)}
+            moods={MOOD_CHIPS}
             covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
           />
+        ) : (
+          <Suspense>
+            <BrowseShell
+              works={filteredWorks}
+              options={filterOptions}
+              searchOptions={searchOptions}
+              currentFilters={params}
+              totalCount={allWorks.length}
+              filteredCount={filteredWorks.length}
+              from={params.from}
+            />
+          </Suspense>
         )}
-
-        <Suspense>
-          <BrowseShell
-            works={filteredWorks}
-            options={filterOptions}
-            searchOptions={searchOptions}
-            currentFilters={params}
-            totalCount={allWorks.length}
-            filteredCount={filteredWorks.length}
-            from={params.from}
-          />
-        </Suspense>
       </main>
     </div>
   );
