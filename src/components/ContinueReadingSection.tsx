@@ -2,7 +2,14 @@
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { GENERIC_COVER } from '@/lib/covers';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
+
+interface Props {
+  /** slug → cover path, passed from the page (localStorage bookmarks lack meta.cover). */
+  covers?: Record<string, string | undefined>;
+}
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -24,7 +31,7 @@ interface RawBookmark {
   totalChapters?: number;
 }
 
-export function ContinueReadingSection() {
+export function ContinueReadingSection({ covers }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -43,7 +50,7 @@ export function ContinueReadingSection() {
             timestamp: b.timestamp,
           }))
           .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 3);
+          .slice(0, 8);
         setBookmarks(items);
       }
     } catch {
@@ -71,26 +78,30 @@ export function ContinueReadingSection() {
         </span>
       </div>
 
-      {/* Cards — up to 3 equal columns */}
+      {/* Thumbnail rail — covers only, title/chapter on hover, progress flush to cover bottom */}
       <div className={styles.cards}>
-        {bookmarks.map((item, i) => (
+        {bookmarks.map((item) => (
           <Link
             key={item.slug}
             href={`/works/${item.slug}`}
-            className={`${styles.card} ${i < bookmarks.length - 1 ? styles.cardDivider : ''}`}
+            className={styles.card}
+            title={`${item.title} · Ch. ${item.chapterIndex + 1} of ${item.totalChapters}`}
+            aria-label={`Continue reading ${item.title}, chapter ${item.chapterIndex + 1} of ${item.totalChapters}`}
           >
-            <div className={styles.cardBody}>
-              <div className={styles.title}>{item.title}</div>
-              <div className={styles.chapterLine}>
-                Ch. {item.chapterIndex + 1} of {item.totalChapters}
-              </div>
-            </div>
-            {/* 3px progress bar flush to card bottom */}
-            <div className={styles.progressTrack}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min(item.scrollPercent * 100, 100).toFixed(1)}%` }}
+            <div className={styles.cover}>
+              <Image
+                src={covers?.[item.slug] ?? GENERIC_COVER}
+                alt=""
+                fill
+                sizes="88px"
+                className={styles.coverImg}
               />
+              <div className={styles.progressTrack}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${Math.min(item.scrollPercent * 100, 100).toFixed(1)}%` }}
+                />
+              </div>
             </div>
           </Link>
         ))}

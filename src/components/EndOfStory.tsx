@@ -1,5 +1,5 @@
 import { WorkSummary } from '@/types';
-import { WorkCard } from './WorkCard';
+import { WorkCardCover } from './WorkCardCover';
 import styles from '@/styles/components/EndOfStory.module.css';
 
 interface Props {
@@ -14,7 +14,7 @@ export function EndOfStory({ recommendations }: Props) {
       {recommendations.length > 0 && (
         <div className={styles.recommendations}>
           {recommendations.map((work) => (
-            <WorkCard key={work.slug} work={work} />
+            <WorkCardCover key={work.slug} work={work} view="list" />
           ))}
         </div>
       )}

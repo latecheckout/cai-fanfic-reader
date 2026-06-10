@@ -1,5 +1,6 @@
 ---
 title: "Gentlebeard's Guide to Retirement"
+cover: "/covers/cover-06.png"
 author: "blackbeards_bathrobe"
 rating: "Mature"
 warnings: ["No Archive Warnings Apply"]

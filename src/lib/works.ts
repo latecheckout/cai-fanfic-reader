@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { Work, WorkMeta, WorkSummary } from '@/types';
 import { parseChapters } from './chapters';
+import { resolveCover } from './covers';
 // Re-export for Server Components that import utils via works
 export { readingTime, formatWords } from './utils';
 
@@ -26,6 +27,7 @@ function normalizeWorkMeta(data: Record<string, unknown>): WorkMeta {
     summary: String(data.summary ?? ''),
     language: String(data.language ?? 'English'),
     status: String(data.status ?? 'Complete'),
+    cover: data.cover != null ? String(data.cover) : undefined,
     // chapters: 0 is sentinel for "unknown total" (YAML null → 0)
     chapters: data.chapters == null ? 0 : Number(data.chapters),
     chaptersPosted: data.chaptersPosted != null ? Number(data.chaptersPosted) : undefined,
@@ -101,9 +103,12 @@ export function getWorkSummaries(): WorkSummary[] {
       })
       .filter((c) => c.text.length > 0);
 
+    const meta = normalizeWorkMeta(data);
+    meta.cover = resolveCover(meta.cover);
+
     return {
       slug,
-      meta: normalizeWorkMeta(data),
+      meta,
       textChunks: textChunks.length > 0 ? textChunks : undefined,
     };
   });
@@ -116,9 +121,12 @@ export function getWork(slug: string): Work | null {
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const { data, content } = matter(fileContent);
 
+  const meta = normalizeWorkMeta(data);
+  meta.cover = resolveCover(meta.cover);
+
   return {
     slug,
-    meta: normalizeWorkMeta(data),
+    meta,
     chapters: parseChapters(content),
   };
 }

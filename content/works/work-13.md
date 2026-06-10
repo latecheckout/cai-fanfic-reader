@@ -1,5 +1,6 @@
 ---
 title: "目が合う | Eyes That Meet"
+cover: "/covers/cover-03.png"
 author: "izuku_brainrot"
 rating: "Teen And Up Audiences"
 warnings: ["No Archive Warnings Apply"]

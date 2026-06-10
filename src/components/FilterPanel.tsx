@@ -4,7 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
+import { LayoutView } from '@/types';
 import { BrowseSearchBar } from './BrowseSearchBar';
+import { ViewToggle } from './ViewToggle';
 import styles from '@/styles/components/FilterPanel.module.css';
 import { PRESETS_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 
@@ -41,8 +43,8 @@ interface Props {
   };
   totalCount: number;
   filteredCount: number;
-  view?: 'default' | 'split';
-  onViewChange?: (v: 'default' | 'split') => void;
+  view?: LayoutView;
+  onViewChange?: (v: LayoutView) => void;
   /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
   basePath?: string;
 }
@@ -624,6 +626,9 @@ export function FilterPanel({
       } else if (pill.paramKey === 'date_custom') {
         params.delete('date_from');
         params.delete('date_to');
+      } else if (pill.paramKey === 'q') {
+        // Free-text search is a single value (may itself contain commas) — delete outright
+        params.delete('q');
       } else {
         const newVal = removeFromCommaList(params.get(pill.paramKey) ?? undefined, pill.value);
         if (newVal) params.set(pill.paramKey, newVal);
@@ -925,37 +930,7 @@ export function FilterPanel({
                 : `${filteredCount} of ${totalCount}`}
             </span>
           </span>
-          {onViewChange && (
-            <div className={styles.viewToggle} aria-label="View layout">
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'default' ? styles.viewBtnActive : ''}`}
-                onClick={() => onViewChange('default')}
-                aria-label="Default view"
-                aria-pressed={view === 'default'}
-                title="Default view"
-              >
-                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
-                  <rect x="0" y="0" width="14" height="1.5" fill="currentColor" />
-                  <rect x="0" y="5.25" width="14" height="1.5" fill="currentColor" />
-                  <rect x="0" y="10.5" width="14" height="1.5" fill="currentColor" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'split' ? styles.viewBtnActive : ''}`}
-                onClick={() => onViewChange('split')}
-                aria-label="Split view"
-                aria-pressed={view === 'split'}
-                title="Split view"
-              >
-                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
-                  <rect x="0" y="0" width="6" height="12" fill="currentColor" />
-                  <rect x="8" y="0" width="6" height="12" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
-          )}
+          {onViewChange && view && <ViewToggle view={view} onViewChange={onViewChange} />}
         </div>
       </div>
 

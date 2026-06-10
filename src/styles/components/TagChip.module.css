@@ -44,9 +44,6 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--secondary);
-  border-color: transparent;
-  padding-left: 0;
-  padding-right: 0;
 }
 
 /* Category: category (M/F, F/F, etc) */

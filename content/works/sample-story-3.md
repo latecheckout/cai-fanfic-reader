@@ -1,5 +1,6 @@
 ---
 title: "The Dogfather"
+cover: "/covers/cover-09.png"
 author: "padfoot_lives"
 rating: "Teen And Up"
 warnings: ["Creator Chose Not To Use Archive Warnings"]

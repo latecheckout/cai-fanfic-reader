@@ -1,5 +1,6 @@
 ---
 title: "The Unbearable Lightness of Draco Malfoy"
+cover: "/covers/cover-11.png"
 author: "ferretface_apologist"
 rating: "Explicit"
 warnings: ["No Archive Warnings Apply"]

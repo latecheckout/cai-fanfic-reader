@@ -1,5 +1,6 @@
 ---
 title: "Dead Men Tell Good Stories (If You Know How to Listen)"
+cover: "/covers/cover-23.png"
 author: "the_swedes_accordion"
 rating: "Mature"
 warnings: ["No Archive Warnings Apply"]

@@ -1523,14 +1523,17 @@ span.pillToggleArea {
   line-height: 1.5;
 }
 
+/* Phones only: hide the work count + view toggle (kept on tablet and up) */
+@media (max-width: 480px) {
+  .subrow {
+    display: none;
+  }
+}
+
 /* ── Mobile breakpoint (max-width: 768px) ── */
 @media (max-width: 768px) {
   /* Toolbar: search bar + icon filter button only */
   .sortWrap {
-    display: none;
-  }
-
-  .subrow {
     display: none;
   }
 

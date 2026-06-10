@@ -1,5 +1,6 @@
 ---
 title: "A Certain Arrangement"
+cover: "/covers/cover-15.png"
 author: "ineffable_husbands"
 rating: "Teen And Up"
 warnings: ["No Archive Warnings Apply"]

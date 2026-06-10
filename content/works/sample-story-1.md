@@ -1,5 +1,6 @@
 ---
 title: "The Last Great Marauder"
+cover: "/covers/cover-08.png"
 author: "moonmoony"
 rating: "Mature"
 warnings: ["Graphic Depictions Of Violence", "Major Character Death"]

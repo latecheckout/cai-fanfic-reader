@@ -1,5 +1,6 @@
 ---
 title: "The Hextech Correspondence"
+cover: "/covers/cover-24.png"
 author: "powderline_productions"
 rating: "Teen And Up Audiences"
 warnings: ["No Archive Warnings Apply"]

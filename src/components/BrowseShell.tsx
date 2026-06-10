@@ -2,13 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { WorkSummary } from '@/types';
+import { WorkSummary, LayoutView } from '@/types';
 
 const VIEW_PREF_KEY = 'cai_view_pref';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
 import { FilterPanel } from './FilterPanel';
-import { WorkCard } from './WorkCard';
-import { WorkCardSplit } from './WorkCardSplit';
+import { WorkCardCover } from './WorkCardCover';
 import styles from '@/styles/components/BrowseShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
 
@@ -67,17 +66,21 @@ export function BrowseShell({
   filteredCount,
   from,
 }: Props) {
-  const [view, setView] = useState<'default' | 'split'>('default');
+  const [view, setView] = useState<LayoutView>('list');
   const [isFiltering, setIsFiltering] = useState(false);
+  const [viewSwitching, setViewSwitching] = useState(false);
+  const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterKey = JSON.stringify(currentFilters);
   const prevFilterKey = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(false);
 
-  // Persist view preference to localStorage
+  // Restore view preference (migrating legacy grid2/grid3/split/default values).
   useEffect(() => {
     const saved = localStorage.getItem(VIEW_PREF_KEY);
-    if (saved === 'split' || saved === 'default') setView(saved);
+    if (saved === 'list' || saved === 'grid') setView(saved);
+    else if (saved === 'grid2' || saved === 'grid3' || saved === 'split') setView('grid');
+    else if (saved === 'default') setView('list');
   }, []);
 
   // Show skeleton briefly when filters change (skip initial mount)
@@ -96,9 +99,14 @@ export function BrowseShell({
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [filterKey]);
 
-  const handleViewChange = (v: 'default' | 'split') => {
+  const handleViewChange = (v: LayoutView) => {
+    if (v === view) return;
     setView(v);
     localStorage.setItem(VIEW_PREF_KEY, v);
+    // Brief skeleton in the new layout, then cards fade/stagger in (character-brain feel).
+    setViewSwitching(true);
+    if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 260);
   };
 
   const activeFilterLabels = Object.entries(currentFilters)
@@ -123,11 +131,14 @@ export function BrowseShell({
         </Link>
       )}
 
-      <div className={styles.workList}>
-        {isFiltering ? (
-          Array.from({ length: SKELETON_COUNT }, (_, i) => (
-            <SkeletonCard key={i} index={i} styles={styles} />
-          ))
+      <div className={`${styles.workList} ${isFiltering ? styles.list : styles[view]}`}>
+        {isFiltering || viewSwitching ? (
+          // On a view switch keep the page the same height (one skeleton per work)
+          // so the scrollbar never toggles → no horizontal shift of the fixed FAB.
+          Array.from(
+            { length: viewSwitching ? Math.max(SKELETON_COUNT, works.length) : SKELETON_COUNT },
+            (_, i) => <SkeletonCard key={i} index={i} styles={styles} />,
+          )
         ) : works.length === 0 ? (
           <div className={styles.empty}>
             <p className={styles.emptyHeading}>No works match your filters.</p>
@@ -139,17 +150,14 @@ export function BrowseShell({
             )}
           </div>
         ) : (
-          works.map((work) =>
-            // Always use default view on mobile (split view hidden on ≤768px)
-            (view === 'split' && typeof window !== 'undefined' && window.innerWidth > 768)
-              ? <WorkCardSplit key={work.slug} work={work} activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }} />
-              : <WorkCard
-                  key={work.slug}
-                  work={work}
-                  activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }}
-                  activeQ={currentFilters.q}
-                />
-          )
+          works.map((work, i) => (
+            <WorkCardCover
+              key={work.slug}
+              work={work}
+              view={view}
+              priority={i < 3}
+            />
+          ))
         )}
       </div>
     </>

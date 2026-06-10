@@ -1,0 +1,125 @@
+/* ============================================================
+   VIEW TOGGLE: segmented Text / Image control in the toolbar.
+   Mirrors the sort pill (36px, --border-strong, 999px, 12px sans).
+   Active segment = a shared-layout accent pill (motion layoutId) that
+   springs between options; active icon + label sit white over it.
+   ============================================================ */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 3px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.seg {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1;
+  color: var(--secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-micro);
+}
+
+.seg:hover {
+  color: var(--text);
+}
+
+.segActive,
+.segActive:hover {
+  color: #fff;
+}
+
+/* Shared-layout sliding pill (accent — same as the old FAB puck, plushy inner highlight) */
+.fill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.30),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.30),
+    0 1px 3px rgba(0, 0, 0, 0.18);
+  outline: 1.25px solid rgba(255, 255, 255, 0.22);
+  outline-offset: -1.25px;
+}
+
+.segIcon,
+.segLabel {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.segIcon {
+  flex-shrink: 0;
+}
+
+/* Tooltip (character-brain style): dark bubble, light text, rounded, arrow,
+   fade + slide-down + zoom on hover. Appears BELOW the segment, right-anchored
+   so it grows left and never clips off the right edge of the viewport. */
+.seg[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  transform: translateY(-4px) scale(0.97);
+  transform-origin: top right;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.3;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms var(--ease-out-expo);
+  z-index: 30;
+}
+
+.seg[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 22px;
+  width: 9px;
+  height: 9px;
+  background: var(--text);
+  border-radius: 2px;
+  transform: translateY(-4px) rotate(45deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms var(--ease-out-expo);
+  z-index: 30;
+}
+
+.seg:hover[data-tooltip]::after,
+.seg:focus-visible[data-tooltip]::after {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.seg:hover[data-tooltip]::before,
+.seg:focus-visible[data-tooltip]::before {
+  opacity: 1;
+  transform: translateY(0) rotate(45deg);
+}

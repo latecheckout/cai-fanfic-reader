@@ -1,5 +1,6 @@
 ---
 title: "Upside Down and Right-Side Up"
+cover: "/covers/cover-18.png"
 author: "hawkinslocal"
 rating: "Teen And Up Audiences"
 warnings: ["No Archive Warnings Apply"]

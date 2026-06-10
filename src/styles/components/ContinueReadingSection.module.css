@@ -1,6 +1,7 @@
 /* ============================================================
-   CONTINUE READING — 3-column horizontal card strip
+   CONTINUE READING — thumbnail rail under the hero banner
    From localStorage bookmarks. Hidden when no bookmarks.
+   Covers only; title/chapter live in the link tooltip.
    ============================================================ */
 
 @keyframes expandIn {
@@ -60,77 +61,75 @@
   text-underline-offset: 2px;
 }
 
-/* ── Cards grid ── */
+/* ── Thumbnail rail ── */
 .cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  display: flex;
+  gap: 10px;
   padding: var(--space-4) 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.cards::-webkit-scrollbar {
+  display: none;
 }
 
 .card {
-  position: relative;
-  padding: var(--space-4) var(--space-4) var(--space-5);
+  flex-shrink: 0;
+  display: block;
   text-decoration: none;
   color: inherit;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border);
+}
+
+/* ── Cover thumbnail ── */
+.cover {
+  position: relative;
+  width: 84px;
+  aspect-ratio: 2 / 3;
   border-radius: 4px;
-  transition: background var(--transition-micro);
+  overflow: hidden;
+  background: var(--border);
+  transition: transform var(--transition-micro);
 }
 
-.card:hover {
-  background: color-mix(in srgb, var(--text) 3%, transparent);
+.card:hover .cover {
+  transform: translateY(-2px);
 }
 
-/* .cardDivider — superseded by full border; reset to no-op */
-.cardDivider {
-  border-right: none;
+.coverImg {
+  object-fit: cover;
 }
 
-.cardBody {
-  flex: 1;
-}
-
-.title {
-  font-family: var(--font-serif);
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.35;
-  margin-bottom: 6px;
-  transition: text-decoration-color var(--transition-micro);
-}
-
-.card:hover .title {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-
-.chapterLine {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  color: var(--secondary);
-  letter-spacing: 0.04em;
-}
-
-/* ── Progress bar — 3px, flush to card bottom ── */
+/* ── Progress bar — overlaid on the cover art, flush to its bottom edge.
+   Needs its own contrast layer: a 15% tint reads fine on a flat card
+   background but vanishes over artwork. ── */
 .progressTrack {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: color-mix(in srgb, var(--rating-t) 15%, transparent);
+  height: 4px;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
 }
 
 .progressFill {
   height: 100%;
   background: var(--rating-t);
-  opacity: 0.8;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Soft scrim above the bar so it never blends into busy cover art */
+.cover::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 18px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent);
+  pointer-events: none;
 }
 
 /* ── Page load stagger ── */
@@ -140,20 +139,20 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .card:nth-child(1) {
-    animation: fadeUp 650ms var(--ease-out-expo) 30ms both;
-  }
-  .card:nth-child(2) {
-    animation: fadeUp 650ms var(--ease-out-expo) 60ms both;
-  }
-  .card:nth-child(3) {
-    animation: fadeUp 650ms var(--ease-out-expo) 90ms both;
-  }
+  .card { animation: fadeUp 650ms var(--ease-out-expo) both; }
+  .card:nth-child(1) { animation-delay: 30ms; }
+  .card:nth-child(2) { animation-delay: 60ms; }
+  .card:nth-child(3) { animation-delay: 90ms; }
+  .card:nth-child(4) { animation-delay: 120ms; }
+  .card:nth-child(5) { animation-delay: 150ms; }
+  .card:nth-child(6) { animation-delay: 180ms; }
+  .card:nth-child(7) { animation-delay: 210ms; }
+  .card:nth-child(8) { animation-delay: 240ms; }
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-  /* Fix 2: hide center meta count, keep label + link at opposite ends */
+  /* Hide center meta count, keep label + link at opposite ends */
   .bandMeta {
     display: none;
   }
@@ -165,25 +164,5 @@
 
   .bandLink:hover {
     opacity: 1;
-  }
-
-  /* Fix 3: horizontal scroll row with min-width cards */
-  .cards {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-    padding-bottom: var(--space-2);
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .cards::-webkit-scrollbar {
-    display: none;
-  }
-
-  .card {
-    min-width: 160px;
-    width: 160px;
-    flex-shrink: 0;
   }
 }

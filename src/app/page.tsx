@@ -9,6 +9,8 @@ import { FilterState } from '@/types';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { ContinueReadingSection } from '@/components/ContinueReadingSection';
+// import { OriginalsSection } from '@/components/OriginalsSection';
+import { HeroCarousel } from '@/components/HeroCarousel';
 import styles from './browse.module.css';
 
 interface PageProps {
@@ -101,8 +103,16 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 
-        {/* Continue Reading — hidden when filters are active */}
-        {!hasActiveFilters && <ContinueReadingSection />}
+        {/* {!hasActiveFilters && <OriginalsSection works={allWorks.slice(0, 8)} />} */}
+
+        {!hasActiveFilters && <HeroCarousel />}
+
+        {/* Continue Reading — thumbnail rail under the hero, hidden when filters are active */}
+        {!hasActiveFilters && (
+          <ContinueReadingSection
+            covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
+          />
+        )}
 
         <Suspense>
           <BrowseShell

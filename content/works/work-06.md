@@ -1,5 +1,6 @@
 ---
 title: "The Consulting Wizard"
+cover: "/covers/cover-20.png"
 author: "diagonallines"
 rating: "Mature"
 warnings: ["No Archive Warnings Apply"]

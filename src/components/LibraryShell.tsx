@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { WorkSummary } from '@/types';
+import { WorkSummary, LayoutView } from '@/types';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
 import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
 import { FilterPanel } from './FilterPanel';
-import { WorkCard } from './WorkCard';
+// (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
+import { WorkCardCover } from './WorkCardCover';
 import styles from '@/styles/components/LibraryShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
+
+const VIEW_PREF_KEY = 'cai_view_pref';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -70,6 +73,9 @@ export function LibraryShell({
   const searchParams = useSearchParams();
   const [removedSlugs, setRemovedSlugs] = useState<Set<string>>(new Set());
   const [isFiltering, setIsFiltering] = useState(false);
+  const [view, setView] = useState<LayoutView>('list');
+  const [viewSwitching, setViewSwitching] = useState(false);
+  const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterKey = JSON.stringify(currentFilters);
   const prevFilterKey = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -82,6 +88,23 @@ export function LibraryShell({
       setRemovedSlugs(new Set(Array.isArray(stored) ? stored : []));
     } catch { /* ignore */ }
   }, []);
+
+  // Restore the shared layout preference (persists across Browse + Library).
+  useEffect(() => {
+    const saved = localStorage.getItem(VIEW_PREF_KEY);
+    if (saved === 'list' || saved === 'grid') setView(saved);
+    else if (saved === 'grid2' || saved === 'grid3' || saved === 'split') setView('grid');
+    else if (saved === 'default') setView('list');
+  }, []);
+
+  const handleViewChange = (v: LayoutView) => {
+    if (v === view) return;
+    setView(v);
+    localStorage.setItem(VIEW_PREF_KEY, v);
+    setViewSwitching(true);
+    if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 260);
+  };
 
   // Show skeleton briefly when filters change (skip initial mount)
   useEffect(() => {
@@ -155,14 +178,18 @@ export function LibraryShell({
         totalCount={totalCount}
         filteredCount={displayedWorks.length}
         basePath="/reading"
+        view={view}
+        onViewChange={handleViewChange}
       />
 
       {/* ── Work list ── */}
-      <div className={styles.workList}>
-        {isFiltering ? (
-          Array.from({ length: SKELETON_COUNT }, (_, i) => (
-            <SkeletonCard key={i} index={i} styles={styles} variant="library" />
-          ))
+      <div className={`${styles.workList} ${styles[view]}`}>
+        {isFiltering || viewSwitching ? (
+          // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
+          Array.from(
+            { length: viewSwitching ? Math.max(SKELETON_COUNT, displayedWorks.length) : SKELETON_COUNT },
+            (_, i) => <SkeletonCard key={i} index={i} styles={styles} variant="library" />,
+          )
         ) : displayedWorks.length === 0 ? (
           <div className={styles.empty}>
             <p className={styles.emptyHeading}>
@@ -178,10 +205,7 @@ export function LibraryShell({
           displayedWorks.map((work) =>
             activeTab === 'bookmarked' ? (
               <div key={work.slug} className={styles.cardWrapper}>
-                <WorkCard
-                  work={work}
-                  activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }}
-                />
+                <WorkCardCover work={work} view={view} />
                 <button
                   className={styles.bookmarkBtn}
                   onClick={() => handleRemove(work.slug)}
@@ -194,11 +218,7 @@ export function LibraryShell({
                 </button>
               </div>
             ) : (
-              <WorkCard
-                key={work.slug}
-                work={work}
-                activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }}
-              />
+              <WorkCardCover key={work.slug} work={work} view={view} />
             )
           )
         )}

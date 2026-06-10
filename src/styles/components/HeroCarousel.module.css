@@ -1,0 +1,230 @@
+/* ============================================================
+   HERO CAROUSEL: wide, full-bleed promo banners (Wattpad-style)
+   Swipeable (scroll-snap), with arrows + dots. Each slide is a link:
+   1) story spotlight → /works/[slug]  2) trope → /?tag=  3) originals.
+   ============================================================ */
+
+.hero {
+  position: relative;
+  margin-bottom: var(--space-8);
+}
+
+.viewport {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-radius: 6px;
+}
+
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Slide ── */
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  aspect-ratio: 16 / 5;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: var(--border);
+}
+
+.bg {
+  object-fit: cover;
+}
+
+.slide:hover .bg {
+  transform: scale(1.02);
+}
+
+.bg {
+  transition: transform 600ms var(--ease-out-expo);
+}
+
+/* Left-weighted scrim so the headline stays legible over any image */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(15, 12, 10, 0.82) 0%,
+    rgba(15, 12, 10, 0.55) 38%,
+    rgba(15, 12, 10, 0.12) 62%,
+    rgba(15, 12, 10, 0) 80%
+  );
+}
+
+/* ── Tilted cover (story spotlights) ── */
+/* Centered overlay row: cover + text together, centered as a group */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3.5%, 52px);
+  padding: 0 clamp(20px, 5%, 64px);
+}
+
+.coverWrap {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(104px, 15%, 188px);
+  aspect-ratio: 2 / 3;
+  transform: rotate(-7deg);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.cover {
+  object-fit: cover;
+}
+
+/* ── Text block ── */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* No-cover (trope) cards center their own text */
+.contentCentered {
+  align-items: center;
+  text-align: center;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f3d9a4;
+}
+
+.headline {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 3.2vw, 38px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: #fbf2dc;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  max-width: 30ch;
+  white-space: pre-line; /* honor explicit line breaks in the headline */
+}
+
+/* CTA: reuses the "Recently updated" sort-button treatment (outlined pill),
+   adapted to read on the dark banner. */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background var(--transition-micro), border-color var(--transition-micro);
+}
+
+.slide:hover .cta {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+}
+
+/* ── Arrows ── */
+/* Outlined pill, matching the "Read now" CTA / sort-button treatment */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 150ms ease, background var(--transition-micro), border-color var(--transition-micro);
+}
+
+.hero:hover .arrow {
+  opacity: 1;
+}
+
+.arrow:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+}
+
+.arrow:disabled {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.arrowPrev { left: 14px; }
+.arrowNext { right: 14px; }
+
+/* ── Dots ── */
+.dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 7px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: background var(--transition-micro), width var(--transition-micro);
+}
+
+.dotActive {
+  width: 20px;
+  background: #fff;
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .slide {
+    aspect-ratio: 4 / 3;
+  }
+  .content {
+    left: clamp(130px, 34%, 190px);
+  }
+  .coverWrap {
+    width: 108px;
+  }
+  .arrow {
+    display: none; /* swipe only on mobile */
+  }
+}

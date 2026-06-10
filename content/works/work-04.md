@@ -1,5 +1,6 @@
 ---
 title: "Three Pipe Problem"
+cover: "/covers/cover-04.png"
 author: "221b_forever"
 rating: "Not Rated"
 warnings: ["Creator Chose Not To Use Archive Warnings"]

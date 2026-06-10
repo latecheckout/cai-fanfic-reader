@@ -1,5 +1,6 @@
 ---
 title: "Osmanthus Wine and Other Things He Remembers"
+cover: "/covers/cover-17.png"
 author: "geo_archon_simp"
 rating: "Teen And Up"
 warnings: ["Creator Chose Not To Use Archive Warnings"]

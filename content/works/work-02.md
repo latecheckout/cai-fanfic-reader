@@ -1,5 +1,6 @@
 ---
 title: "All Wolves Dream of Running"
+cover: "/covers/cover-02.png"
 author: "continentalwitch"
 rating: "Explicit"
 warnings: ["Graphic Depictions Of Violence", "No Archive Warnings Apply"]
