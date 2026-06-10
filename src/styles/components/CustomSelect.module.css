@@ -12,7 +12,7 @@
 /* Trigger button — visually matches the existing .select style */
 .trigger {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   background: transparent;
   border: none;
@@ -87,7 +87,7 @@
 /* Dropdown option */
 .option {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   padding: 7px 12px;
   cursor: pointer;

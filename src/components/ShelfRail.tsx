@@ -18,23 +18,29 @@ const isWipStatus = (status: string) => {
   return s.includes('progress') || s === 'wip' || s === 'in-progress';
 };
 
+const MAX_RAIL_TAGS = 2;
 const MAX_TEXT_TAGS = 8;
 
 /**
- * Horizontal cover rail for one shelf. Each card renders both presentation
- * variants; html[data-mode] (the nav toggle) picks one via CSS:
- * visual = cover thumbnail with rating badge, title, one tag, kudos;
- * text = an enlarged AO3-style blurb card where every element (title,
- * author, fandom, ship, warnings, tags) is individually clickable.
+ * Horizontal shelf rail. Visual mode: clean rounded-cover cards (no grid
+ * lattice chrome) carrying the full grid-card data set: cover, rating and
+ * status badges, title, author, tags, reads and kudos. Text mode
+ * (html[data-mode='text']) swaps in an AO3-style blurb card where every
+ * element is individually clickable.
  */
 export function ShelfRail({ shelf, priority = false }: Props) {
   return (
     <section className={styles.section} aria-label={shelf.title}>
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          {/* The title itself routes to the shelf's full result set. */}
+          {/* Filter-driven shelves link their title to the full result set;
+              manually curated shelves have no filter URL. */}
           <h2 className={styles.title}>
-            <Link href={shelf.href} className={styles.titleLink}>{shelf.title}</Link>
+            {shelf.href ? (
+              <Link href={shelf.href} className={styles.titleLink}>{shelf.title}</Link>
+            ) : (
+              shelf.title
+            )}
           </h2>
           <p className={styles.subtitle}>{shelf.subtitle}</p>
         </div>
@@ -47,44 +53,73 @@ export function ShelfRail({ shelf, priority = false }: Props) {
           const wip = isWipStatus(meta.status);
           const catLabel = categoryLabel(meta.category);
           const warnings = meta.warnings.filter((w) => w !== 'No Archive Warnings Apply');
+          const hiddenTagCount = meta.tags.length - MAX_RAIL_TAGS;
           return (
             <article key={slug} className={styles.card}>
               {/* ── Visual variant ── */}
-              <Link href={`/works/${slug}`} className={styles.coverLink} title={meta.title}>
-                <span className={styles.coverWrap}>
-                  {meta.cover && (
-                    <Image
-                      src={meta.cover}
-                      alt=""
-                      fill
-                      sizes="(max-width: 768px) 124px, 150px"
-                      priority={priority && i < 4}
-                      className={styles.coverImg}
-                    />
-                  )}
-                </span>
-              </Link>
-              <span className={styles.badgeRow}>
-                <span className={`${styles.ratingLetter} ${rClass}`} title={meta.rating}>
-                  {ratingLetter(meta.rating)}
-                </span>
-              </span>
-              <Link href={`/works/${slug}`} className={styles.cardTitle}>
-                {meta.title}
-              </Link>
-              {meta.tags.length > 0 && (
-                <span className={styles.tags}>
-                  <Link
-                    href={`/?tag=${encodeURIComponent(meta.tags[0])}`}
-                    className={styles.tagChip}
+              <div className={styles.visual}>
+                <Link href={`/works/${slug}`} className={styles.coverLink} title={meta.title}>
+                  <span className={styles.coverWrap}>
+                    {meta.cover && (
+                      <Image
+                        src={meta.cover}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 156px, 188px"
+                        priority={priority && i < 4}
+                        className={styles.coverImg}
+                      />
+                    )}
+                  </span>
+                </Link>
+
+                {/* Badges above the title: rating + status (grid card parity) */}
+                <span className={styles.badgeRow}>
+                  <span className={`${styles.ratingLetter} ${rClass}`} title={meta.rating}>
+                    {ratingLetter(meta.rating)}
+                  </span>
+                  <span
+                    className={`${styles.statusPill} ${wip ? styles.statusWip : styles.statusDone}`}
+                    title={wip ? 'Work in Progress' : 'Complete'}
                   >
-                    {meta.tags[0]}
-                  </Link>
+                    {wip ? 'WIP' : '✓'}
+                  </span>
                 </span>
-              )}
-              {meta.kudos > 0 && (
-                <span className={styles.cardMeta}>♥ {formatCount(meta.kudos)}</span>
-              )}
+
+                <Link href={`/works/${slug}`} className={styles.cardTitle}>
+                  {meta.title}
+                </Link>
+                {meta.author && <span className={styles.cardAuthor}>by {meta.author}</span>}
+
+                {meta.tags.length > 0 && (
+                  <span className={styles.tags}>
+                    {meta.tags.slice(0, MAX_RAIL_TAGS).map((t) => (
+                      <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>
+                        {t}
+                      </Link>
+                    ))}
+                    {hiddenTagCount > 0 && (
+                      <Link href={`/works/${slug}`} className={styles.tagsMore}>
+                        +{hiddenTagCount}
+                      </Link>
+                    )}
+                  </span>
+                )}
+
+                <span className={styles.cardMeta}>
+                  {meta.hits > 0 && (
+                    <span className={styles.metaItem}>
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                        strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                      {formatCount(meta.hits)}
+                    </span>
+                  )}
+                  {meta.kudos > 0 && <span className={styles.metaItem}>♥ {formatCount(meta.kudos)}</span>}
+                </span>
+              </div>
 
               {/* ── Text variant: AO3 blurb in the enlarged thumbnail footprint ── */}
               <div className={styles.textCard}>

@@ -17,9 +17,18 @@ export interface Shelf {
   key: string;
   title: string;
   subtitle: string;
-  /** Filter URL for the full result set, e.g. /?tag=Found%20Family */
-  href: string;
+  /** Filter URL for the full result set; absent for manually curated shelves. */
+  href?: string;
   works: WorkSummary[];
+}
+
+export interface Creator {
+  name: string;
+  workCount: number;
+  kudos: number;
+  hits: number;
+  /** Filter URL: searches the archive for this creator. */
+  href: string;
 }
 
 export interface FandomTile {
@@ -54,55 +63,47 @@ interface ShelfDef {
   key: string;
   title: string;
   subtitle: string;
-  filters: FilterState;
+  /** Filter-driven shelf: works come from the filter engine. */
+  filters?: FilterState;
   /** URL params equivalent to `filters`, in page.tsx param naming. */
-  params: Record<string, string>;
+  params?: Record<string, string>;
+  /** Manually curated shelf: explicit slug list, order preserved. */
+  slugs?: string[];
 }
 
 const PER_SHELF = 12;
 const MIN_SHELF_WORKS = 4;
 
+/**
+ * @DUMMY — Featured is manually curated. Per Devon (design review,
+ * June 2026): his team's backend will populate curated shelves with
+ * book IDs; the frontend deliverable is the shelf itself. Replace this
+ * slug list with the API-provided IDs when wiring.
+ */
+const FEATURED_SLUGS: string[] = [
+  'sample-story-2',
+  'work-01',
+  'sample-story-11',
+  'sample-story-10',
+  'work-13',
+  'sample-story-8',
+  'work-05',
+  'sample-story-5',
+];
+
 const SHELF_DEFS: ShelfDef[] = [
   {
     key: 'trending',
-    title: 'Trending now',
-    subtitle: 'The most loved works on the archive',
+    title: 'Trending',
+    subtitle: 'What everyone is reading right now',
     filters: { sort: 'kudos' },
     params: { sort: 'kudos' },
   },
   {
-    key: 'slow-burn',
-    title: 'The tension is the point',
-    subtitle: 'Slow burn and mutual pining',
-    filters: { tag: 'Slow Burn,Pining,Mutual Pining' },
-    params: { tag: 'Slow Burn,Pining,Mutual Pining' },
-  },
-  {
-    key: 'cozy',
-    title: 'Soft landings',
-    subtitle: 'Cozy comfort reads, nobody dies',
-    filters: {
-      tag: 'Fluff,Domestic Fluff,Hurt/Comfort,Happy Ending',
-      exWarning: 'Major Character Death',
-    },
-    params: {
-      tag: 'Fluff,Domestic Fluff,Hurt/Comfort,Happy Ending',
-      ex_warning: 'Major Character Death',
-    },
-  },
-  {
-    key: 'found-family',
-    title: 'Found family',
-    subtitle: 'Everyone gets adopted by the end',
-    filters: { tag: 'Found Family' },
-    params: { tag: 'Found Family' },
-  },
-  {
-    key: 'short',
-    title: 'Done in one sitting',
-    subtitle: 'Complete stories under 15k words',
-    filters: { maxWords: 15000, status: 'Complete' },
-    params: { max_words: '15000', status: 'Complete' },
+    key: 'featured',
+    title: 'Featured',
+    subtitle: 'Hand-picked by the c.ai team',
+    slugs: FEATURED_SLUGS,
   },
 ];
 
@@ -112,16 +113,40 @@ function buildHref(params: Record<string, string>): string {
 }
 
 export function buildShelves(works: WorkSummary[]): Shelf[] {
+  const bySlug = new Map(works.map((w) => [w.slug, w]));
   return SHELF_DEFS.map((def) => {
-    const matched = applyFilters(works, def.filters);
+    const matched = def.slugs
+      ? def.slugs.map((s) => bySlug.get(s)).filter((w): w is WorkSummary => w !== undefined)
+      : applyFilters(works, def.filters ?? {});
     return {
       key: def.key,
       title: def.title,
       subtitle: def.subtitle,
-      href: buildHref(def.params),
+      href: def.params ? buildHref(def.params) : undefined,
       works: matched.slice(0, PER_SHELF),
     };
   }).filter((shelf) => shelf.works.length >= MIN_SHELF_WORKS);
+}
+
+/** Aggregate authors into creator cards, ranked by total kudos. */
+export function buildCreators(works: WorkSummary[], maxCreators = 12): Creator[] {
+  const byAuthor = new Map<string, { workCount: number; kudos: number; hits: number }>();
+  for (const w of works) {
+    if (!w.meta.author) continue;
+    const cur = byAuthor.get(w.meta.author) ?? { workCount: 0, kudos: 0, hits: 0 };
+    cur.workCount += 1;
+    cur.kudos += w.meta.kudos;
+    cur.hits += w.meta.hits;
+    byAuthor.set(w.meta.author, cur);
+  }
+  return Array.from(byAuthor.entries())
+    .map(([name, stats]) => ({
+      name,
+      ...stats,
+      href: buildHref({ q: name }),
+    }))
+    .sort((a, b) => b.kudos - a.kudos)
+    .slice(0, maxCreators);
 }
 
 /** Shorten a canonical fandom tag for tile display. */

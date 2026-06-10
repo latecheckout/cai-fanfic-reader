@@ -65,17 +65,23 @@
   border-bottom: 1px solid var(--border);
 }
 
-.grid:nth-child(3n) { border-right: none; }
+/* Lattice lines track the column counts in BrowseShell.module.css:
+   4 by default, 5 on wide desktops, 3 on tablets, 2 on phones. */
+.grid:nth-child(4n) { border-right: none; }
+
+@media (min-width: 1100px) {
+  .grid:nth-child(4n) { border-right: 1px solid var(--border); }
+  .grid:nth-child(5n) { border-right: none; }
+}
 
 @media (max-width: 768px) {
-  /* collapses to 2 columns here */
-  .grid:nth-child(3n) { border-right: 1px solid var(--border); }
-  .grid:nth-child(2n) { border-right: none; }
+  .grid:nth-child(4n) { border-right: 1px solid var(--border); }
+  .grid:nth-child(3n) { border-right: none; }
 }
 
 @media (max-width: 460px) {
-  /* single column — no vertical lines */
-  .grid { border-right: none; }
+  .grid:nth-child(3n) { border-right: 1px solid var(--border); }
+  .grid:nth-child(2n) { border-right: none; }
 }
 
 /* ── Cover (fixed-width thumbnail) ── */
@@ -116,7 +122,7 @@
   padding: 0 4px;
   border-radius: 3px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #fff;
@@ -134,7 +140,7 @@
 .gridBody {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* match the list .content gap for consistent row spacing */
+  gap: 10px; /* match the list .content gap for consistent row spacing */
 }
 
 .gridTitleRow {
@@ -153,7 +159,7 @@
 
 .gridTitle {
   font-family: var(--font-serif);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
   color: var(--text);
   line-height: 1.3;
@@ -182,7 +188,7 @@
 
 .metaCat {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--secondary);
@@ -190,14 +196,14 @@
 
 .metaStatus {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--secondary);
 }
 
 /* Ships — the AO3 hero line; rendered inline in the meta row (list only) */
 .ships {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--text);
 }
@@ -240,7 +246,7 @@
   position: relative;
   z-index: 1;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--secondary);
@@ -262,7 +268,7 @@
   position: relative;
   z-index: 1;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   line-height: 1.5;
 }
@@ -291,7 +297,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px; /* breathing room for the +2px type */
 }
 
 /* ── Title row: title + find-similar inline 6px to its right ── */
@@ -307,7 +313,7 @@
   z-index: 1;
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   word-spacing: -0.3em;
   color: var(--secondary);
   background: none;
@@ -349,7 +355,7 @@
 
 .title {
   font-family: var(--font-serif);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
   color: var(--text);
   line-height: 1.35;
@@ -368,7 +374,7 @@
 
 .author {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -379,7 +385,7 @@
   margin: 0; /* spacing handled by the uniform .content gap */
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--secondary);
   display: -webkit-box;
@@ -390,7 +396,7 @@
 
 .metrics {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
 }
 
@@ -400,13 +406,13 @@
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tagChip {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   background: var(--border);
   border-radius: 3px;
@@ -425,7 +431,7 @@
 .warnChip {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--bg);
   background: var(--text);
   border-radius: 3px;
@@ -443,7 +449,7 @@
   display: inline-flex;
   align-items: center;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   opacity: 0.7;
   padding: 2px 7px;
@@ -501,7 +507,7 @@
   justify-content: center;
   border-radius: 2px;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
   flex-shrink: 0;
@@ -524,7 +530,7 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   /* Dim the M/M via color only — NOT element opacity, which would also
      fade the ::after tooltip and make it translucent vs the others. */
   color: color-mix(in srgb, var(--secondary) 75%, transparent);
@@ -543,7 +549,7 @@
   justify-content: center;
   border-radius: 2px;
   font-family: var(--font-sans);
-  font-size: 8px;
+  font-size: 10px;
   color: var(--secondary);
   pointer-events: auto;
   cursor: default;
@@ -570,7 +576,7 @@
   background: var(--text);
   color: var(--bg);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.02em;
   padding: 4px 8px;
   border-radius: 4px;
@@ -593,7 +599,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 /* Bottom section (fandom/ships/characters) — separated by whitespace only */
@@ -606,7 +612,7 @@
 
 .statsBottom {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
   color: var(--secondary);
   transition: color var(--transition-micro);
@@ -640,7 +646,7 @@
 }
 
 .list .title {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.4;
   display: inline;
   -webkit-line-clamp: initial;

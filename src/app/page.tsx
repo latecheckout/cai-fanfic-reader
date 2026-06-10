@@ -6,7 +6,7 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { buildShelves, buildFandomTiles } from '@/lib/shelves';
+import { buildShelves, buildFandomTiles, buildCreators } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
@@ -120,6 +120,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
              visual = covers, text = AO3-style metadata cards. */
           <BrowseHome
             shelves={buildShelves(allWorks)}
+            creators={buildCreators(allWorks)}
             fandoms={buildFandomTiles(allWorks)}
             covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
           />

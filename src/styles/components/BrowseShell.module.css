@@ -20,19 +20,25 @@
 }
 
 /* Internal lattice only — lines between cells, no outer frame (cells draw
-   their own right/bottom; the last column's right line is removed). */
+   their own right/bottom; the last column's right line is removed).
+   Density per Devon: 4 up by default, 5 on wide desktops; glanceability
+   over gallery. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (min-width: 1100px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
 }
 
 /* Collapse columns on narrower viewports */
 @media (max-width: 768px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 460px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ── Back link (e.g. "← Characters" when navigating from characters page) ── */
@@ -40,7 +46,7 @@
   display: inline-block;
   margin-bottom: var(--space-4);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   color: var(--secondary);
   text-decoration: none;
@@ -57,20 +63,20 @@
   padding: var(--space-12) 0;
   text-align: center;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
 }
 
 .emptyHeading {
   margin: 0 0 8px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
 .emptyHint {
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--secondary);
 }
 
@@ -123,15 +129,20 @@
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
-.grid .skeletonCard:nth-child(3n) { border-right: none; }
+.grid .skeletonCard:nth-child(4n) { border-right: none; }
 .grid .skeletonStrip { width: 100%; }
 
+@media (min-width: 1100px) {
+  .grid .skeletonCard:nth-child(4n) { border-right: 1px solid var(--border); }
+  .grid .skeletonCard:nth-child(5n) { border-right: none; }
+}
 @media (max-width: 768px) {
-  .grid .skeletonCard:nth-child(3n) { border-right: 1px solid var(--border); }
-  .grid .skeletonCard:nth-child(2n) { border-right: none; }
+  .grid .skeletonCard:nth-child(4n) { border-right: 1px solid var(--border); }
+  .grid .skeletonCard:nth-child(3n) { border-right: none; }
 }
 @media (max-width: 460px) {
-  .grid .skeletonCard { border-right: none; }
+  .grid .skeletonCard:nth-child(3n) { border-right: 1px solid var(--border); }
+  .grid .skeletonCard:nth-child(2n) { border-right: none; }
 }
 
 /* Cover-shaped placeholder (2:3, matches the card thumbnail) */

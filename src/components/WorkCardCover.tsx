@@ -22,7 +22,7 @@ const MAX_TAGS_GRID = 2;
 
 const COVER_SIZES: Record<LayoutView, string> = {
   list: '(max-width: 768px) 100px, 96px',
-  grid: '(max-width: 460px) 100vw, (max-width: 768px) 50vw, 33vw',
+  grid: '(max-width: 460px) 50vw, (max-width: 768px) 33vw, (min-width: 1100px) 20vw, 25vw',
 };
 
 const RATING_LETTER: Record<string, string> = {

@@ -1,14 +1,16 @@
 /* ============================================================
-   SHELF RAIL: horizontal cover shelf on the browse-first home.
-   One shelf = one pre-canned filter query. Cards stay minimal;
-   full metadata lives on the results layer.
+   SHELF RAIL: horizontal shelf on the browse-first home.
+   Visual mode: clean rounded-cover cards (no grid lattice
+   chrome) carrying the full grid-card data set.
+   Text mode: an enlarged AO3 blurb card takes the footprint.
+   Type sizes follow the +2px accessibility bump.
    ============================================================ */
 
 .section {
   margin-bottom: var(--space-10);
 }
 
-/* ── Header: editorial title, taxonomy subtitle, view-all link ── */
+/* ── Header: editorial title, taxonomy subtitle ── */
 .header {
   display: flex;
   align-items: flex-end;
@@ -24,7 +26,7 @@
 .title {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--text);
@@ -33,7 +35,7 @@
 .subtitle {
   margin: 2px 0 0;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--secondary);
 }
 
@@ -47,7 +49,7 @@
   text-underline-offset: 3px;
 }
 
-/* ── Cover row ── */
+/* ── Card row ── */
 .row {
   display: flex;
   gap: var(--space-4);
@@ -66,12 +68,19 @@
 
 .card {
   flex-shrink: 0;
-  width: 150px;
+  width: 188px;
+  display: flex;
+  flex-direction: column;
+}
+
+.visual {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 100%;
 }
 
+/* ── Cover ── */
 .coverLink {
   display: block;
   width: 100%;
@@ -99,11 +108,11 @@
   transform: scale(1.04);
 }
 
-/* ── Rating badge row, above the title ── */
+/* ── Badges above the title: rating + status (grid card parity) ── */
 .badgeRow {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   margin-top: var(--space-2);
 }
 
@@ -111,12 +120,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
   border-radius: 3px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
 }
@@ -127,10 +136,34 @@
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
 
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.statusWip {
+  color: var(--rating-t);
+  border: 1px solid currentColor;
+}
+
+.statusDone {
+  color: var(--rating-g);
+  border: 1px solid currentColor;
+}
+
+/* ── Title + author ── */
 .cardTitle {
-  margin-top: var(--space-1);
+  margin-top: var(--space-2);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   line-height: 1.35;
   color: var(--text);
@@ -146,21 +179,31 @@
   text-underline-offset: 2px;
 }
 
-/* ── One tag, above the social metric ── */
+.cardAuthor {
+  margin-top: 2px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+/* ── Tags: two chips plus overflow count ── */
 .tags {
   display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-top: var(--space-2);
   max-width: 100%;
 }
 
-.tagChip {
+.tagChip,
+.tagsMore {
   display: inline-block;
   max-width: 100%;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 3px;
   background: var(--border);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.4;
   color: var(--secondary);
   text-decoration: none;
@@ -170,23 +213,67 @@
   transition: color var(--transition-micro), background var(--transition-micro);
 }
 
-.tagChip:hover {
+.tagChip:hover,
+.tagsMore:hover {
   color: var(--text);
   background: var(--border-strong);
 }
 
+/* ── Metrics: reads + kudos ── */
 .cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   margin-top: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
 }
 
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Page load stagger ── */
+@keyframes shelfFadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: shelfFadeUp 500ms var(--ease-out-expo) both; }
+  .card:nth-child(1) { animation-delay: 25ms; }
+  .card:nth-child(2) { animation-delay: 50ms; }
+  .card:nth-child(3) { animation-delay: 75ms; }
+  .card:nth-child(4) { animation-delay: 100ms; }
+  .card:nth-child(5) { animation-delay: 125ms; }
+  .card:nth-child(6) { animation-delay: 150ms; }
+  .card:nth-child(7) { animation-delay: 175ms; }
+  .card:nth-child(8) { animation-delay: 200ms; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: var(--space-8);
+  }
+
+  .title {
+    font-size: 21px;
+  }
+
+  .card {
+    width: 156px;
+  }
+}
+
 /* ============================================================
    TEXT MODE (html[data-mode='text'], set by the nav toggle).
-   The cover and its caption stack hide; an enlarged AO3 blurb
-   card takes over the footprint. Every element is its own link.
+   The cover card hides; an enlarged AO3 blurb card takes over.
+   Every element is its own link.
    ============================================================ */
 
 .textCard {
@@ -194,14 +281,10 @@
 }
 
 :global(html[data-mode='text']) .card {
-  width: 280px;
+  width: 300px;
 }
 
-:global(html[data-mode='text']) .coverLink,
-:global(html[data-mode='text']) .badgeRow,
-:global(html[data-mode='text']) .cardTitle,
-:global(html[data-mode='text']) .tags,
-:global(html[data-mode='text']) .cardMeta {
+:global(html[data-mode='text']) .visual {
   display: none;
 }
 
@@ -231,7 +314,7 @@
 
 .tcCat {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.04em;
   color: var(--secondary);
   border: 1px solid var(--border-chip);
@@ -241,7 +324,7 @@
 
 .tcStatus {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--secondary);
@@ -250,7 +333,7 @@
 .tcDate {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
 }
@@ -259,7 +342,7 @@
 .tcTitle {
   margin-top: var(--space-3);
   font-family: var(--font-serif);
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.3;
   color: var(--text);
@@ -279,7 +362,7 @@
   margin-top: 2px;
   align-self: flex-start;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   text-decoration: none;
 }
@@ -293,7 +376,7 @@
 .tcFandom {
   margin-top: var(--space-2);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
@@ -313,7 +396,7 @@
 .tcShips {
   margin-top: 2px;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
   white-space: nowrap;
@@ -339,7 +422,7 @@
 .tcSummary {
   margin-top: var(--space-2);
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   line-height: 1.5;
   color: var(--secondary);
   display: -webkit-box;
@@ -352,19 +435,19 @@
 .tcTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   margin-top: var(--space-2);
-  max-height: 44px;
+  max-height: 52px;
   overflow: hidden;
 }
 
 .tcTag,
 .tcWarn {
   display: inline-block;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.6;
   text-decoration: none;
   white-space: nowrap;
@@ -396,7 +479,7 @@
   margin-top: auto;
   padding-top: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 11.5px;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
   color: var(--secondary);
@@ -404,39 +487,6 @@
 
 @media (max-width: 768px) {
   :global(html[data-mode='text']) .card {
-    width: 244px;
-  }
-}
-
-/* ── Page load stagger ── */
-@keyframes shelfFadeUp {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .card { animation: shelfFadeUp 500ms var(--ease-out-expo) both; }
-  .card:nth-child(1) { animation-delay: 25ms; }
-  .card:nth-child(2) { animation-delay: 50ms; }
-  .card:nth-child(3) { animation-delay: 75ms; }
-  .card:nth-child(4) { animation-delay: 100ms; }
-  .card:nth-child(5) { animation-delay: 125ms; }
-  .card:nth-child(6) { animation-delay: 150ms; }
-  .card:nth-child(7) { animation-delay: 175ms; }
-  .card:nth-child(8) { animation-delay: 200ms; }
-}
-
-/* ── Mobile ── */
-@media (max-width: 768px) {
-  .section {
-    margin-bottom: var(--space-8);
-  }
-
-  .title {
-    font-size: 19px;
-  }
-
-  .card {
-    width: 124px;
+    width: 260px;
   }
 }

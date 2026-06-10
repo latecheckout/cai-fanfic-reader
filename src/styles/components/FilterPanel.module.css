@@ -54,7 +54,7 @@
   gap: 6px;
   height: 36px;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -85,7 +85,7 @@
 
 .sortBtnKbd {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   opacity: 0.6;
   letter-spacing: 0.02em;
   margin-left: 1px;
@@ -123,7 +123,7 @@
   padding: 9px 14px;
   text-align: left;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   background: transparent;
   border: none;
@@ -166,7 +166,7 @@
   gap: 6px;
   height: 36px;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -220,7 +220,7 @@
 /* Keyboard shortcut hint */
 .filterBtnKbd {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   opacity: 0.6;
   letter-spacing: 0.02em;
   margin-left: 1px;
@@ -249,7 +249,7 @@
   display: inline-flex;
   align-items: center;
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   background: var(--text);
   color: var(--bg);
   border: none;
@@ -292,7 +292,7 @@ span.pillToggleArea {
 }
 
 .pillIcon {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
   line-height: 1;
@@ -312,7 +312,7 @@ span.pillToggleArea {
 /* X remove button */
 .pillXBtn {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 16px;
   color: inherit;
   background: none;
   border: none;
@@ -342,7 +342,7 @@ span.pillToggleArea {
   border: 1px dashed var(--border-strong);
   border-radius: 20px;
   padding: 3px 10px;
-  font-size: 11.5px;
+  font-size: 13.5px;
   cursor: pointer;
   transition: color var(--transition-micro), border-color var(--transition-micro);
 }
@@ -355,7 +355,7 @@ span.pillToggleArea {
 /* ── Work count with rolling number ── */
 .workCount {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   white-space: nowrap;
 }
@@ -408,7 +408,7 @@ span.pillToggleArea {
 /* ── Clear all button ── */
 .clearAllBtn {
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   color: var(--secondary);
   background: transparent;
   border: none;
@@ -426,7 +426,7 @@ span.pillToggleArea {
 /* ── Save as preset button (in pills row) ── */
 .saveAsPresetBtn {
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   color: var(--secondary);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -451,7 +451,7 @@ span.pillToggleArea {
 
 .saveBarInput {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -474,7 +474,7 @@ span.pillToggleArea {
 
 .saveBarSave {
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   background: var(--text);
   color: var(--bg);
   border: none;
@@ -492,7 +492,7 @@ span.pillToggleArea {
 
 .saveBarCancel {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
   background: none;
   border: none;
@@ -678,7 +678,7 @@ span.pillToggleArea {
 
 .drawerLabel {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
   letter-spacing: 0;
@@ -701,7 +701,7 @@ span.pillToggleArea {
 
 .sectionChevron {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
   display: inline-block;
   transform: rotate(-90deg);
@@ -722,7 +722,7 @@ span.pillToggleArea {
 
 .sectionClear {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   background: none;
   border: none;
@@ -781,7 +781,7 @@ span.pillToggleArea {
 
 .ratingCardName {
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -828,7 +828,7 @@ span.pillToggleArea {
 
 .dPillIcon {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   opacity: 0.7;
   margin-right: 2px;
 }
@@ -858,7 +858,7 @@ span.pillToggleArea {
 }
 
 .statusIcon {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
   line-height: 1;
   flex-shrink: 0;
@@ -866,7 +866,7 @@ span.pillToggleArea {
 
 .statusLabel {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text);
 }
 
@@ -895,7 +895,7 @@ span.pillToggleArea {
 /* ── Warnings contextual note ── */
 .warningsNote {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   font-style: italic;
   margin: 0;
@@ -905,7 +905,7 @@ span.pillToggleArea {
 /* ── Drawer pill — 3 states ── */
 .dPill {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 20px;
   padding: 4px 14px;
   cursor: pointer;
@@ -949,7 +949,7 @@ span.pillToggleArea {
 
 .customChevron {
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
   margin-left: 3px;
   transition: transform 200ms var(--ease-out-expo);
 }
@@ -980,7 +980,7 @@ span.pillToggleArea {
 
 .wcInput {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -1002,7 +1002,7 @@ span.pillToggleArea {
 
 .wcSep {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
 }
 
@@ -1015,7 +1015,7 @@ span.pillToggleArea {
 
 .dateInput {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -1064,7 +1064,7 @@ span.pillToggleArea {
 
 .presetName {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text);
   flex: 1;
   background: none;
@@ -1112,7 +1112,7 @@ span.pillToggleArea {
 
 .presetToast {
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   color: var(--secondary);
   padding: 6px 0 2px;
   font-style: italic;
@@ -1130,7 +1130,7 @@ span.pillToggleArea {
 
 .savePresetTrigger {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   background: none;
   border: none;
@@ -1151,7 +1151,7 @@ span.pillToggleArea {
 
 .savePresetInput {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -1168,7 +1168,7 @@ span.pillToggleArea {
 
 .savePresetSubmit {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   background: var(--text);
   color: var(--bg);
   border: none;
@@ -1195,7 +1195,7 @@ span.pillToggleArea {
 
 .drawerFooterClear {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--secondary);
   background: none;
   border: none;
@@ -1220,7 +1220,7 @@ span.pillToggleArea {
 .applyBtn {
   display: none;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--text);
   background: transparent;
@@ -1239,7 +1239,7 @@ span.pillToggleArea {
 .drawerShowBtn {
   display: none;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--bg);
   background: var(--text);
@@ -1320,7 +1320,7 @@ span.pillToggleArea {
   border-radius: 6px;
   padding: 5px 10px;
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(26, 24, 22, 0.10);
@@ -1396,7 +1396,7 @@ span.pillToggleArea {
 
 .savePopoverLabel {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1413,7 +1413,7 @@ span.pillToggleArea {
 
 .savePopoverPill {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--text);
   border-radius: 20px;
@@ -1428,7 +1428,7 @@ span.pillToggleArea {
 
 .savePopoverInput {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border-strong);
@@ -1450,7 +1450,7 @@ span.pillToggleArea {
 
 .savePopoverSave {
   font-family: var(--font-sans);
-  font-size: 11.5px;
+  font-size: 13.5px;
   background: var(--text);
   color: var(--bg);
   border: none;
@@ -1474,7 +1474,7 @@ span.pillToggleArea {
 
 .presetModifiedBtn {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   background: none;
   border: none;
@@ -1505,7 +1505,7 @@ span.pillToggleArea {
 
 .presetPreview {
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   margin: 0;
   padding-left: 0;
@@ -1515,7 +1515,7 @@ span.pillToggleArea {
 
 .savedEmpty {
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--secondary);
   font-style: italic;
   padding: 8px 0 4px;
@@ -1561,7 +1561,7 @@ span.pillToggleArea {
 
   /* Pill row adjustments */
   .pill {
-    font-size: 12px;
+    font-size: 14px;
     padding: 0;
   }
 

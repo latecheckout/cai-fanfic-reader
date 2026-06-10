@@ -14,32 +14,32 @@
 
 /* Category: fandom */
 .fandom {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
 /* Category: relationship */
 .relationship {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   font-style: italic;
 }
 
 /* Category: character */
 .character {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
 }
 
 /* Category: additional / trope */
 .additional {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 300;
 }
 
 /* Category: warning */
 .warning {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -48,7 +48,7 @@
 
 /* Category: category (M/F, F/F, etc) */
 .category {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--secondary);
 }

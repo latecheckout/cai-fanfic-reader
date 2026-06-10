@@ -13,7 +13,7 @@ const OPTIONS: { value: LayoutView; label: string; desc: string; icon: React.Rea
   {
     value: 'list',
     label: 'List',
-    desc: 'Detailed cards with tags, ships, stats',
+    desc: 'AO3 mode: for the tag purists',
     icon: (
       <svg width="15" height="14" viewBox="0 0 15 14" fill="none" stroke="currentColor"
         strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
@@ -24,7 +24,7 @@ const OPTIONS: { value: LayoutView; label: string; desc: string; icon: React.Rea
   {
     value: 'grid',
     label: 'Grid',
-    desc: 'Big covers for fast visual browsing',
+    desc: 'Judge a book by its cover',
     icon: (
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
         <rect x="0" y="0" width="6" height="6" rx="1" fill="currentColor" />
