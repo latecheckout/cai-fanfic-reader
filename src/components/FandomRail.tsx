@@ -43,33 +43,16 @@ export function FandomRail({ tiles }: Props) {
               </span>
             </Link>
 
-            {/* Text variant: metadata tile, every element its own link */}
+            {/* Text variant: label plus the fandom's two top tag pills */}
             <div className={styles.textCard}>
               <span className={styles.tcKicker}>Fandom</span>
               <Link href={tile.href} className={styles.tcLabel}>{tile.label}</Link>
-              <span className={styles.tcName}>{tile.name}</span>
 
-              {tile.topShips.length > 0 && (
-                <span className={styles.tcSection}>
-                  <span className={styles.tcSectionLabel}>Top ships</span>
-                  {tile.topShips.map((ship) => (
-                    <Link
-                      key={ship}
-                      href={`/?relationship=${encodeURIComponent(ship)}`}
-                      className={styles.tcShipLink}
-                    >
-                      {ship}
-                    </Link>
-                  ))}
-                </span>
-              )}
-
-              {tile.topWorks.length > 0 && (
-                <span className={styles.tcSection}>
-                  <span className={styles.tcSectionLabel}>Most loved</span>
-                  {tile.topWorks.map((w) => (
-                    <Link key={w.slug} href={`/works/${w.slug}`} className={styles.tcWorkLink}>
-                      {w.title}
+              {tile.topTags.length > 0 && (
+                <span className={styles.tcTags}>
+                  {tile.topTags.map((t) => (
+                    <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tcTag}>
+                      {t}
                     </Link>
                   ))}
                 </span>

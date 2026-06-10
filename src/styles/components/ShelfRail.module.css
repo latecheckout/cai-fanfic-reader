@@ -68,54 +68,26 @@
 
 .card {
   flex-shrink: 0;
-  width: 188px;
+  width: 232px;
   display: flex;
   flex-direction: column;
 }
 
-.visual {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
+/* ── Visual slot: the results grid card, UI reused verbatim ── */
+/* The grid card draws results-lattice borders and cell padding; inside a
+   rail the row gap handles spacing, so strip only that chrome. The card's
+   own badges, pills, tag expander, and stats render untouched. */
+.slot article {
+  border-right: none;
+  border-bottom: none;
+  padding: 0;
 }
 
-/* ── Cover ── */
-.coverLink {
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  color: inherit;
+.slot article:hover {
+  background: transparent;
 }
 
-.coverWrap {
-  position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.coverImg {
-  object-fit: cover;
-  transition: transform 400ms var(--ease-out-expo);
-}
-
-.coverLink:hover .coverImg {
-  transform: scale(1.04);
-}
-
-/* ── Badges above the title: rating + status (grid card parity) ── */
-.badgeRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
+/* ── Rating badge (text variant) ── */
 .ratingLetter {
   display: inline-flex;
   align-items: center;
@@ -135,107 +107,6 @@
 .ratingM  { background: var(--rating-m); }
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
-
-.statusPill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 18px;
-  padding: 0 6px;
-  border-radius: 3px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.statusWip {
-  color: var(--rating-t);
-  border: 1px solid currentColor;
-}
-
-.statusDone {
-  color: var(--rating-g);
-  border: 1px solid currentColor;
-}
-
-/* ── Title + author ── */
-.cardTitle {
-  margin-top: var(--space-2);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.35;
-  color: var(--text);
-  text-decoration: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.cardTitle:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.cardAuthor {
-  margin-top: 2px;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--secondary);
-}
-
-/* ── Tags: two chips plus overflow count ── */
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: var(--space-2);
-  max-width: 100%;
-}
-
-.tagChip,
-.tagsMore {
-  display: inline-block;
-  max-width: 100%;
-  padding: 2px 8px;
-  border-radius: 3px;
-  background: var(--border);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--secondary);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition-micro), background var(--transition-micro);
-}
-
-.tagChip:hover,
-.tagsMore:hover {
-  color: var(--text);
-  background: var(--border-strong);
-}
-
-/* ── Metrics: reads + kudos ── */
-.cardMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--secondary);
-}
-
-.metaItem {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
 
 /* ── Page load stagger ── */
 @keyframes shelfFadeUp {
@@ -284,7 +155,7 @@
   width: 300px;
 }
 
-:global(html[data-mode='text']) .visual {
+:global(html[data-mode='text']) .slot {
   display: none;
 }
 

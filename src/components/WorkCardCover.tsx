@@ -135,11 +135,6 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
   const catLabel = categoryLabel(meta.category);
   const rClass = ratingClass(meta.rating);
 
-  const handleFindSimilar = () => {
-    const topTags = meta.tags.slice(0, 3).join(', ');
-    document.dispatchEvent(new CustomEvent('fill-search', { detail: { value: topTags } }));
-  };
-
   // ── grid: cover-led visual card. cover → strip → title → author → tags → reads·kudos ──
   if (view === 'grid') {
     const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, MAX_TAGS_GRID);
@@ -174,17 +169,6 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
               <span className={styles.gridTitle}>{meta.title}</span>
             </Link>
             {meta.author && <span className={styles.author}>by {meta.author}</span>}
-            {meta.tags.length > 0 && (
-              <button
-                type="button"
-                className={styles.findSimilarBtn}
-                onClick={handleFindSimilar}
-                aria-label="Find similar works"
-                title="Find similar works"
-              >
-                ≈ similar
-              </button>
-            )}
           </div>
           {meta.tags.length > 0 && (
             <div className={styles.tags}>
@@ -236,17 +220,6 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
             </Link>
           </h3>
           {meta.author && <span className={styles.author}>by {meta.author}</span>}
-          {meta.tags.length > 0 && (
-            <button
-              type="button"
-              className={styles.findSimilarBtn}
-              onClick={handleFindSimilar}
-              aria-label="Find similar works"
-              title="Find similar works"
-            >
-              ≈ similar
-            </button>
-          )}
         </div>
 
         {meta.summary && <p className={styles.summary}>{meta.summary}</p>}

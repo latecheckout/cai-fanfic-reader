@@ -39,10 +39,8 @@ export interface FandomTile {
   count: number;
   /** Full-bleed tile art: generated fandom mood image, falling back to the top work's cover. */
   image: string;
-  /** Most frequent relationships in this fandom, for the text-mode tile. */
-  topShips: string[];
-  /** Most kudosed works in this fandom, for the text-mode tile. */
-  topWorks: { title: string; slug: string }[];
+  /** The fandom's two most frequent tags, shown as pills on the text-mode tile. */
+  topTags: string[];
   href: string;
 }
 
@@ -181,23 +179,22 @@ export function buildFandomTiles(works: WorkSummary[], maxTiles = 10): FandomTil
       // the fandom's top work cover so the tile never renders broken.
       const art = FANDOM_ART[label];
       const artExists = art && fs.existsSync(path.join(process.cwd(), 'public', art));
-      const shipCounts = new Map<string, number>();
+      const tagCounts = new Map<string, number>();
       for (const w of list) {
-        for (const r of w.meta.relationships) {
-          shipCounts.set(r, (shipCounts.get(r) ?? 0) + 1);
+        for (const t of w.meta.tags) {
+          tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
         }
       }
-      const topShips = Array.from(shipCounts.entries())
+      const topTags = Array.from(tagCounts.entries())
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([ship]) => ship);
+        .slice(0, 2)
+        .map(([tag]) => tag);
       return {
         name,
         label,
         count: list.length,
         image: (artExists ? art : sorted[0].meta.cover) ?? '',
-        topShips,
-        topWorks: sorted.slice(0, 3).map((w) => ({ title: w.meta.title, slug: w.slug })),
+        topTags,
         href: buildHref({ fandom: name }),
       };
     })

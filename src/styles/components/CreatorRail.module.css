@@ -41,7 +41,7 @@
 /* ── Card row ── */
 .row {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-4);
   overflow-x: auto;
   padding-bottom: var(--space-2);
   scrollbar-width: none;
@@ -56,43 +56,38 @@
 
 .card {
   flex-shrink: 0;
-  width: 148px;
+  width: 150px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--space-4) var(--space-3);
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
+  align-items: flex-start;
   text-decoration: none;
   color: inherit;
-  transition: transform var(--transition-micro), border-color var(--transition-micro);
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
+/* ── Portrait: same 2:3 footprint as the story shelves; in production the
+   whole card is the creator's face. ── */
+.coverWrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* ── Initials avatar ── */
-.avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--text);
-  color: var(--bg);
-  font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: 600;
-  opacity: 0.85;
+.coverImg {
+  object-fit: cover;
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.card:hover .coverImg {
+  transform: scale(1.04);
 }
 
 .name {
-  margin-top: var(--space-3);
+  margin-top: var(--space-2);
   max-width: 100%;
   font-family: var(--font-sans);
   font-size: 15px;
@@ -127,6 +122,6 @@
   }
 
   .card {
-    width: 132px;
+    width: 124px;
   }
 }
