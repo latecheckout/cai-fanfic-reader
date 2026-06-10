@@ -103,11 +103,13 @@ vibe engine.
 
 `/` now branches into two layers (`src/app/page.tsx`):
 
-- **Layer zero (no params): `BrowseHome`** — hero carousel (existing), the full `BrowseSearchBar`
-  demoted below the hero (vibe, autocomplete, presets, and Cmd+K all intact) with an "All works"
-  capsule and a mood-chip strip, Continue Reading rail (existing), `FandomRail` (tiles with
-  stacked covers routing to `?fandom=`), then five `ShelfRail` cover shelves, and a footer link
-  to the full archive.
+- **Layer zero (no params): `BrowseHome`** — hero carousel (existing), with the full
+  `BrowseSearchBar` living in the nav (a search slot in `BrowseHeader`; vibe, autocomplete,
+  presets, and Cmd+K all intact, matching where Wattpad and AO3 put search). Below the hero:
+  a quick-browse row (mood chips plus an "All works" capsule), Continue Reading rail (existing),
+  `FandomRail` (tiles with stacked covers routing to `?fandom=`), then five `ShelfRail` cover
+  shelves, and a footer link to the full archive. The list/grid toggle stays a results-layer
+  control: it adjusts card density, and layer zero has no card list to densify.
 - **Layer one (any filter/search/sort param): `BrowseShell`** — entirely untouched. Filter
   drawer, 3-state pills, include/exclude, presets, list/grid toggle, and `WorkCardCover` are
   exactly as shipped on `06082026`.

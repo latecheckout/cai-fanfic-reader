@@ -10,6 +10,7 @@ import { buildShelves, buildFandomTiles, MOOD_CHIPS } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
+import { BrowseSearchBar } from '@/components/BrowseSearchBar';
 import styles from './browse.module.css';
 
 interface PageProps {
@@ -98,7 +99,17 @@ export default async function BrowsePage({ searchParams }: PageProps) {
 
   return (
     <div className={styles.page}>
-      <BrowseHeader />
+      {/* On the home, search lives in the nav. Results pages keep search in
+          the sticky toolbar, so the nav slot stays empty there. */}
+      <BrowseHeader
+        search={
+          !hasActiveFilters ? (
+            <Suspense>
+              <BrowseSearchBar options={searchOptions} />
+            </Suspense>
+          ) : undefined
+        }
+      />
 
       <main className={styles.main}>
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
@@ -107,7 +118,6 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {!hasActiveFilters ? (
           <BrowseHome
             totalCount={allWorks.length}
-            searchOptions={searchOptions}
             shelves={buildShelves(allWorks)}
             fandoms={buildFandomTiles(allWorks)}
             moods={MOOD_CHIPS}

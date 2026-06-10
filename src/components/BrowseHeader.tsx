@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import styles from '@/styles/components/BrowseHeader.module.css';
 import { MobileNav } from './MobileNav';
@@ -11,7 +12,13 @@ const NAV_LINKS = [
   { href: '/characters', label: 'Characters' },
 ];
 
-export function BrowseHeader() {
+interface Props {
+  /** Search slot, rendered in the right zone. The browse home passes
+      BrowseSearchBar here; results pages keep search in their toolbar. */
+  search?: ReactNode;
+}
+
+export function BrowseHeader({ search }: Props = {}) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
 
@@ -59,8 +66,9 @@ export function BrowseHeader() {
           ))}
         </nav>
 
-        {/* ── Right zone: avatar (desktop) + hamburger (mobile) ── */}
+        {/* ── Right zone: search slot + avatar (desktop) + hamburger (mobile) ── */}
         <div className={styles.zoneRight}>
+          {search && <div className={styles.zoneSearch}>{search}</div>}
           <div className={styles.avatar} aria-hidden="true">
             P
           </div>
