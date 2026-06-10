@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { WorkSummary, FilterState } from '@/types';
 import { applyFilters } from './filters';
 
@@ -26,9 +28,23 @@ export interface FandomTile {
   /** Display label, shortened for the tile ("Harry Potter - J. K. Rowling" reads as "Harry Potter"). */
   label: string;
   count: number;
-  covers: string[];
+  /** Full-bleed tile art: generated fandom mood image, falling back to the top work's cover. */
+  image: string;
   href: string;
 }
+
+/** Generated fandom mood art (Higgsfield, no-text scenes), keyed by display label. */
+const FANDOM_ART: Record<string, string> = {
+  'Harry Potter': '/fandoms/harry-potter.png',
+  'Marvel Cinematic Universe': '/fandoms/marvel-cinematic-universe.png',
+  'Our Flag Means Death': '/fandoms/our-flag-means-death.png',
+  'Supernatural': '/fandoms/supernatural.png',
+  'Good Omens': '/fandoms/good-omens.png',
+  'Arcane: League of Legends': '/fandoms/arcane.png',
+  'Stranger Things': '/fandoms/stranger-things.png',
+  'Sherlock': '/fandoms/sherlock.png',
+  'Original Work': '/fandoms/original-work.png',
+};
 
 interface ShelfDef {
   key: string;
@@ -131,11 +147,16 @@ export function buildFandomTiles(works: WorkSummary[], maxTiles = 10): FandomTil
     .filter(([, list]) => list.length >= 2)
     .map(([name, list]) => {
       const sorted = [...list].sort((a, b) => b.meta.kudos - a.meta.kudos);
+      const label = fandomLabel(name);
+      // Generated art can be missing (moderation rejections); fall back to
+      // the fandom's top work cover so the tile never renders broken.
+      const art = FANDOM_ART[label];
+      const artExists = art && fs.existsSync(path.join(process.cwd(), 'public', art));
       return {
         name,
-        label: fandomLabel(name),
+        label,
         count: list.length,
-        covers: sorted.slice(0, 3).map((w) => w.meta.cover ?? ''),
+        image: (artExists ? art : sorted[0].meta.cover) ?? '',
         href: buildHref({ fandom: name }),
       };
     })

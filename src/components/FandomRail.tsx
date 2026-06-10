@@ -8,9 +8,9 @@ interface Props {
 }
 
 /**
- * Fandom tile row: the IP layer of the browse-first home (Spotify treats
- * genre this way; here the genre is the fandom). Each tile is a stack of
- * that fandom's top covers and routes to the plain ?fandom= filter URL.
+ * Fandom rail: the IP layer of the browse-first home (Spotify treats genre
+ * this way; here the genre is the fandom). Each card is a full-bleed fandom
+ * mood image, same shape as the shelf cards, routing to ?fandom=.
  */
 export function FandomRail({ tiles }: Props) {
   if (tiles.length === 0) return null;
@@ -29,28 +29,26 @@ export function FandomRail({ tiles }: Props) {
 
       <div className={styles.row}>
         {tiles.map((tile) => (
-          <Link
-            key={tile.name}
-            href={tile.href}
-            className={styles.tile}
-            title={tile.name}
-          >
-            <span className={styles.stack}>
-              {tile.covers.map((cover, i) => (
-                <span
-                  key={`${tile.name}-${i}`}
-                  className={styles.stackCover}
-                  style={{ left: `${i * 34}px`, zIndex: tile.covers.length - i }}
-                >
-                  {cover && (
-                    <Image src={cover} alt="" fill sizes="58px" className={styles.stackImg} />
-                  )}
-                </span>
-              ))}
+          <Link key={tile.name} href={tile.href} className={styles.card} title={tile.name}>
+            {/* Visual variant: full-bleed fandom art */}
+            <span className={styles.coverWrap}>
+              {tile.image && (
+                <Image src={tile.image} alt="" fill sizes="(max-width: 768px) 124px, 150px" className={styles.coverImg} />
+              )}
             </span>
             <span className={styles.label}>{tile.label}</span>
             <span className={styles.count}>
               {tile.count} {tile.count === 1 ? 'work' : 'works'}
+            </span>
+
+            {/* Text variant: metadata tile in the same footprint */}
+            <span className={styles.textCard}>
+              <span className={styles.tcKicker}>Fandom</span>
+              <span className={styles.tcLabel}>{tile.label}</span>
+              <span className={styles.tcName}>{tile.name}</span>
+              <span className={styles.tcCount}>
+                {tile.count} {tile.count === 1 ? 'work' : 'works'}
+              </span>
             </span>
           </Link>
         ))}

@@ -89,13 +89,19 @@ export function LibraryShell({
     } catch { /* ignore */ }
   }, []);
 
-  // Restore the shared layout preference (persists across Browse + Library).
+  // The global site mode (nav toggle) is the single source of layout truth.
   useEffect(() => {
-    const saved = localStorage.getItem(VIEW_PREF_KEY);
-    if (saved === 'list' || saved === 'grid') setView(saved);
-    else if (saved === 'grid2' || saved === 'grid3' || saved === 'split') setView('grid');
-    else if (saved === 'default') setView('list');
+    setView(localStorage.getItem('cai_site_mode') === 'text' ? 'list' : 'grid');
   }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { mode } = (e as CustomEvent).detail;
+      handleViewChange(mode === 'text' ? 'list' : 'grid');
+    };
+    window.addEventListener('cai-mode-change', handler);
+    return () => window.removeEventListener('cai-mode-change', handler);
+  });
 
   const handleViewChange = (v: LayoutView) => {
     if (v === view) return;
@@ -178,8 +184,6 @@ export function LibraryShell({
         totalCount={totalCount}
         filteredCount={displayedWorks.length}
         basePath="/reading"
-        view={view}
-        onViewChange={handleViewChange}
       />
 
       {/* ── Work list ── */}

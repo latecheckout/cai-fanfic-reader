@@ -22,6 +22,8 @@ export function ThemeScript() {
         }
       });
     }
+    var siteMode = localStorage.getItem('cai_site_mode');
+    root.setAttribute('data-mode', siteMode === 'text' ? 'text' : 'visual');
     var font = localStorage.getItem('fanfic-font') || 'serif';
     var fontSize = localStorage.getItem('fanfic-font-size') || '19';
     var lineWidth = localStorage.getItem('fanfic-line-width');

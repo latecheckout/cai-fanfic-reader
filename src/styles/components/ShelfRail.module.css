@@ -69,6 +69,12 @@
   width: 150px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+
+.coverLink {
+  display: block;
+  width: 100%;
   text-decoration: none;
   color: inherit;
 }
@@ -89,16 +95,156 @@
   transition: transform 400ms var(--ease-out-expo);
 }
 
-.card:hover .coverImg {
+.coverLink:hover .coverImg {
   transform: scale(1.04);
 }
 
-.cardTitle {
+/* ── Rating badge row, above the title ── */
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
   margin-top: var(--space-2);
+}
+
+.ratingLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ratingG  { background: var(--rating-g); }
+.ratingT  { background: var(--rating-t); }
+.ratingM  { background: var(--rating-m); }
+.ratingE  { background: var(--rating-e); }
+.ratingNR { background: var(--rating-nr); }
+
+.cardTitle {
+  margin-top: var(--space-1);
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.35;
+  color: var(--text);
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardTitle:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── One tag, above the social metric ── */
+.tags {
+  display: flex;
+  margin-top: var(--space-2);
+  max-width: 100%;
+}
+
+.tagChip {
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--border);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-micro), background var(--transition-micro);
+}
+
+.tagChip:hover {
+  color: var(--text);
+  background: var(--border-strong);
+}
+
+.cardMeta {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary);
+}
+
+/* ============================================================
+   TEXT MODE (html[data-mode='text'], set by the nav toggle).
+   The cover and its caption stack hide; the AO3 metadata card
+   takes over the thumbnail footprint, slightly enlarged.
+   ============================================================ */
+
+.textCard {
+  display: none;
+}
+
+:global(html[data-mode='text']) .card {
+  width: 210px;
+}
+
+:global(html[data-mode='text']) .coverLink,
+:global(html[data-mode='text']) .badgeRow,
+:global(html[data-mode='text']) .cardTitle,
+:global(html[data-mode='text']) .tags,
+:global(html[data-mode='text']) .cardMeta {
+  display: none;
+}
+
+:global(html[data-mode='text']) .textCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition: border-color var(--transition-micro), transform var(--transition-micro);
+}
+
+:global(html[data-mode='text']) .textCard:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.tcBadges {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tcStatus {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.tcTitle {
+  margin-top: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
   color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -106,15 +252,54 @@
   overflow: hidden;
 }
 
-.card:hover .cardTitle {
+.textCard:hover .tcTitle {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.cardMeta {
-  margin-top: 3px;
-  font-family: var(--font-mono);
+.tcAuthor {
+  margin-top: 2px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--secondary);
+}
+
+.tcShip {
+  margin-top: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--space-2);
+  overflow: hidden;
+}
+
+.tcTag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--border);
+  font-family: var(--font-sans);
   font-size: 10px;
+  line-height: 1.5;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.tcStats {
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
 }

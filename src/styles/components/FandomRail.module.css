@@ -46,10 +46,10 @@
   text-underline-offset: 3px;
 }
 
-/* ── Tile row ── */
+/* ── Card row (same shape as ShelfRail) ── */
 .row {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-4);
   overflow-x: auto;
   padding-bottom: var(--space-2);
   scrollbar-width: none;
@@ -62,50 +62,40 @@
   display: none;
 }
 
-.tile {
+.card {
   flex-shrink: 0;
-  width: 176px;
+  width: 150px;
   display: flex;
   flex-direction: column;
-  padding: var(--space-3);
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 10px;
+  align-items: flex-start;
   text-decoration: none;
   color: inherit;
-  transition: transform var(--transition-micro), border-color var(--transition-micro);
 }
 
-.tile:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-strong);
-}
-
-/* ── Cover stack: up to three covers, overlapping left to right ── */
-.stack {
+/* ── Full-bleed fandom art ── */
+.coverWrap {
   position: relative;
   display: block;
-  height: 88px;
-  margin-bottom: var(--space-3);
-}
-
-.stackCover {
-  position: absolute;
-  top: 0;
-  display: block;
-  width: 58px;
-  height: 88px;
-  border-radius: 4px;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
   overflow: hidden;
   background: var(--border);
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.stackImg {
+.coverImg {
   object-fit: cover;
+  transition: transform 400ms var(--ease-out-expo);
+}
+
+.card:hover .coverImg {
+  transform: scale(1.04);
 }
 
 .label {
+  margin-top: var(--space-2);
+  max-width: 100%;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
@@ -115,10 +105,95 @@
   text-overflow: ellipsis;
 }
 
+.card:hover .label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .count {
-  margin-top: 2px;
+  margin-top: 3px;
   font-family: var(--font-mono);
   font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary);
+}
+
+/* ============================================================
+   TEXT MODE (html[data-mode='text'], set by the nav toggle).
+   Art hides; a metadata tile takes the same footprint.
+   ============================================================ */
+
+.textCard {
+  display: none;
+}
+
+:global(html[data-mode='text']) .card {
+  width: 210px;
+}
+
+:global(html[data-mode='text']) .coverWrap,
+:global(html[data-mode='text']) .label,
+:global(html[data-mode='text']) .count {
+  display: none;
+}
+
+:global(html[data-mode='text']) .textCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  overflow: hidden;
+  transition: border-color var(--transition-micro), transform var(--transition-micro);
+}
+
+:global(html[data-mode='text']) .card:hover .textCard {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.tcKicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.tcLabel {
+  margin-top: var(--space-2);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.card:hover .tcLabel {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tcName {
+  margin-top: var(--space-1);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tcCount {
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
   font-variant-numeric: tabular-nums;
   color: var(--secondary);
 }
@@ -133,7 +208,7 @@
     font-size: 19px;
   }
 
-  .tile {
-    width: 156px;
+  .card {
+    width: 124px;
   }
 }

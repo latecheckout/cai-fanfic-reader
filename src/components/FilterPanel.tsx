@@ -4,9 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
-import { LayoutView } from '@/types';
 import { BrowseSearchBar } from './BrowseSearchBar';
-import { ViewToggle } from './ViewToggle';
 import styles from '@/styles/components/FilterPanel.module.css';
 import { PRESETS_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 
@@ -43,8 +41,6 @@ interface Props {
   };
   totalCount: number;
   filteredCount: number;
-  view?: LayoutView;
-  onViewChange?: (v: LayoutView) => void;
   /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
   basePath?: string;
 }
@@ -205,8 +201,6 @@ export function FilterPanel({
   currentFilters,
   totalCount,
   filteredCount,
-  view,
-  onViewChange,
   basePath = '/',
 }: Props) {
   const router = useRouter();
@@ -930,7 +924,7 @@ export function FilterPanel({
                 : `${filteredCount} of ${totalCount}`}
             </span>
           </span>
-          {onViewChange && view && <ViewToggle view={view} onViewChange={onViewChange} />}
+          {/* View toggle removed: the global mode toggle in the nav owns layout now. */}
         </div>
       </div>
 

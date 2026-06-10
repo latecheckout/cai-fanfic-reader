@@ -66,7 +66,7 @@ export function BrowseShell({
   filteredCount,
   from,
 }: Props) {
-  const [view, setView] = useState<LayoutView>('list');
+  const [view, setView] = useState<LayoutView>('grid');
   const [isFiltering, setIsFiltering] = useState(false);
   const [viewSwitching, setViewSwitching] = useState(false);
   const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,13 +75,20 @@ export function BrowseShell({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(false);
 
-  // Restore view preference (migrating legacy grid2/grid3/split/default values).
+  // The global site mode (nav toggle) is the single source of layout truth:
+  // text mode renders the rich-metadata list, visual mode the cover grid.
   useEffect(() => {
-    const saved = localStorage.getItem(VIEW_PREF_KEY);
-    if (saved === 'list' || saved === 'grid') setView(saved);
-    else if (saved === 'grid2' || saved === 'grid3' || saved === 'split') setView('grid');
-    else if (saved === 'default') setView('list');
+    setView(localStorage.getItem('cai_site_mode') === 'text' ? 'list' : 'grid');
   }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { mode } = (e as CustomEvent).detail;
+      handleViewChange(mode === 'text' ? 'list' : 'grid');
+    };
+    window.addEventListener('cai-mode-change', handler);
+    return () => window.removeEventListener('cai-mode-change', handler);
+  });
 
   // Show skeleton briefly when filters change (skip initial mount)
   useEffect(() => {
@@ -121,8 +128,6 @@ export function BrowseShell({
         currentFilters={currentFilters}
         totalCount={totalCount}
         filteredCount={filteredCount}
-        view={view}
-        onViewChange={handleViewChange}
       />
 
       {from && FROM_LABELS[from] && (

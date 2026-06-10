@@ -116,8 +116,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         <h1 className="visually-hidden">Browse Works</h1>
 
         {!hasActiveFilters ? (
+          /* The global mode toggle restyles every card here via html[data-mode]:
+             visual = covers, text = AO3-style metadata cards. */
           <BrowseHome
-            totalCount={allWorks.length}
             shelves={buildShelves(allWorks)}
             fandoms={buildFandomTiles(allWorks)}
             covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
