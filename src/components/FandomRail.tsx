@@ -30,31 +30,38 @@ export function FandomRail({ tiles }: Props) {
       <div className={styles.row}>
         {tiles.map((tile) => (
           <article key={tile.name} className={styles.card}>
-            {/* Visual variant: full-bleed fandom art */}
-            <Link href={tile.href} className={styles.visual} title={tile.name}>
-              <span className={styles.coverWrap}>
-                {tile.image && (
-                  <Image src={tile.image} alt="" fill sizes="(max-width: 768px) 124px, 150px" className={styles.coverImg} />
-                )}
-              </span>
-              <span className={styles.label}>{tile.label}</span>
-              <span className={styles.count}>
-                {tile.count} {tile.count === 1 ? 'work' : 'works'}
-              </span>
-            </Link>
+            {/* Visual variant: full-bleed fandom art, one tag pill underneath */}
+            <div className={styles.visual}>
+              <Link href={tile.href} className={styles.coverLink} title={tile.name}>
+                <span className={styles.coverWrap}>
+                  {tile.image && (
+                    <Image src={tile.image} alt={tile.label} fill sizes="(max-width: 768px) 124px, 150px" className={styles.coverImg} />
+                  )}
+                </span>
+              </Link>
+              {tile.topTags.length > 0 && (
+                <Link
+                  href={`/?tag=${encodeURIComponent(tile.topTags[0])}`}
+                  className={styles.tagPill}
+                >
+                  {tile.topTags[0]}
+                </Link>
+              )}
+            </div>
 
-            {/* Text variant: label plus the fandom's two top tag pills */}
+            {/* Text variant: label plus the fandom's top tag pill */}
             <div className={styles.textCard}>
               <span className={styles.tcKicker}>Fandom</span>
               <Link href={tile.href} className={styles.tcLabel}>{tile.label}</Link>
 
               {tile.topTags.length > 0 && (
                 <span className={styles.tcTags}>
-                  {tile.topTags.map((t) => (
-                    <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tcTag}>
-                      {t}
-                    </Link>
-                  ))}
+                  <Link
+                    href={`/?tag=${encodeURIComponent(tile.topTags[0])}`}
+                    className={styles.tcTag}
+                  >
+                    {tile.topTags[0]}
+                  </Link>
                 </span>
               )}
 
