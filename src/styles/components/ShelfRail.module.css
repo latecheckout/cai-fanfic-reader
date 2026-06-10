@@ -185,8 +185,8 @@
 
 /* ============================================================
    TEXT MODE (html[data-mode='text'], set by the nav toggle).
-   The cover and its caption stack hide; the AO3 metadata card
-   takes over the thumbnail footprint, slightly enlarged.
+   The cover and its caption stack hide; an enlarged AO3 blurb
+   card takes over the footprint. Every element is its own link.
    ============================================================ */
 
 .textCard {
@@ -194,7 +194,7 @@
 }
 
 :global(html[data-mode='text']) .card {
-  width: 210px;
+  width: 280px;
 }
 
 :global(html[data-mode='text']) .coverLink,
@@ -210,25 +210,33 @@
   flex-direction: column;
   width: 100%;
   aspect-ratio: 2 / 3;
-  padding: var(--space-3);
+  padding: var(--space-4);
   border: 1px solid var(--card-border);
   border-radius: 6px;
   background: var(--card-bg);
-  text-decoration: none;
-  color: inherit;
   overflow: hidden;
-  transition: border-color var(--transition-micro), transform var(--transition-micro);
+  transition: border-color var(--transition-micro);
 }
 
 :global(html[data-mode='text']) .textCard:hover {
   border-color: var(--border-strong);
-  transform: translateY(-2px);
 }
 
+/* ── Badge row: rating, category, status, date ── */
 .tcBadges {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+.tcCat {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+  border: 1px solid var(--border-chip);
+  border-radius: 3px;
+  padding: 1px 4px;
 }
 
 .tcStatus {
@@ -239,69 +247,165 @@
   color: var(--secondary);
 }
 
+.tcDate {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--secondary);
+}
+
+/* ── Identity: title, author, fandom, ships ── */
 .tcTitle {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
   font-family: var(--font-serif);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
   color: var(--text);
+  text-decoration: none;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.textCard:hover .tcTitle {
+.tcTitle:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .tcAuthor {
   margin-top: 2px;
+  align-self: flex-start;
   font-family: var(--font-sans);
   font-size: 11px;
   color: var(--secondary);
+  text-decoration: none;
 }
 
-.tcShip {
+.tcAuthor:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tcFandom {
   margin-top: var(--space-2);
   font-family: var(--font-sans);
   font-size: 11px;
-  font-weight: 500;
-  color: var(--text);
+  line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.tcFandomLink {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.tcFandomLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tcShips {
+  margin-top: 2px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcShipLink {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tcShipLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tcShipSep {
+  color: var(--secondary);
+}
+
+/* ── Summary ── */
+.tcSummary {
+  margin-top: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Warnings + tags: two rows max, individually clickable ── */
 .tcTags {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   margin-top: var(--space-2);
+  max-height: 44px;
   overflow: hidden;
 }
 
-.tcTag {
+.tcTag,
+.tcWarn {
   display: inline-block;
   padding: 1px 6px;
   border-radius: 3px;
-  background: var(--border);
   font-family: var(--font-sans);
   font-size: 10px;
-  line-height: 1.5;
-  color: var(--secondary);
+  line-height: 1.6;
+  text-decoration: none;
   white-space: nowrap;
+  transition: color var(--transition-micro), background var(--transition-micro);
 }
 
+.tcTag {
+  background: var(--border);
+  color: var(--secondary);
+}
+
+.tcTag:hover {
+  color: var(--text);
+  background: var(--border-strong);
+}
+
+.tcWarn {
+  background: var(--color-exclude-bg);
+  color: var(--color-exclude);
+}
+
+.tcWarn:hover {
+  background: var(--color-exclude);
+  color: #fff;
+}
+
+/* ── Stats footer ── */
 .tcStats {
   margin-top: auto;
   padding-top: var(--space-2);
   font-family: var(--font-mono);
   font-size: 9.5px;
   font-variant-numeric: tabular-nums;
+  line-height: 1.5;
   color: var(--secondary);
+}
+
+@media (max-width: 768px) {
+  :global(html[data-mode='text']) .card {
+    width: 244px;
+  }
 }
 
 /* ── Page load stagger ── */

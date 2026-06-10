@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Shelf } from '@/lib/shelves';
-import { formatCount, formatWords, formatChapters, ratingClass } from '@/lib/utils';
+import { formatCount, formatWords, formatChapters, ratingClass, categoryLabel } from '@/lib/utils';
 import styles from '@/styles/components/ShelfRail.module.css';
 
 interface Props {
@@ -18,11 +18,14 @@ const isWipStatus = (status: string) => {
   return s.includes('progress') || s === 'wip' || s === 'in-progress';
 };
 
+const MAX_TEXT_TAGS = 8;
+
 /**
  * Horizontal cover rail for one shelf. Each card renders both presentation
  * variants; html[data-mode] (the nav toggle) picks one via CSS:
  * visual = cover thumbnail with rating badge, title, one tag, kudos;
- * text = an AO3-style metadata card in the same thumbnail footprint.
+ * text = an enlarged AO3-style blurb card where every element (title,
+ * author, fandom, ship, warnings, tags) is individually clickable.
  */
 export function ShelfRail({ shelf, priority = false }: Props) {
   return (
@@ -39,13 +42,15 @@ export function ShelfRail({ shelf, priority = false }: Props) {
 
       <div className={styles.row}>
         {shelf.works.map((work, i) => {
-          const { meta } = work;
+          const { meta, slug } = work;
           const rClass = styles[ratingClass(meta.rating) as keyof typeof styles];
           const wip = isWipStatus(meta.status);
+          const catLabel = categoryLabel(meta.category);
+          const warnings = meta.warnings.filter((w) => w !== 'No Archive Warnings Apply');
           return (
-            <article key={work.slug} className={styles.card}>
+            <article key={slug} className={styles.card}>
               {/* ── Visual variant ── */}
-              <Link href={`/works/${work.slug}`} className={styles.coverLink} title={meta.title}>
+              <Link href={`/works/${slug}`} className={styles.coverLink} title={meta.title}>
                 <span className={styles.coverWrap}>
                   {meta.cover && (
                     <Image
@@ -64,7 +69,7 @@ export function ShelfRail({ shelf, priority = false }: Props) {
                   {ratingLetter(meta.rating)}
                 </span>
               </span>
-              <Link href={`/works/${work.slug}`} className={styles.cardTitle}>
+              <Link href={`/works/${slug}`} className={styles.cardTitle}>
                 {meta.title}
               </Link>
               {meta.tags.length > 0 && (
@@ -81,29 +86,76 @@ export function ShelfRail({ shelf, priority = false }: Props) {
                 <span className={styles.cardMeta}>♥ {formatCount(meta.kudos)}</span>
               )}
 
-              {/* ── Text variant: AO3 metadata in the thumbnail footprint ── */}
-              <Link href={`/works/${work.slug}`} className={styles.textCard} title={meta.title}>
-                <span className={styles.tcBadges}>
-                  <span className={`${styles.ratingLetter} ${rClass}`}>{ratingLetter(meta.rating)}</span>
+              {/* ── Text variant: AO3 blurb in the enlarged thumbnail footprint ── */}
+              <div className={styles.textCard}>
+                <div className={styles.tcBadges}>
+                  <span className={`${styles.ratingLetter} ${rClass}`} title={meta.rating}>
+                    {ratingLetter(meta.rating)}
+                  </span>
+                  {catLabel && <span className={styles.tcCat}>{catLabel}</span>}
                   <span className={styles.tcStatus}>{wip ? 'WIP' : 'Complete'}</span>
-                </span>
-                <span className={styles.tcTitle}>{meta.title}</span>
-                {meta.author && <span className={styles.tcAuthor}>by {meta.author}</span>}
-                {meta.relationships.length > 0 && (
-                  <span className={styles.tcShip}>{meta.relationships[0]}</span>
+                  {(meta.updated || meta.published) && (
+                    <span className={styles.tcDate}>{meta.updated || meta.published}</span>
+                  )}
+                </div>
+
+                <Link href={`/works/${slug}`} className={styles.tcTitle}>{meta.title}</Link>
+                {meta.author && (
+                  <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.tcAuthor}>
+                    by {meta.author}
+                  </Link>
                 )}
-                {meta.tags.length > 0 && (
-                  <span className={styles.tcTags}>
-                    {meta.tags.slice(0, 4).map((t) => (
-                      <span key={t} className={styles.tcTag}>{t}</span>
+
+                {meta.fandom.length > 0 && (
+                  <span className={styles.tcFandom}>
+                    {meta.fandom.map((f, fi) => (
+                      <span key={f}>
+                        {fi > 0 && ', '}
+                        <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.tcFandomLink}>
+                          {f}
+                        </Link>
+                      </span>
                     ))}
                   </span>
                 )}
+
+                {meta.relationships.length > 0 && (
+                  <span className={styles.tcShips}>
+                    {meta.relationships.slice(0, 2).map((r, ri) => (
+                      <span key={r}>
+                        {ri > 0 && <span className={styles.tcShipSep}> / </span>}
+                        <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.tcShipLink}>
+                          {r}
+                        </Link>
+                      </span>
+                    ))}
+                  </span>
+                )}
+
+                {meta.summary && <span className={styles.tcSummary}>{meta.summary}</span>}
+
+                {(warnings.length > 0 || meta.tags.length > 0) && (
+                  <span className={styles.tcTags}>
+                    {warnings.map((w) => (
+                      <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className={styles.tcWarn}>
+                        {w}
+                      </Link>
+                    ))}
+                    {meta.tags.slice(0, MAX_TEXT_TAGS).map((t) => (
+                      <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tcTag}>
+                        {t}
+                      </Link>
+                    ))}
+                  </span>
+                )}
+
                 <span className={styles.tcStats}>
                   {formatWords(meta.words)} · {formatChapters(meta.chaptersPosted, meta.chapters)}
                   {meta.kudos > 0 && <> · ♥ {formatCount(meta.kudos)}</>}
+                  {meta.bookmarks > 0 && <> · ⚑ {formatCount(meta.bookmarks)}</>}
+                  {meta.hits > 0 && <> · {formatCount(meta.hits)} hits</>}
                 </span>
-              </Link>
+              </div>
             </article>
           );
         })}

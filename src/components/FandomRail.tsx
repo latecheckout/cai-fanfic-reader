@@ -29,28 +29,57 @@ export function FandomRail({ tiles }: Props) {
 
       <div className={styles.row}>
         {tiles.map((tile) => (
-          <Link key={tile.name} href={tile.href} className={styles.card} title={tile.name}>
+          <article key={tile.name} className={styles.card}>
             {/* Visual variant: full-bleed fandom art */}
-            <span className={styles.coverWrap}>
-              {tile.image && (
-                <Image src={tile.image} alt="" fill sizes="(max-width: 768px) 124px, 150px" className={styles.coverImg} />
-              )}
-            </span>
-            <span className={styles.label}>{tile.label}</span>
-            <span className={styles.count}>
-              {tile.count} {tile.count === 1 ? 'work' : 'works'}
-            </span>
-
-            {/* Text variant: metadata tile in the same footprint */}
-            <span className={styles.textCard}>
-              <span className={styles.tcKicker}>Fandom</span>
-              <span className={styles.tcLabel}>{tile.label}</span>
-              <span className={styles.tcName}>{tile.name}</span>
-              <span className={styles.tcCount}>
+            <Link href={tile.href} className={styles.visual} title={tile.name}>
+              <span className={styles.coverWrap}>
+                {tile.image && (
+                  <Image src={tile.image} alt="" fill sizes="(max-width: 768px) 124px, 150px" className={styles.coverImg} />
+                )}
+              </span>
+              <span className={styles.label}>{tile.label}</span>
+              <span className={styles.count}>
                 {tile.count} {tile.count === 1 ? 'work' : 'works'}
               </span>
-            </span>
-          </Link>
+            </Link>
+
+            {/* Text variant: metadata tile, every element its own link */}
+            <div className={styles.textCard}>
+              <span className={styles.tcKicker}>Fandom</span>
+              <Link href={tile.href} className={styles.tcLabel}>{tile.label}</Link>
+              <span className={styles.tcName}>{tile.name}</span>
+
+              {tile.topShips.length > 0 && (
+                <span className={styles.tcSection}>
+                  <span className={styles.tcSectionLabel}>Top ships</span>
+                  {tile.topShips.map((ship) => (
+                    <Link
+                      key={ship}
+                      href={`/?relationship=${encodeURIComponent(ship)}`}
+                      className={styles.tcShipLink}
+                    >
+                      {ship}
+                    </Link>
+                  ))}
+                </span>
+              )}
+
+              {tile.topWorks.length > 0 && (
+                <span className={styles.tcSection}>
+                  <span className={styles.tcSectionLabel}>Most loved</span>
+                  {tile.topWorks.map((w) => (
+                    <Link key={w.slug} href={`/works/${w.slug}`} className={styles.tcWorkLink}>
+                      {w.title}
+                    </Link>
+                  ))}
+                </span>
+              )}
+
+              <Link href={tile.href} className={styles.tcCount}>
+                {tile.count} {tile.count === 1 ? 'work' : 'works'}
+              </Link>
+            </div>
+          </article>
         ))}
       </div>
     </section>
