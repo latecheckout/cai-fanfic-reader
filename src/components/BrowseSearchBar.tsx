@@ -391,7 +391,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
             ref={inputRef}
             type="text"
             className={`${styles.input} ${query ? styles.inputWithActions : ''}`}
-            placeholder="Search works, fandoms, tags, or describe a vibe…"
+            placeholder="Search…"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);

@@ -6,7 +6,7 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { buildShelves, buildFandomTiles, MOOD_CHIPS } from '@/lib/shelves';
+import { buildShelves, buildFandomTiles } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
@@ -120,7 +120,6 @@ export default async function BrowsePage({ searchParams }: PageProps) {
             totalCount={allWorks.length}
             shelves={buildShelves(allWorks)}
             fandoms={buildFandomTiles(allWorks)}
-            moods={MOOD_CHIPS}
             covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
           />
         ) : (

@@ -36,22 +36,14 @@
   color: var(--secondary);
 }
 
-.viewAll {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-  padding-bottom: 2px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--secondary);
+.titleLink {
+  color: inherit;
   text-decoration: none;
-  transition: color var(--transition-micro);
 }
 
-.viewAll:hover {
-  color: var(--text);
+.titleLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ── Tile row ── */

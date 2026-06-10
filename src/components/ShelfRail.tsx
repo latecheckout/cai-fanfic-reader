@@ -20,16 +20,12 @@ export function ShelfRail({ shelf, priority = false }: Props) {
     <section className={styles.section} aria-label={shelf.title}>
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          <h2 className={styles.title}>{shelf.title}</h2>
+          {/* The title itself routes to the shelf's full result set. */}
+          <h2 className={styles.title}>
+            <Link href={shelf.href} className={styles.titleLink}>{shelf.title}</Link>
+          </h2>
           <p className={styles.subtitle}>{shelf.subtitle}</p>
         </div>
-        <Link href={shelf.href} className={styles.viewAll}>
-          view all
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
-            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="3 1.5 7 5 3 8.5" />
-          </svg>
-        </Link>
       </div>
 
       <div className={styles.row}>

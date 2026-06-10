@@ -1,76 +1,9 @@
 /* ============================================================
    BROWSE HOME: layer-zero composition for the unfiltered /.
-   Owns the demoted search row, mood chips, and the archive
-   footer link. Shelves and tiles style themselves.
+   Search lives in the nav; shelves and tiles style themselves.
+   This file owns only the archive footer link.
    ============================================================ */
 
-.quickRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-8);
-}
-
-.allWorksLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  flex-shrink: 0;
-  padding: 9px 14px;
-  border: 1px solid var(--border-chip);
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--secondary);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--transition-micro), border-color var(--transition-micro);
-}
-
-.allWorksLink:hover {
-  color: var(--text);
-  border-color: var(--border-active);
-}
-
-/* ── Mood chips: vibe queries as one-tap entries into the filter engine ── */
-.moods {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
-.moodsLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--secondary);
-  margin-right: var(--space-1);
-}
-
-.moodChip {
-  display: inline-block;
-  padding: 4px 12px;
-  border: 1px solid var(--border-chip);
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  color: var(--secondary);
-  text-decoration: none;
-  transition: color var(--transition-micro), border-color var(--transition-micro), background var(--transition-micro);
-}
-
-.moodChip:hover {
-  color: var(--text);
-  border-color: var(--border-active);
-  background: var(--card-bg);
-}
-
-/* ── Archive footer link ── */
 .footer {
   border-top: 1px solid var(--border);
   margin-top: var(--space-4);
@@ -91,30 +24,4 @@
 
 .footerLink:hover {
   color: var(--text);
-}
-
-/* ── Mobile ── */
-@media (max-width: 768px) {
-  .quickRow {
-    margin-bottom: var(--space-6);
-  }
-
-  /* The chip row stays one line and scrolls; wrapping would stack
-     five chips above the fold on small screens. */
-  .moods {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .moods::-webkit-scrollbar {
-    display: none;
-  }
-
-  .moodsLabel,
-  .moodChip,
-  .allWorksLink {
-    flex-shrink: 0;
-  }
 }

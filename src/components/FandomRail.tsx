@@ -19,16 +19,12 @@ export function FandomRail({ tiles }: Props) {
     <section className={styles.section} aria-label="Browse by fandom">
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          <h2 className={styles.title}>Browse by fandom</h2>
+          {/* The title itself routes to the full fandom index. */}
+          <h2 className={styles.title}>
+            <Link href="/fandoms" className={styles.titleLink}>Browse by fandom</Link>
+          </h2>
           <p className={styles.subtitle}>Start from a universe you already love</p>
         </div>
-        <Link href="/fandoms" className={styles.viewAll}>
-          all fandoms
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
-            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="3 1.5 7 5 3 8.5" />
-          </svg>
-        </Link>
       </div>
 
       <div className={styles.row}>

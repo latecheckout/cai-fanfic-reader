@@ -30,11 +30,6 @@ export interface FandomTile {
   href: string;
 }
 
-export interface MoodChip {
-  label: string;
-  href: string;
-}
-
 interface ShelfDef {
   key: string;
   title: string;
@@ -89,14 +84,6 @@ const SHELF_DEFS: ShelfDef[] = [
     filters: { maxWords: 15000, status: 'Complete' },
     params: { max_words: '15000', status: 'Complete' },
   },
-];
-
-export const MOOD_CHIPS: MoodChip[] = [
-  { label: 'angst', href: buildHref({ tag: 'Angst,Angst with a Happy Ending,Light Angst,Fluff and Angst' }) },
-  { label: 'humor', href: buildHref({ tag: 'Humor,Crack,Fluff and Humor' }) },
-  { label: 'fix-it', href: buildHref({ tag: 'Fix-It,Post-Canon Fix-It,Fix-It of a Sort' }) },
-  { label: 'no major deaths', href: buildHref({ ex_warning: 'Major Character Death' }) },
-  { label: 'long haul (100k+)', href: buildHref({ min_words: '100000' }) },
 ];
 
 function buildHref(params: Record<string, string>): string {
