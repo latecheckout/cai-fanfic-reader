@@ -522,27 +522,32 @@
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
 
+/* Category is a filled chip — solid like the rating, but a neutral tone
+   so it never shares a color with the rating hue. Grows wider than the
+   square to fit "M/M", "Multi", etc. */
 .catLabel {
-  width: 20px;
+  min-width: 20px;
   height: 20px;
+  padding: 0 6px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 2px;
+  background: var(--secondary);
+  color: var(--bg);
   font-family: var(--font-mono);
   font-size: 11px;
-  /* Dim the M/M via color only — NOT element opacity, which would also
-     fade the ::after tooltip and make it translucent vs the others. */
-  color: color-mix(in srgb, var(--secondary) 75%, transparent);
+  font-weight: 600;
   letter-spacing: 0.04em;
+  flex-shrink: 0;
   position: relative;
   pointer-events: auto;
   cursor: default;
 }
 
-/* Two distinct treatments, no color shared with the rating letter:
-   complete = solid ink fill (never a rating hue), in-progress = dashed
-   open outline (unfinished). The status pill may grow wider than the
-   rating square; its glyph centers either way. */
+/* Status is a stroke (no fill), so it shares no color with the filled
+   rating or category: complete = solid 1:1 square + check, in-progress =
+   dashed open outline that may grow wider than the square. */
 .statusPill {
   position: relative;
   min-width: 20px;
@@ -552,20 +557,19 @@
   justify-content: center;
   border-radius: 2px;
   flex-shrink: 0;
+  color: var(--secondary);
   pointer-events: auto;
   cursor: default;
 }
 
 .statusDone {
   width: 20px;
-  background: var(--text);
-  color: var(--bg);
+  border: 1px solid var(--border-active);
 }
 
 .statusWip {
   padding: 0 7px;
   border: 1px dashed var(--border-active);
-  color: var(--secondary);
 }
 
 /* Tooltip bubbles — below the strip item (row layout) */
