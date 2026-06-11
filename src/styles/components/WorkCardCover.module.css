@@ -539,28 +539,33 @@
   cursor: default;
 }
 
-/* Filled badge, matching the rating letter's footprint (white glyph),
-   with its own status colors: green = complete, amber = in progress. */
+/* Two distinct treatments, no color shared with the rating letter:
+   complete = solid ink fill (never a rating hue), in-progress = dashed
+   open outline (unfinished). The status pill may grow wider than the
+   rating square; its glyph centers either way. */
 .statusPill {
   position: relative;
-  width: 20px;
+  min-width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 2px;
   flex-shrink: 0;
-  color: #fff;
   pointer-events: auto;
   cursor: default;
 }
 
 .statusDone {
-  background: var(--rating-g);
+  width: 20px;
+  background: var(--text);
+  color: var(--bg);
 }
 
 .statusWip {
-  background: var(--rating-t);
+  padding: 0 7px;
+  border: 1px dashed var(--border-active);
+  color: var(--secondary);
 }
 
 /* Tooltip bubbles — below the strip item (row layout) */

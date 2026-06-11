@@ -321,18 +321,13 @@
   overflow: hidden;
 }
 
-/* ── Warnings + tags: two rows when collapsed, all when expanded ── */
+/* ── Warnings + tags: collapsed count is capped in JS so the +N
+   expander always sits inline and visible (no max-height clip). ── */
 .tcTags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin-top: var(--space-2);
-  max-height: 52px;
-  overflow: hidden;
-}
-
-.textCardExpanded .tcTags {
-  max-height: none;
 }
 
 .tcTag,

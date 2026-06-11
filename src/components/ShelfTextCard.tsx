@@ -20,7 +20,7 @@ const isWipStatus = (status: string) => {
 /** @DUMMY — shared placeholder until real author photos exist. */
 const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
 
-const COLLAPSED_TAGS = 8;
+const COLLAPSED_TAGS = 6;
 
 /**
  * AO3-style blurb shown in place of the cover when the site is in text
