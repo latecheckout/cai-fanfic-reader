@@ -91,12 +91,14 @@ export function ShelfTextCard({ work }: Props) {
         </span>
       )}
 
+      {/* Every segment renders even at zero so the icon set is uniform
+          across cards. */}
       <span className={styles.tcStats}>
         {formatWords(meta.words)} · {formatChapters(meta.chaptersPosted, meta.chapters)}
         {(meta.updated || meta.published) && <> · updated {meta.updated || meta.published}</>}
-        {meta.kudos > 0 && <> · ♥ {formatCount(meta.kudos)}</>}
-        {meta.bookmarks > 0 && <> · ⚑ {formatCount(meta.bookmarks)}</>}
-        {meta.hits > 0 && <> · {formatCount(meta.hits)} hits</>}
+        <> · ♥ {formatCount(meta.kudos)}</>
+        <> · ⚑ {formatCount(meta.bookmarks)}</>
+        <> · {formatCount(meta.hits)} hits</>
       </span>
 
       <span className={styles.tcBottom}>
