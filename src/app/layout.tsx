@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeScript } from '@/components/ThemeScript';
+import { DevAnnotation } from '@/components/DevAnnotation';
 
 export const metadata: Metadata = {
   title: 'c.ai Fanfic',
@@ -23,7 +24,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <ThemeScript />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Dev-only UI annotation overlay; stripped from production builds. */}
+        {process.env.NODE_ENV !== 'production' && <DevAnnotation />}
+      </body>
     </html>
   );
 }
