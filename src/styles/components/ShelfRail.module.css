@@ -52,7 +52,7 @@
 /* ── Card row ── */
 .row {
   display: flex;
-  align-items: flex-start; /* an expanded text card grows alone; siblings stay put */
+  align-items: flex-start;
   gap: var(--space-3);
   overflow-x: auto;
   padding-bottom: var(--space-2);
@@ -156,17 +156,30 @@
   border-color: var(--border-strong);
 }
 
-/* Expanding drops the 2:3 lock and lets the card grow downward to fit all
-   tags, rather than overflowing the fixed box. The bottom discovery group
-   un-pins so it follows the content instead of floating to a fixed foot. */
-:global(html[data-mode='text']) .textCardExpanded {
-  aspect-ratio: auto;
-  height: auto;
-  overflow: visible;
+/* ── Fixed-box internals: pinned head, scrolling body ──
+   The 2:3 footprint never changes. The head (signal strip, title, byline)
+   stays pinned so the card identifies the work even mid-scroll; everything
+   from the summary down scrolls inside the card when the tags expand.
+   min-height: 0 on the body is load-bearing: without it the flex item
+   sizes to its content and stretches the aspect-ratio box. */
+.tcHead {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
-.textCardExpanded .tcBottom {
-  margin-top: var(--space-3);
+.tcBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.tcBody::-webkit-scrollbar {
+  display: none;
 }
 
 /* ── Identity: title + author ── */
@@ -231,16 +244,15 @@
   text-underline-offset: 2px;
 }
 
-/* ── Bottom discovery group: fandom, ships, characters (list-card order),
-   pinned to the card foot like the list card's whitespace-separated block ── */
+/* ── Bottom discovery group: fandom, ships, characters (list-card order).
+   margin-top: auto pins it to the foot of the scroll body when content is
+   short; once expanded tags overflow, it simply follows the content. ── */
 .tcBottom {
   display: flex;
   flex-direction: column;
   gap: 3px;
   margin-top: auto;
   padding-top: var(--space-2);
-  min-height: 0;
-  overflow: hidden;
 }
 
 .tcFandom {
