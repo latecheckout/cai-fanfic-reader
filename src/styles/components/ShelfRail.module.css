@@ -148,14 +148,21 @@
   border: 1px solid var(--card-border);
   border-radius: 6px;
   background: var(--card-bg);
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
+  overflow: hidden;
   transition: border-color var(--transition-micro);
 }
 
-:global(html[data-mode='text']) .textCard::-webkit-scrollbar {
+/* Only an expanded card is a live scroll container. Collapsed cards fit
+   their capped content, so they must stay overflow: hidden and never trap
+   wheel or trackpad gestures meant for the rail or the page. Containment
+   is y-only: horizontal swipes still chain up to the rail's scroll. */
+:global(html[data-mode='text']) .textCardOpen {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+:global(html[data-mode='text']) .textCardOpen::-webkit-scrollbar {
   display: none;
 }
 

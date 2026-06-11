@@ -27,9 +27,10 @@ const COLLAPSED_TAGS = 6;
  * (AO4) mode. Hierarchy mirrors the list card: signal strip, title +
  * author (with a circular avatar — circles mean humans), summary,
  * warnings + tags with a pill expander, stats, then the bottom discovery
- * group (fandom, ships, characters). The card is a fixed 2:3 box that
- * scrolls as one piece (scrollbar hidden), so expanding the tags never
- * resizes the card or the rail.
+ * group (fandom, ships, characters). The card is a fixed 2:3 box; when
+ * the tags are expanded it scrolls as one piece (scrollbar hidden), so
+ * expanding never resizes the card or the rail. Collapsed cards are not
+ * scroll containers, so they cannot trap rail or page scroll gestures.
  */
 export function ShelfTextCard({ work }: Props) {
   const { meta, slug } = work;
@@ -42,7 +43,7 @@ export function ShelfTextCard({ work }: Props) {
   const hiddenCount = meta.tags.length - COLLAPSED_TAGS;
 
   return (
-    <div className={styles.textCard}>
+    <div className={`${styles.textCard} ${tagsExpanded ? styles.textCardOpen : ''}`}>
       <SignalStrip
         rating={meta.rating}
         rClass={ratingClass(meta.rating)}
