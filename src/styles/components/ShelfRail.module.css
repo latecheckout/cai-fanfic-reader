@@ -148,44 +148,26 @@
   border: 1px solid var(--card-border);
   border-radius: 6px;
   background: var(--card-bg);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
   transition: border-color var(--transition-micro);
+}
+
+:global(html[data-mode='text']) .textCard::-webkit-scrollbar {
+  display: none;
 }
 
 :global(html[data-mode='text']) .textCard:hover {
   border-color: var(--border-strong);
 }
 
-/* ── Fixed-box internals: pinned head, scrolling body ──
-   The 2:3 footprint never changes. The head (signal strip, title, byline)
-   stays pinned so the card identifies the work even mid-scroll; everything
-   from the summary down scrolls inside the card when the tags expand.
-   min-height: 0 on the body is load-bearing: without it the flex item
-   sizes to its content and stretches the aspect-ratio box. */
-.tcHead {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.tcBody {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: none;
-}
-
-.tcBody::-webkit-scrollbar {
-  display: none;
-}
-
-/* Children must keep their natural height so overflow goes to scroll.
-   Without this, flex shrinks them to fit first, and the clamped summary
-   (overflow: hidden gives it a zero minimum) collapses entirely. */
-.tcBody > * {
+/* The whole card scrolls as one piece inside the fixed 2:3 box; nothing
+   is pinned. Children keep their natural height so overflow goes to the
+   scroll instead of flex shrinking them to fit, which would crush the
+   clamped summary (its overflow: hidden gives it a zero minimum). */
+.textCard > * {
   flex-shrink: 0;
 }
 
@@ -252,14 +234,15 @@
 }
 
 /* ── Bottom discovery group: fandom, ships, characters (list-card order).
-   margin-top: auto pins it to the foot of the scroll body when content is
-   short; once expanded tags overflow, it simply follows the content. ── */
+   margin-top: auto pins it to the card foot when content is short; once
+   expanded tags overflow, it follows the content. The padding keeps
+   ample air between the stats line and these three metadata rows. ── */
 .tcBottom {
   display: flex;
   flex-direction: column;
   gap: 3px;
   margin-top: auto;
-  padding-top: var(--space-2);
+  padding-top: var(--space-5);
 }
 
 .tcFandom {
