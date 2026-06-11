@@ -1,0 +1,157 @@
+/* ============================================================
+   AO4 TURBO TOGGLE — the global mode switch as a draggable toggle.
+   Combines: NavSwitch track + DragSlider drag/snap + ActionButton
+   plush-oklch thumb. The thumb ("AO4 turbo") slides/taps on↔off; ON
+   = text mode. Replaces the old Ao4 FAB (same corner + behaviour).
+   ============================================================ */
+
+.root {
+  position: fixed;
+  right: 28px;
+  bottom: calc(24px + var(--safe-bottom));
+  z-index: var(--z-sticky);
+}
+
+/* Ambient radial glow emanating from the corner, behind the toggle — gives the
+   toggle a sense of depth, like there's space between it and the page. */
+.aura {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  height: 300px;
+  z-index: calc(var(--z-sticky) - 1);
+  pointer-events: none;
+  background: radial-gradient(
+    125% 125% at 100% 100%,
+    color-mix(in oklch, #d90082 24%, transparent) 0%,
+    color-mix(in oklch, #ae00d9 12%, transparent) 38%,
+    transparent 68%
+  );
+}
+
+@media (max-width: 768px) {
+  .aura {
+    width: 280px;
+    height: 240px;
+  }
+}
+
+/* NavSwitch-style muted pill track. */
+.track {
+  position: relative;
+  width: 194px;   /* thumb 140 + travel 48 + padding 6 */
+  height: 50px;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  touch-action: none;
+}
+
+/* On/off marks living in the track's negative space — the thumb covers the
+   active side, leaving the other symbol showing (off = ring, on = bar). */
+.sym {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--secondary);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.symLeft { left: 26px; }
+.symRight { right: 26px; }
+
+/* The draggable thumb — ActionButton plush + oklch glow. */
+.thumb {
+  --ab-magenta: #d90082;
+  --ab-hot-pink: #ff4dc9;
+  --ab-alt-violet: #ae00d9;
+  --mx: 50%;
+  --my: 50%;
+
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 140px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--ab-magenta);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: grab;
+  will-change: transform;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.18), 0 14px 28px -12px rgba(0, 0, 0, 0.22);
+}
+
+.thumb:active { cursor: grabbing; }
+
+/* Plush inner drop-shadow + glass stroke (the ActionButton signature). */
+.plush {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 -2.5px 5px 0 rgba(255, 255, 255, 0.44), inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.44);
+  outline: 1.25px solid rgba(255, 255, 255, 0.22);
+  outline-offset: -1.25px;
+}
+
+/* Mouse-tracked dual-radial oklch glow on hover. */
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  background:
+    radial-gradient(120px circle at var(--mx) var(--my),
+      color-mix(in oklch, var(--ab-hot-pink) 85%, transparent), transparent 60%),
+    radial-gradient(200px circle at calc(100% - var(--mx)) calc(100% - var(--my)),
+      color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%);
+}
+
+.thumb:hover .glow { opacity: 1; }
+
+/* OFF (image mode is active): grey fill so it reads as off. The oklch hover
+   glow still comes through on top. ON keeps the magenta fill. */
+.off {
+  background: var(--secondary);
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Mobile: clear the bottom reading bar; shrink to ~FAB size ── */
+@media (max-width: 768px) {
+  .root {
+    right: 16px;
+    bottom: calc(18px + var(--safe-bottom));
+  }
+  .track { height: 46px; }
+  .thumb { height: 40px; }
+}

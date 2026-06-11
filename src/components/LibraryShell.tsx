@@ -8,6 +8,7 @@ import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
 import { FilterPanel } from './FilterPanel';
 // (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
 import { WorkCardCover } from './WorkCardCover';
+import { WorkCardGrid } from './WorkCardGrid';
 import styles from '@/styles/components/LibraryShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
 
@@ -193,7 +194,15 @@ export function LibraryShell({
           // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
           Array.from(
             { length: viewSwitching ? Math.max(SKELETON_COUNT, displayedWorks.length) : SKELETON_COUNT },
-            (_, i) => <SkeletonCard key={i} index={i} styles={styles} variant="library" />,
+            (_, i) => (
+              <SkeletonCard
+                key={i}
+                index={i}
+                styles={styles}
+                variant="library"
+                layout={isFiltering ? 'list' : view}
+              />
+            ),
           )
         ) : displayedWorks.length === 0 ? (
           <div className={styles.empty}>
@@ -210,7 +219,7 @@ export function LibraryShell({
           displayedWorks.map((work) =>
             activeTab === 'bookmarked' ? (
               <div key={work.slug} className={styles.cardWrapper}>
-                <WorkCardCover work={work} view={view} />
+                {view === 'grid' ? <WorkCardGrid work={work} /> : <WorkCardCover work={work} />}
                 <button
                   className={styles.bookmarkBtn}
                   onClick={() => handleRemove(work.slug)}
@@ -222,8 +231,10 @@ export function LibraryShell({
                   </svg>
                 </button>
               </div>
+            ) : view === 'grid' ? (
+              <WorkCardGrid key={work.slug} work={work} />
             ) : (
-              <WorkCardCover key={work.slug} work={work} view={view} />
+              <WorkCardCover key={work.slug} work={work} />
             )
           )
         )}

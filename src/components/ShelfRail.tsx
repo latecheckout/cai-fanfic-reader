@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Shelf } from '@/lib/shelves';
+import { WorkCardGrid } from './WorkCardGrid';
 import { WorkCardCover } from './WorkCardCover';
-import { ShelfTextCard } from './ShelfTextCard';
+import { ModeSwitchFlash } from './ModeSwitchFlash';
 import styles from '@/styles/components/ShelfRail.module.css';
 
 interface Props {
@@ -11,11 +12,13 @@ interface Props {
 }
 
 /**
- * Horizontal shelf rail. Visual mode renders the real results grid card
- * (WorkCardCover) so shelf thumbnails reuse the exact same UI and data as
- * grid view. Text mode (html[data-mode='text']) swaps in ShelfTextCard,
- * the AO3-style blurb. Both presentations are server-rendered; CSS picks
- * one by the global data-mode.
+ * Horizontal shelf rail (server component). The exact browse cards are reused
+ * verbatim: visual mode renders WorkCardGrid, text mode the WorkCardCover list
+ * card; the global data-mode toggle picks the slot via CSS. ModeSwitchFlash is
+ * the only client bit — it flashes skeletons on a mode toggle while these
+ * server-rendered cards pass through as its children.
+ *
+ * Edge fades are directional via a CSS scroll-driven animation (see .rail).
  */
 export function ShelfRail({ shelf, priority = false }: Props) {
   return (
@@ -35,17 +38,25 @@ export function ShelfRail({ shelf, priority = false }: Props) {
         </div>
       </div>
 
-      <div className={styles.row}>
-        {shelf.works.map((work, i) => (
-          <article key={work.slug} className={styles.card}>
-            {/* Visual variant: the results grid card, UI reused verbatim */}
-            <div className={styles.slot}>
-              <WorkCardCover work={work} view="grid" priority={priority && i < 4} />
-            </div>
-            {/* Text variant: AO3 blurb (client, owns the tag expander) */}
-            <ShelfTextCard work={work} />
-          </article>
-        ))}
+      {/* .rail is the non-scrolling frame that carries the edge-fade overlays;
+          .row is the actual horizontal scroller. */}
+      <div className={styles.rail}>
+        <div className={styles.row}>
+          <ModeSwitchFlash count={shelf.works.length} cardClassName={styles.card} layout="auto">
+            {shelf.works.map((work, i) => (
+              <div key={work.slug} className={styles.card}>
+                {/* Visual: the exact browse grid card (2:3 image, browse width) */}
+                <div className={styles.slot}>
+                  <WorkCardGrid work={work} priority={priority && i < 4} />
+                </div>
+                {/* Text: the exact browse list card (browse 2-up width) */}
+                <div className={styles.slotText}>
+                  <WorkCardCover work={work} />
+                </div>
+              </div>
+            ))}
+          </ModeSwitchFlash>
+        </div>
       </div>
     </section>
   );

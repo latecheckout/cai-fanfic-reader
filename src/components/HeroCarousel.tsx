@@ -63,20 +63,37 @@ export function HeroCarousel() {
     setIndex(clamped);
   };
 
-  // Forward one slide; at the last, scroll FORWARD into a clone of the first then
-  // snap back invisibly, so it loops without rewinding backward through the list.
+  // Forward one slide; at the last, glide FORWARD into a clone of the first, then
+  // jump back to the real first slide so it loops without rewinding the list.
   const advance = () => {
     const vp = viewportRef.current;
     if (!vp) return;
     const cur = Math.round(vp.scrollLeft / vp.clientWidth);
-    if (cur >= realCount - 1) {
-      scrollToPos(realCount, true);
-      setIndex(0);
-      window.setTimeout(() => scrollToPos(0, false), 650);
-    } else {
+    if (cur < realCount - 1) {
       scrollToPos(cur + 1, true);
       setIndex(cur + 1);
+      return;
     }
+
+    // Glide into the clone, then — once the scroll has fully SETTLED (scrollend,
+    // not a guessed timer) — jump back to slide 0. Snap is disabled for the jump
+    // so `scroll-snap-type: mandatory` doesn't re-animate it (the visible glitch).
+    scrollToPos(realCount, true);
+    setIndex(0);
+
+    let done = false;
+    let fallback: ReturnType<typeof setTimeout>;
+    const settle = () => {
+      if (done) return;
+      done = true;
+      vp.removeEventListener('scrollend', settle);
+      clearTimeout(fallback);
+      vp.style.scrollSnapType = 'none';
+      vp.scrollLeft = 0;
+      requestAnimationFrame(() => { vp.style.scrollSnapType = ''; });
+    };
+    vp.addEventListener('scrollend', settle);
+    fallback = setTimeout(settle, 900); // safety net if scrollend never fires
   };
 
   // Back one slide; from the first, wrap to the last.
@@ -128,14 +145,17 @@ export function HeroCarousel() {
               alt=""
               fill
               sizes="(max-width: 980px) 100vw, 940px"
-              priority={i === 0}
+              /* Only the first banner is the LCP image → priority. The others
+                 load eagerly (decoded before they animate in) but without a
+                 competing preload, so LCP isn't penalised. */
+              {...(i === 0 ? { priority: true } : { loading: 'eager' as const })}
               className={styles.bg}
             />
             <span className={styles.scrim} aria-hidden="true" />
             <span className={styles.overlay}>
               {s.cover && (
                 <span className={styles.coverWrap} aria-hidden="true">
-                  <Image src={s.cover} alt="" fill sizes="120px" className={styles.cover} />
+                  <Image src={s.cover} alt="" fill sizes="120px" priority={i === 0} className={styles.cover} />
                 </span>
               )}
               <span className={`${styles.content} ${s.cover ? '' : styles.contentCentered}`}>

@@ -10,7 +10,7 @@
 }
 
 .section {
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
   border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
@@ -64,6 +64,7 @@
 /* ── Thumbnail rail ── */
 .cards {
   display: flex;
+  align-items: flex-start;
   gap: 10px;
   padding: var(--space-4) 0;
   overflow-x: auto;
@@ -75,62 +76,75 @@
   display: none;
 }
 
-.card {
-  flex-shrink: 0;
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-/* ── Cover thumbnail ── */
-.cover {
+/* ── Directional edge fades (matches the shelves) ────────────────────────
+   .rail frames the scroller; gradient overlays fade content into the page
+   background, driven continuously by scroll position (no JS, no snap).
+   Fallback without scroll-timeline support: right fade shown, left hidden. */
+.rail {
   position: relative;
-  width: 84px;
-  aspect-ratio: 2 / 3;
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--border);
-  transition: transform var(--transition-micro);
 }
 
-.card:hover .cover {
-  transform: translateY(-2px);
-}
-
-.coverImg {
-  object-fit: cover;
-}
-
-/* ── Progress bar — overlaid on the cover art, flush to its bottom edge.
-   Needs its own contrast layer: a 15% tint reads fine on a flat card
-   background but vanishes over artwork. ── */
-.progressTrack {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--rating-t);
-  border-radius: 0 2px 2px 0;
-}
-
-/* Soft scrim above the bar so it never blends into busy cover art */
-.cover::after {
+.rail::before,
+.rail::after {
   content: '';
   position: absolute;
+  top: 0;
   bottom: 0;
-  left: 0;
-  right: 0;
-  height: 18px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.35), transparent);
+  width: 48px;
+  z-index: 2;
   pointer-events: none;
 }
+
+.rail::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+  opacity: 0;
+}
+
+.rail::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+  opacity: 1;
+}
+
+@supports (animation-timeline: scroll()) {
+  .rail {
+    timeline-scope: --continue-rail-x;
+  }
+
+  .cards {
+    scroll-timeline: --continue-rail-x inline;
+  }
+
+  .rail::before,
+  .rail::after {
+    animation-duration: 1ms;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --continue-rail-x;
+  }
+
+  .rail::before {
+    animation-name: continueRailFadeLeft;
+  }
+
+  .rail::after {
+    animation-name: continueRailFadeRight;
+  }
+}
+
+@keyframes continueRailFadeLeft {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes continueRailFadeRight {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* The card itself lives in ContinueCard / ContinueCard.module.css. */
 
 /* ── Page load stagger ── */
 @keyframes fadeUp {
@@ -139,15 +153,15 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .card { animation: fadeUp 650ms var(--ease-out-expo) both; }
-  .card:nth-child(1) { animation-delay: 30ms; }
-  .card:nth-child(2) { animation-delay: 60ms; }
-  .card:nth-child(3) { animation-delay: 90ms; }
-  .card:nth-child(4) { animation-delay: 120ms; }
-  .card:nth-child(5) { animation-delay: 150ms; }
-  .card:nth-child(6) { animation-delay: 180ms; }
-  .card:nth-child(7) { animation-delay: 210ms; }
-  .card:nth-child(8) { animation-delay: 240ms; }
+  .cards > * { animation: fadeUp 650ms var(--ease-out-expo) both; }
+  .cards > *:nth-child(1) { animation-delay: 30ms; }
+  .cards > *:nth-child(2) { animation-delay: 60ms; }
+  .cards > *:nth-child(3) { animation-delay: 90ms; }
+  .cards > *:nth-child(4) { animation-delay: 120ms; }
+  .cards > *:nth-child(5) { animation-delay: 150ms; }
+  .cards > *:nth-child(6) { animation-delay: 180ms; }
+  .cards > *:nth-child(7) { animation-delay: 210ms; }
+  .cards > *:nth-child(8) { animation-delay: 240ms; }
 }
 
 /* ── Mobile ── */

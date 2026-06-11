@@ -1,0 +1,176 @@
+/* ============================================================
+   WORK CARD — Grid (image-background)
+   The cover fills the whole card; all metadata is overlaid in the
+   bottom-left over a scrim. Typography/spacing mirror the list card
+   (WorkCardCover .list); only the colours go light for the overlay.
+   Layering: image (0) · scrim (1) · whole-card link (2) · content (3).
+   ============================================================ */
+
+.card {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  /* Concentric with the rating badge: badge radius (2px) + padding (12px). */
+  border-radius: 14px;
+  padding: var(--space-3);
+  /* No overflow:hidden here — it would clip the badge tooltips. Clipping lives
+     on .media instead. */
+}
+
+/* Lift the hovered card above its neighbours so an overflowing badge tooltip
+   paints over the adjacent card instead of slipping behind it. */
+.card:hover {
+  z-index: 5;
+}
+
+/* Holds the cover + scrim; clips the rounded corners and the hover zoom.
+   clip-path (not overflow:hidden + border-radius) — the latter leaves an
+   antialiased corner fringe where the photo bleeds past the stroke; clip-path
+   produces one clean rounded clip for the image and the ring pseudo alike. */
+.media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 14px;
+  clip-path: inset(0 round 14px);
+  /* Dark neutral so the scrim + white text still read if a cover is missing. */
+  background: #1a1614;
+}
+
+/* Hairline stroke — a 1px white ring on a pseudo INSIDE .media, so it paints
+   over the image and is clipped by the same overflow:hidden. Sharing the clip
+   means the ring and the image edge round identically: no sub-pixel bleed. */
+.media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  transition: transform 320ms var(--ease-out-expo, ease);
+}
+
+.card:hover .image {
+  transform: scale(1.035);
+}
+
+/* Bottom-weighted scrim for legibility over the photo — a deeper black floor
+   so the overlaid content pops, fading out toward the top of the card. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.92) 28%,
+    rgba(0, 0, 0, 0.62) 52%,
+    rgba(0, 0, 0, 0) 78%
+  );
+}
+
+.cardLink {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* Metadata cluster — anchored bottom-left, inset by the card padding.
+   pointer-events:none lets clicks fall through to .cardLink; the tag links
+   re-enable themselves. Gap mirrors the list card's .content (10px). */
+.content {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Title — matches list .title (serif 16px / 500), clamped to two lines. */
+.title {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #fff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Whole card is a link → underline the title on hover, like the list card. */
+.card:hover .title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* Byline — matches list (sans 14px) + the shared circular Avatar. */
+.byline {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.by {
+  margin-right: 5px;
+}
+
+/* Author name links to its search; re-enable pointer events so it's clickable
+   above the whole-card link (the "by" + avatar stay non-interactive). */
+.authorLink {
+  pointer-events: auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.authorLink:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Tags — mirror list .tagChip sizing, recoloured for the overlay. Up to 3,
+   no expander. Re-enable pointer events so the chips stay clickable. */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  pointer-events: auto;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  text-decoration: none;
+  transition: background var(--transition-micro);
+}
+
+.tag:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Social metrics — matches list (mono 13px), recoloured light. */
+.metrics {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+}

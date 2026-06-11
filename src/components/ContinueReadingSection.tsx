@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { GENERIC_COVER } from '@/lib/covers';
+import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
+import { useModeSwitch } from '@/lib/useModeSwitch';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
@@ -34,6 +33,7 @@ interface RawBookmark {
 export function ContinueReadingSection({ covers }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const { switching } = useModeSwitch();
 
   useIsomorphicLayoutEffect(() => {
     try {
@@ -78,33 +78,16 @@ export function ContinueReadingSection({ covers }: Props) {
         </span>
       </div>
 
-      {/* Thumbnail rail — covers only, title/chapter on hover, progress flush to cover bottom */}
-      <div className={styles.cards}>
-        {bookmarks.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/works/${item.slug}`}
-            className={styles.card}
-            title={`${item.title} · Ch. ${item.chapterIndex + 1} of ${item.totalChapters}`}
-            aria-label={`Continue reading ${item.title}, chapter ${item.chapterIndex + 1} of ${item.totalChapters}`}
-          >
-            <div className={styles.cover}>
-              <Image
-                src={covers?.[item.slug] ?? GENERIC_COVER}
-                alt=""
-                fill
-                sizes="88px"
-                className={styles.coverImg}
-              />
-              <div className={styles.progressTrack}>
-                <div
-                  className={styles.progressFill}
-                  style={{ width: `${Math.min(item.scrollPercent * 100, 100).toFixed(1)}%` }}
-                />
-              </div>
-            </div>
-          </Link>
-        ))}
+      {/* Card rail — visual covers or text cards, by the global mode.
+          .rail frames the scroller and carries the directional edge fades. */}
+      <div className={styles.rail}>
+        <div className={styles.cards}>
+          {switching
+            ? bookmarks.map((item) => <ContinueCardSkeleton key={item.slug} />)
+            : bookmarks.map((item) => (
+                <ContinueCard key={item.slug} item={item} cover={covers?.[item.slug]} />
+              ))}
+        </div>
       </div>
     </section>
   );

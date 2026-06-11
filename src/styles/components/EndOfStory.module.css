@@ -73,10 +73,33 @@
   color: var(--secondary);
 }
 
-/* Recommendations */
+/* Recommendations — respect the global mode (html[data-mode]):
+   visual = a 2-up grid of image cards, text = a vertical stack of list cards. */
 .recommendations {
   margin-top: 60px;
+  padding-top: var(--space-6);
   border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+:global(html[data-mode='text']) .recommendations {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The text/list slot is hidden in visual mode; CSS swaps which one shows. */
+.slotText {
+  display: none;
+}
+
+:global(html[data-mode='text']) .slot {
+  display: none;
+}
+
+:global(html[data-mode='text']) .slotText {
+  display: block;
 }
 
 /* Bottom padding */

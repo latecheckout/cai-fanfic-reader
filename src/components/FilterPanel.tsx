@@ -199,7 +199,7 @@ export function FilterPanel({
   options: _options,
   searchOptions: _searchOptions,
   currentFilters,
-  totalCount,
+  totalCount: _totalCount,
   filteredCount,
   basePath = '/',
 }: Props) {
@@ -914,18 +914,6 @@ export function FilterPanel({
             </div>
           </div>
         )}
-
-        {/* Subrow: always visible — work count (left) + view toggle (right) */}
-        <div className={styles.subrow}>
-          <span className={styles.workCount} aria-live="polite" aria-atomic="true">
-            <span key={filteredCount} className={styles.countRoll}>
-              {filteredCount === totalCount
-                ? `${totalCount} works`
-                : `${filteredCount} of ${totalCount}`}
-            </span>
-          </span>
-          {/* View toggle removed: the global mode toggle in the nav owns layout now. */}
-        </div>
       </div>
 
       {/* Filter Drawer — right-side slide panel, non-blocking on desktop */}

@@ -1,13 +1,13 @@
 /* ============================================================
    SHELF RAIL: horizontal shelf on the browse-first home.
-   Visual mode: clean rounded-cover cards (no grid lattice
-   chrome) carrying the full grid-card data set.
-   Text mode: an enlarged AO3 blurb card takes the footprint.
-   Type sizes follow the +2px accessibility bump.
+   Reuses the EXACT browse cards verbatim — WorkCardGrid in visual
+   mode, the WorkCardCover list card in text mode. The rail only
+   supplies each card's width (a flex scroller can't inherit the
+   browse grid's column width); the components own everything else.
    ============================================================ */
 
 .section {
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-12);
 }
 
 /* ── Header: editorial title, taxonomy subtitle ── */
@@ -52,40 +52,105 @@
 /* ── Card row ── */
 .row {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
+  /* stretch so every card in a rail shares the tallest card's height — same
+     equal-height behaviour as the browse list grid. */
+  align-items: stretch;
+  gap: var(--space-4);
   overflow-x: auto;
   padding-bottom: var(--space-2);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  /* Gradual fade on the trailing edge so the scroll cutoff is not harsh */
-  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
-  mask-image: linear-gradient(to right, #000 88%, transparent 100%);
 }
 
 .row::-webkit-scrollbar {
   display: none;
 }
 
+/* ── Directional edge fades ──────────────────────────────────────────────
+   .rail frames the scroller and carries two gradient overlays that fade the
+   content into the page background. Their opacity is driven *continuously*
+   by the row's scroll position via a scroll-driven animation, so the fade
+   tracks the finger smoothly (no snapping) and needs no JS.
+   Fallback (no scroll-timeline support): right fade shown, left hidden. */
+.rail {
+  position: relative;
+}
+
+.rail::before,
+.rail::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.rail::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+  opacity: 0;
+}
+
+.rail::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+  opacity: 1;
+}
+
+@supports (animation-timeline: scroll()) {
+  /* timeline-scope hoists the row's named scroll timeline so the rail's
+     ::before/::after (its siblings of .row) can both reference it. */
+  .rail {
+    timeline-scope: --shelf-rail-x;
+  }
+
+  .row {
+    scroll-timeline: --shelf-rail-x inline;
+  }
+
+  .rail::before,
+  .rail::after {
+    animation-duration: 1ms; /* placeholder; the scroll timeline owns progress */
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --shelf-rail-x;
+  }
+
+  .rail::before {
+    animation-name: shelfRailFadeLeft;
+  }
+
+  .rail::after {
+    animation-name: shelfRailFadeRight;
+  }
+}
+
+/* Left fade rises fast right as scroll begins; right fade clears only at the end. */
+@keyframes shelfRailFadeLeft {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes shelfRailFadeRight {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Visual mode: a hair under a browse grid card (296px) so a 5th card peeks at
+   the edge, signalling the rail scrolls. WorkCardGrid's 2:3 aspect sets height. */
 .card {
   flex-shrink: 0;
-  width: 252px;
+  width: 280px;
   display: flex;
   flex-direction: column;
 }
 
-/* ── Visual slot: the results grid card, UI reused verbatim ── */
-/* The grid card draws results-lattice borders and cell padding; inside a
-   rail the row gap handles spacing, so strip only that chrome. The card's
-   own badges, pills, tag expander, and stats render untouched. */
-.slot article {
-  border-right: none;
-  border-bottom: none;
-  padding: 0;
-}
-
-.slot article:hover {
-  background: transparent;
+/* Text slot holds the exact browse list card; hidden until text mode. */
+.slotText {
+  display: none;
 }
 
 /* ── Page load stagger ── */
@@ -106,307 +171,63 @@
   .card:nth-child(8) { animation-delay: 200ms; }
 }
 
-/* ── Mobile ── */
-@media (max-width: 768px) {
-  .section {
-    margin-bottom: var(--space-8);
-  }
-
-  .title {
-    font-size: 21px;
-  }
-
-  .card {
-    width: 168px;
-  }
-}
-
 /* ============================================================
-   TEXT MODE (html[data-mode='text'], set by the nav toggle).
-   The cover card hides; an enlarged AO3 blurb card takes over.
-   Every element is its own link.
+   TEXT MODE (html[data-mode='text']): swap the grid card for the
+   exact browse list card. Width matches a browse 2-up list card
+   (608px of the 1232px content area).
    ============================================================ */
-
-.textCard {
-  display: none;
-}
-
+/* A hair under a browse 2-up list card (608px) so the next card peeks. */
 :global(html[data-mode='text']) .card {
-  width: 360px;
+  width: 580px;
 }
 
 :global(html[data-mode='text']) .slot {
   display: none;
 }
 
-:global(html[data-mode='text']) .textCard {
+/* Fill the stretched card height so every list card matches the tallest. */
+:global(html[data-mode='text']) .slotText {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  aspect-ratio: 2 / 3;
-  padding: var(--space-4);
-  border: 1px solid var(--card-border);
-  border-radius: 6px;
-  background: var(--card-bg);
-  overflow: hidden;
-  transition: border-color var(--transition-micro);
+  flex: 1;
+  min-height: 0;
 }
 
-/* Only an expanded card is a live scroll container. Collapsed cards fit
-   their capped content, so they must stay overflow: hidden and never trap
-   wheel or trackpad gestures meant for the rail or the page. Containment
-   is y-only: horizontal swipes still chain up to the rail's scroll. */
-:global(html[data-mode='text']) .textCardOpen {
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none;
+:global(html[data-mode='text']) .slotText > * {
+  flex: 1;
+  min-width: 0;
 }
 
-:global(html[data-mode='text']) .textCardOpen::-webkit-scrollbar {
-  display: none;
-}
-
-:global(html[data-mode='text']) .textCard:hover {
-  border-color: var(--border-strong);
-}
-
-/* The whole card scrolls as one piece inside the fixed 2:3 box; nothing
-   is pinned. Children keep their natural height so overflow goes to the
-   scroll instead of flex shrinking them to fit, which would crush the
-   clamped summary (its overflow: hidden gives it a zero minimum). */
-.textCard > * {
-  flex-shrink: 0;
-}
-
-/* ── Identity: title + author ── */
-.tcTitle {
-  margin-top: var(--space-3);
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text);
-  text-decoration: none;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.tcTitle:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* Byline: "by" + circular avatar (circles mean humans) + author name.
-   Tight gap from "by" to the photo, a touch more from photo to name. */
-.tcByline {
-  display: flex;
-  align-items: center;
-  margin-top: var(--space-2);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  color: var(--secondary);
-}
-
-.tcBy {
-  margin-right: 5px;
-}
-
-.tcAvatar {
-  position: relative;
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 7px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--border);
-  flex-shrink: 0;
-}
-
-.tcAvatarImg {
-  object-fit: cover;
-}
-
-.tcAuthor {
-  color: var(--secondary);
-  text-decoration: none;
-}
-
-.tcAuthor:hover {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* ── Bottom discovery group: fandom, ships, characters (list-card order).
-   margin-top: auto pins it to the card foot when content is short; once
-   expanded tags overflow, it follows the content. The padding keeps
-   ample air between the stats line and these three metadata rows. ── */
-.tcBottom {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-top: auto;
-  padding-top: var(--space-5);
-}
-
-.tcFandom {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  color: var(--secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tcFandomLink {
-  color: inherit;
-  text-decoration: none;
-}
-
-.tcFandomLink:hover {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.tcShips {
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tcShipLink {
-  color: var(--text);
-  text-decoration: none;
-}
-
-.tcShipLink:hover {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.tcShipSep {
-  color: var(--secondary);
-}
-
-.tcCharacters {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tcCharLink {
-  color: inherit;
-  text-decoration: none;
-}
-
-.tcCharLink:hover {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* ── Summary ── */
-.tcSummary {
-  margin-top: var(--space-2);
-  font-family: var(--font-sans);
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* ── Warnings + tags: collapsed count is capped in JS so the +N
-   expander always sits inline and visible (no max-height clip). ── */
-.tcTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: var(--space-3);
-}
-
-.tcTag,
-.tcWarn,
-.tcTagsMore {
-  display: inline-block;
-  padding: 1px 7px;
-  border-radius: 3px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 1.6;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--transition-micro), background var(--transition-micro);
-}
-
-.tcTag {
-  background: var(--border);
-  color: var(--secondary);
-}
-
-.tcTag:hover {
-  color: var(--text);
-  background: var(--border-strong);
-}
-
-.tcWarn {
-  background: var(--color-exclude-bg);
-  color: var(--color-exclude);
-}
-
-.tcWarn:hover {
-  background: var(--color-exclude);
-  color: #fff;
-}
-
-/* Pill expander — mirrors the results card's "+N" tags-more control */
-.tcTagsMore {
-  border: 1px solid var(--border-chip);
-  background: transparent;
-  color: var(--secondary);
-  cursor: pointer;
-}
-
-.tcTagsMore:hover {
-  color: var(--text);
-  border-color: var(--border-active);
-}
-
-/* ── Stats line: sits after tags, before the bottom discovery group ── */
-.tcStats {
-  margin-top: var(--space-4);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.5;
-  color: var(--secondary);
-}
-
-/* A stat and its trailing separator wrap as one unit: lines break only
-   between whole stats, so a glyph never strands at the end of a line. */
-.tcStatItem {
-  white-space: nowrap;
-}
-
+/* ── Mobile ── */
 @media (max-width: 768px) {
+  .section {
+    margin-bottom: var(--space-10);
+  }
+
+  .title {
+    font-size: 21px;
+  }
+
+  /* Tighter gap on phones so the peeking next card reads clearly. */
+  .row {
+    gap: var(--space-3);
+  }
+
+  /* Narrower edge fades to match the smaller cards. */
+  .rail::before,
+  .rail::after {
+    width: 40px;
+  }
+
+  /* Visual: bigger than before so the overlaid metadata isn't cramped/cut off;
+     still leaves a clear peek of the next card. */
+  .card {
+    width: 70vw;
+    max-width: 300px;
+  }
+
+  /* Text: narrower than full width so the next list card clearly peeks. */
   :global(html[data-mode='text']) .card {
-    width: 300px;
+    width: 76vw;
+    max-width: 440px;
   }
 }

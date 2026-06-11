@@ -8,6 +8,7 @@ const VIEW_PREF_KEY = 'cai_view_pref';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
 import { FilterPanel } from './FilterPanel';
 import { WorkCardCover } from './WorkCardCover';
+import { WorkCardGrid } from './WorkCardGrid';
 import styles from '@/styles/components/BrowseShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
 
@@ -143,7 +144,14 @@ export function BrowseShell({
           // so the scrollbar never toggles → no horizontal shift of the fixed FAB.
           Array.from(
             { length: viewSwitching ? Math.max(SKELETON_COUNT, works.length) : SKELETON_COUNT },
-            (_, i) => <SkeletonCard key={i} index={i} styles={styles} />,
+            (_, i) => (
+              <SkeletonCard
+                key={i}
+                index={i}
+                styles={styles}
+                layout={isFiltering ? 'list' : view}
+              />
+            ),
           )
         ) : works.length === 0 ? (
           <div className={styles.empty}>
@@ -156,14 +164,13 @@ export function BrowseShell({
             )}
           </div>
         ) : (
-          works.map((work, i) => (
-            <WorkCardCover
-              key={work.slug}
-              work={work}
-              view={view}
-              priority={i < 3}
-            />
-          ))
+          works.map((work, i) =>
+            view === 'grid' ? (
+              <WorkCardGrid key={work.slug} work={work} priority={i < 4} />
+            ) : (
+              <WorkCardCover key={work.slug} work={work} />
+            ),
+          )
         )}
       </div>
     </>

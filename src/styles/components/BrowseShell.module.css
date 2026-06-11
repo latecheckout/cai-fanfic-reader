@@ -14,31 +14,42 @@
 }
 
 /* ── Layout modes (driven by the view toggle) ── */
+/* Single column by default; two columns on wide desktops so the detailed
+   text cards fill the extra width instead of stretching to one long row. */
 .list {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Internal lattice only — lines between cells, no outer frame (cells draw
-   their own right/bottom; the last column's right line is removed).
-   Density per Devon: 4 up by default, 5 on wide desktops; glanceability
-   over gallery. */
-.grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  /* Default (stretch) so paired cells in a row share the tallest height —
+     no ragged short cards next to tall ones. */
 }
 
 @media (min-width: 1100px) {
-  .grid { grid-template-columns: repeat(5, 1fr); }
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* Collapse columns on narrower viewports */
-@media (max-width: 768px) {
+/* Image-background cards are self-contained (rounded, own scrim), so the grid
+   is a plain gapped lattice: 4 up on desktop, collapsing to 3 then 2. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+/* Collapse columns on narrower viewports — drop early so the image cards keep
+   a comfortable width: 3-up ≤1100, 2-up ≤768, then a single column on phones. */
+@media (max-width: 1100px) {
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 768px) {
   .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 460px) {
+  .grid { grid-template-columns: 1fr; }
 }
 
 /* ── Back link (e.g. "← Characters" when navigating from characters page) ── */
@@ -96,9 +107,19 @@
   50%       { opacity: 0.85; }
 }
 
+/* Both loaders share the exact card chrome — same fill, border (stroke), radius,
+   padding and gap as the real cards. Only the shape differs (list = auto height,
+   grid = 2:3) and where the bars sit. box-sizing: border-box (global) keeps the
+   footprint identical to the cards. */
 .skeletonCard {
+  position: relative;
   display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
   opacity: 0;
 }
 
@@ -113,45 +134,27 @@
   to { opacity: 1; }
 }
 
-/* List: small cover on the left + content (matches the list card) */
+/* No cover block on either loader — both are bordered boxes with shimmer bars. */
+.skeletonStrip { display: none; }
+
+/* List: matches the list card's footprint. Bars stack from the top; min-height
+   approximates a populated list card (badges → title → byline → summary →
+   tags → stats → discovery) so there's no jump when content loads. */
 .list .skeletonCard {
-  flex-direction: row;
-  gap: var(--space-4);
-  border-bottom: 1px solid var(--border);
+  min-height: 300px;
 }
-.list .skeletonCard:last-child { border-bottom: none; }
-.list .skeletonStrip { display: none; }
 
-/* Grid: large cover on top + content below (matches the grid card lattice) */
+/* Grid: same chrome, locked to the image card's 2:3 box; the bar cluster sits
+   at the bottom-left where the card's overlay lives. */
 .grid .skeletonCard {
-  flex-direction: column;
-  gap: var(--space-2);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.grid .skeletonCard:nth-child(4n) { border-right: none; }
-.grid .skeletonStrip { width: 100%; }
-
-@media (min-width: 1100px) {
-  .grid .skeletonCard:nth-child(4n) { border-right: 1px solid var(--border); }
-  .grid .skeletonCard:nth-child(5n) { border-right: none; }
-}
-@media (max-width: 768px) {
-  .grid .skeletonCard:nth-child(4n) { border-right: 1px solid var(--border); }
-  .grid .skeletonCard:nth-child(3n) { border-right: none; }
-}
-@media (max-width: 460px) {
-  .grid .skeletonCard:nth-child(3n) { border-right: 1px solid var(--border); }
-  .grid .skeletonCard:nth-child(2n) { border-right: none; }
-}
-
-/* Cover-shaped placeholder (2:3, matches the card thumbnail) */
-.skeletonStrip {
-  flex-shrink: 0;
   aspect-ratio: 2 / 3;
-  border-radius: 2px;
-  background: var(--border-strong);
-  opacity: 0.5;
+}
+.grid .skeletonContent {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  flex: none;
 }
 
 .skeletonContent {
@@ -162,6 +165,7 @@
   gap: 10px;
 }
 
+/* Shared shimmer-bar fill — identical on both loaders. */
 .skeletonLine {
   border-radius: 3px;
   background: var(--border-strong);

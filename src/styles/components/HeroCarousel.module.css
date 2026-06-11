@@ -15,7 +15,7 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  border-radius: 6px;
+  border-radius: 14px; /* match the cards */
 }
 
 .viewport::-webkit-scrollbar {
@@ -27,7 +27,7 @@
   position: relative;
   flex: 0 0 100%;
   scroll-snap-align: center;
-  aspect-ratio: 16 / 5;
+  aspect-ratio: 15 / 4; /* shorter banner */
   overflow: hidden;
   text-decoration: none;
   color: inherit;
@@ -216,7 +216,7 @@
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .slide {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
   }
   .content {
     left: clamp(130px, 34%, 190px);

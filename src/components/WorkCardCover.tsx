@@ -4,26 +4,19 @@ import { useState, Fragment } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { WorkSummary, LayoutView } from '@/types';
-import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel } from '@/lib/utils';
+import { WorkSummary } from '@/types';
+import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import styles from '@/styles/components/WorkCardCover.module.css';
 
 interface Props {
   work: WorkSummary;
-  /** Current layout — 'list' = detailed text card, 'grid' = cover-led card. */
-  view: LayoutView;
-  /** Eager-load the image — pass true for the first few above-the-fold cards. */
-  priority?: boolean;
 }
 
-// Tag caps: list shows the full set, grid stays minimal.
-const MAX_TAGS_LIST = 12;
-const MAX_TAGS_GRID = 2;
+// List shows up to 8 tags then an expander.
+const MAX_TAGS_LIST = 8;
 
-const COVER_SIZES: Record<LayoutView, string> = {
-  list: '(max-width: 768px) 100px, 96px',
-  grid: '(max-width: 460px) 50vw, (max-width: 768px) 33vw, (min-width: 1100px) 20vw, 25vw',
-};
+/** @DUMMY — placeholder until real author photos exist. */
+const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
 
 const RATING_LETTER: Record<string, string> = {
   G: 'G', T: 'T', M: 'M', E: 'E', 'Not Rated': 'NR', NR: 'NR',
@@ -47,13 +40,25 @@ const CATEGORY_TOOLTIPS: Record<string, { title: string; desc: string }> = {
   'Other': { title: 'Other',           desc: 'An unconventional or unspecified relationship type' },
 };
 
-const isWipStatus = (status: string) => {
-  const s = status.toLowerCase();
-  return s.includes('progress') || s === 'wip' || s === 'in-progress';
+const STATUS_TOOLTIPS = {
+  wip:  { title: 'Work in Progress', desc: 'The author is still adding chapters' },
+  done: { title: 'Complete',         desc: 'All chapters have been published' },
 };
 
+
+/** Two-tier badge tooltip — bold title over a lighter description.
+ *  Shared by all three SignalStrip badges so the styling is identical. */
+function BadgeTooltip({ title, desc }: { title: string; desc: string }) {
+  return (
+    <span className={styles.tooltip}>
+      <span className={styles.tooltipTitle}>{title}</span>
+      <span className={styles.tooltipDesc}>{desc}</span>
+    </span>
+  );
+}
+
 const CheckGlyph = () => (
-  <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor"
+  <svg width="12" height="12" viewBox="0 0 9 9" fill="none" stroke="currentColor"
     strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <polyline points="1.5 4.5 3.5 6.5 7.5 2.5" />
   </svg>
@@ -61,7 +66,7 @@ const CheckGlyph = () => (
 
 /** In-progress counterpart to the check: a half-filled circle (partial = WIP). */
 const ProgressGlyph = () => (
-  <svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true">
+  <svg width="12" height="12" viewBox="0 0 10 10" aria-hidden="true">
     <circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" strokeWidth="1.3" />
     <path d="M5 1.2 A3.8 3.8 0 0 1 5 8.8 Z" fill="currentColor" />
   </svg>
@@ -70,7 +75,7 @@ const ProgressGlyph = () => (
 /** Views/reads eye icon. */
 function EyeIcon() {
   return (
-    <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
       strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
       className={styles.statIcon}>
       <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" />
@@ -79,11 +84,22 @@ function EyeIcon() {
   );
 }
 
-function Views({ hits }: { hits: number }) {
+export function Views({ hits }: { hits: number }) {
   return (
     <span className={styles.statViews}>
       <EyeIcon />
       {formatCount(hits)}
+    </span>
+  );
+}
+
+/** Circular author avatar with a faint white ring.
+ *  Shared by the list and grid bylines so the photo treatment is identical. */
+export function Avatar() {
+  return (
+    <span className={styles.avatar} aria-hidden="true">
+      <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="20px" className={styles.avatarImg} />
+      <span className={styles.avatarRing} />
     </span>
   );
 }
@@ -105,38 +121,45 @@ function StatsLine({ items, className }: { items: ReactNode[]; className: string
 /** Signal row — rating · category · status, with single-line tooltips.
  *  Exported so the AO4 text cards reuse the exact same badge components. */
 export function SignalStrip({
-  rating, rClass, catLabel, category, isWip,
+  rating, rClass, catLabel, category, isWip, onImage = false,
 }: {
   rating: string;
   rClass: string;
   catLabel: string;
   category: string[];
   isWip: boolean;
+  /** Lighten the dashed status pill so it reads over a dark image overlay. */
+  onImage?: boolean;
 }) {
   return (
-    <div className={styles.strip}>
-      <span
-        className={`${styles.ratingLetter} ${styles[rClass as keyof typeof styles]}`}
-        data-tooltip={RATING_TOOLTIPS[rating]?.title ?? rating}
-      >
+    <div className={`${styles.strip} ${onImage ? styles.stripOnImage : ''}`}>
+      <span className={`${styles.ratingLetter} ${styles[rClass as keyof typeof styles]}`}>
         {RATING_LETTER[rating] ?? rating.charAt(0)}
+        <BadgeTooltip
+          title={RATING_TOOLTIPS[rating]?.title ?? rating}
+          desc={RATING_TOOLTIPS[rating]?.desc ?? ''}
+        />
       </span>
       {catLabel && (
-        <div className={styles.catLabel} data-tooltip={CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel}>
+        <div className={styles.catLabel}>
           {catLabel}
+          <BadgeTooltip
+            title={CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel}
+            desc={CATEGORY_TOOLTIPS[category[0]]?.desc ?? ''}
+          />
         </div>
       )}
       <div
-        className={`${styles.statusPill} ${isWip ? styles.statusWip : styles.statusDone}`}
-        data-tooltip={isWip ? 'Work in Progress' : 'Complete'}
+        className={`${styles.statusPill} ${isWip ? styles.statusWip : styles.statusDone} ${onImage ? styles.statusPillOnImage : ''}`}
       >
         {isWip ? <ProgressGlyph /> : <CheckGlyph />}
+        <BadgeTooltip {...(isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done)} />
       </div>
     </div>
   );
 }
 
-export function WorkCardCover({ work, view, priority = false }: Props) {
+export function WorkCardCover({ work }: Props) {
   const { meta, slug } = work;
   const [tagsExpanded, setTagsExpanded] = useState(false);
 
@@ -144,60 +167,7 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
   const catLabel = categoryLabel(meta.category);
   const rClass = ratingClass(meta.rating);
 
-  // ── grid: cover-led visual card. cover → strip → title → author → tags → reads·kudos ──
-  if (view === 'grid') {
-    const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, MAX_TAGS_GRID);
-    const hiddenCount = meta.tags.length - MAX_TAGS_GRID;
-    const metricNodes: ReactNode[] = [
-      meta.hits > 0 ? <Views key="views" hits={meta.hits} /> : null,
-      meta.kudos > 0 ? `♥ ${formatCount(meta.kudos)}` : null,
-    ].filter(Boolean);
-
-    return (
-      <article className={`${styles.card} ${styles.grid}`}>
-        <Link href={`/works/${slug}`} className={styles.coverLink} title={meta.title}>
-          <div className={styles.coverWrap}>
-            {meta.cover && (
-              <Image
-                src={meta.cover}
-                alt={meta.title}
-                fill
-                sizes={COVER_SIZES.grid}
-                priority={priority}
-                className={styles.coverImg}
-              />
-            )}
-          </div>
-        </Link>
-
-        <div className={styles.gridBody}>
-          {/* Badges broken out above the title — rating + status only (no category) */}
-          <SignalStrip rating={meta.rating} rClass={rClass} catLabel="" category={meta.category} isWip={isWip} />
-          <div className={styles.gridTitleRow}>
-            <Link href={`/works/${slug}`} className={styles.gridTitleLink}>
-              <span className={styles.gridTitle}>{meta.title}</span>
-            </Link>
-            {meta.author && <span className={styles.author}>by {meta.author}</span>}
-          </div>
-          {meta.tags.length > 0 && (
-            <div className={styles.tags}>
-              {visibleTags.map((t) => (
-                <a key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>{t}</a>
-              ))}
-              {hiddenCount > 0 && (
-                <button type="button" className={styles.tagsMore} onClick={() => setTagsExpanded(!tagsExpanded)}>
-                  {tagsExpanded ? 'show less' : `+${hiddenCount}`}
-                </button>
-              )}
-            </div>
-          )}
-          {metricNodes.length > 0 && <StatsLine items={metricNodes} className={styles.metrics} />}
-        </div>
-      </article>
-    );
-  }
-
-  // ── list: detailed card. small cover + strip → title → author → summary → tags → fandom → ships → characters → stats ──
+  // ── Detailed list card: strip → title → author → summary → tags → fandom → ships → characters → stats ──
   const statNodes: ReactNode[] = [
     formatWords(meta.words),
     formatChapters(meta.chaptersPosted, meta.chapters),
@@ -211,7 +181,7 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
   const warnings = meta.warnings.filter((w) => w !== 'No Archive Warnings Apply');
 
   return (
-    <article className={`${styles.card} ${styles.list}`}>
+    <article className={`${styles.card} ${styles.list}`} data-flip-card="">
       {/* List view is imageless: all metadata, no cover bias. */}
 
       {/* Content — identity-first: strip → title → author → summary → tags → fandom → ships → characters → stats */}
@@ -224,7 +194,15 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
               <span className={styles.title}>{meta.title}</span>
             </Link>
           </h3>
-          {meta.author && <span className={styles.author}>by {meta.author}</span>}
+          {meta.author && (
+            <span className={`${styles.author} ${styles.bylineAvatar}`}>
+              <span className={styles.bylineBy}>by</span>
+              <Avatar />
+              <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
+                {meta.author}
+              </Link>
+            </span>
+          )}
         </div>
 
         {meta.summary && <p className={styles.summary}>{meta.summary}</p>}

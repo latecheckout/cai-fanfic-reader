@@ -198,6 +198,12 @@ html.focus-active .prose-outer::after {
   }
 }
 
+/* Shared skeleton pulse (home rails reference this global keyframe by name). */
+@keyframes caiSkeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }

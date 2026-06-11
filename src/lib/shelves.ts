@@ -92,14 +92,14 @@ const FEATURED_SLUGS: string[] = [
 const SHELF_DEFS: ShelfDef[] = [
   {
     key: 'trending',
-    title: 'Trending',
+    title: 'Trending 🔥',
     subtitle: 'What everyone is reading right now',
     filters: { sort: 'kudos' },
     params: { sort: 'kudos' },
   },
   {
     key: 'featured',
-    title: 'Featured',
+    title: 'Featured ⭐',
     subtitle: 'Hand-picked by the c.ai team',
     slugs: FEATURED_SLUGS,
   },

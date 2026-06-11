@@ -19,185 +19,41 @@
 
 .card:hover {
   background: rgba(26, 24, 22, 0.025);
+  /* Lift above neighbours so an overflowing badge tooltip paints over the
+     adjacent card instead of slipping behind it. */
+  z-index: 5;
 }
 
 [data-theme="dark"] .card:hover {
   background: rgba(229, 225, 216, 0.03);
 }
 
-/* List: imageless, text only */
-
-/* Grid: cover-led vertical card — cover on top, text below */
-.grid {
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--space-2);
-}
-
-.grid .coverLink {
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  color: inherit;
-}
-
-.grid .coverWrap {
-  width: 100%;
-}
-
-/* List mode: full-width rows with a bottom divider — same inset padding box as
-   the grid cells (no bleed), so the hover tint has even breathing room. */
+/* List card: imageless, all-metadata. Each row is its own card — fill, stroke, and
+   radius borrowed from the horizontal shelf text cards; hover lifts the border
+   instead of tinting the fill. Everything else (padding, layout) is unchanged. */
 .list {
   padding: var(--space-3);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--card-border);
+  /* Concentric with the rating badge: badge radius (2px) + padding (12px). */
+  border-radius: 14px;
+  /* A shade lighter than --card-bg — lifts the fill off the page tone. */
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
+  transition: border-color var(--transition-micro);
 }
 
-.list:last-child {
-  border-bottom: none;
+[data-theme="dark"] .list {
+  background: var(--card-bg);
 }
 
-/* Grid: internal separators only — each cell draws its right + bottom line,
-   then the last column's right line is removed so there's no outer frame. */
-.grid {
-  padding: var(--space-3);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+/* Shelf-card hover: border-color lift, no fill tint (overrides .card:hover). */
+.list:hover {
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
+  border-color: var(--border-strong);
 }
 
-/* Lattice lines track the column counts in BrowseShell.module.css:
-   4 by default, 5 on wide desktops, 3 on tablets, 2 on phones. */
-.grid:nth-child(4n) { border-right: none; }
-
-@media (min-width: 1100px) {
-  .grid:nth-child(4n) { border-right: 1px solid var(--border); }
-  .grid:nth-child(5n) { border-right: none; }
-}
-
-@media (max-width: 768px) {
-  .grid:nth-child(4n) { border-right: 1px solid var(--border); }
-  .grid:nth-child(3n) { border-right: none; }
-}
-
-@media (max-width: 460px) {
-  .grid:nth-child(3n) { border-right: 1px solid var(--border); }
-  .grid:nth-child(2n) { border-right: none; }
-}
-
-/* ── Cover (fixed-width thumbnail) ── */
-/* Wrapper stays overflow-visible (badge tooltips); the image itself is rounded */
-.coverWrap {
-  position: relative;
-  aspect-ratio: 2 / 3;
-  width: var(--cover-w, 140px);
-  flex-shrink: 0;
-  border-radius: 2px;
-  background: var(--border);
-}
-
-.coverImg {
-  object-fit: cover;
-  border-radius: 2px;
-}
-
-/* Rating · category · status badges overlaid on the grid cover (top-left) */
-.coverBadges {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.coverRating,
-.coverCat,
-.coverStatus {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 18px;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 3px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #fff;
-}
-
-/* .coverRating gets its background from the rating color class (.ratingG etc.) */
-.coverCat,
-.coverStatus {
-  font-weight: 600;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
-}
-
-/* Grid card text block (under the cover) */
-.gridBody {
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* match the list .content gap for consistent row spacing */
-}
-
-.gridTitleRow {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.gridTitleLink {
-  text-decoration: none;
-  color: inherit;
-  width: fit-content;
-  max-width: 100%;
-}
-
-.gridTitle {
-  font-family: var(--font-serif);
-  font-size: 17px;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card:hover .gridTitle {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-}
-
-/* ── Meta row above the title (rating · category · status · ships) ── */
-.metaRow {
-  position: relative; /* sits above the stretched link so ship links are clickable */
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 2px;
-}
-
-.metaCat {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--secondary);
-}
-
-.metaStatus {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--secondary);
+[data-theme="dark"] .list:hover {
+  background: var(--card-bg);
+  border-color: var(--border-strong);
 }
 
 /* Ships — the AO3 hero line; rendered inline in the meta row (list only) */
@@ -232,12 +88,6 @@
   color: var(--secondary);
   font-weight: 400;
   opacity: 0.6;
-}
-
-.shipEmpty {
-  color: var(--secondary);
-  opacity: 0.4;
-  font-weight: 400;
 }
 
 /* ── List-only framework rows: fandom + characters ── */
@@ -289,47 +139,11 @@
   opacity: 0.4;
 }
 
-/* ── Body ── */
-.body {
-  position: relative; /* anchors the find-similar button to the title row */
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px; /* breathing room for the +2px type */
-}
-
-/* ── Title row: title + find-similar inline 6px to its right ── */
+/* ── Title row ── */
 .titleRow {
   display: flex;
   align-items: baseline;
   gap: 6px;
-}
-
-/* ── Find similar button (hover reveal) — inline, right of the title ── */
-.findSimilarBtn {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  word-spacing: -0.3em;
-  color: var(--secondary);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  opacity: 0;
-  transition: opacity 150ms, color var(--transition-micro);
-}
-
-.card:hover .findSimilarBtn {
-  opacity: 0.4;
-}
-
-.findSimilarBtn:hover {
-  opacity: 1 !important;
-  color: var(--text);
 }
 
 .titleWrap {
@@ -380,6 +194,61 @@
   white-space: nowrap;
 }
 
+/* List byline with circular author avatar — mirrors the shelf text card.
+   pointer-events:none lets the "by" + avatar whitespace fall through to the
+   whole-card stretched link; the author name re-enables itself below. */
+.bylineAvatar {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bylineBy {
+  margin-right: 5px;
+}
+
+/* Author name links to its search, sitting above the stretched card link. */
+.authorLink {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.authorLink:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.avatar {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 7px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  object-fit: cover;
+}
+
+/* Low-opacity white ring layered above the avatar image. */
+.avatarRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
 .summary {
   margin: 0; /* spacing handled by the uniform .content gap */
   font-family: var(--font-serif);
@@ -391,12 +260,6 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.metrics {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--secondary);
 }
 
 /* ── Tags — filled pills, sit above the stretched link ── */
@@ -450,18 +313,18 @@
   font-family: var(--font-sans);
   font-size: 13px;
   color: var(--secondary);
-  opacity: 0.7;
+  opacity: 1;
   padding: 2px 7px;
   background: none;
   border: 1px dashed var(--border-chip, var(--border));
   border-radius: 3px;
   cursor: pointer;
   line-height: 1.4;
-  transition: opacity var(--transition-micro);
+  transition: color var(--transition-micro);
 }
 
 .tagsMore:hover {
-  opacity: 1;
+  color: var(--text);
 }
 
 /* ============================================================
@@ -511,7 +374,6 @@
   letter-spacing: 0.02em;
   flex-shrink: 0;
   color: #fff;
-  position: relative;
   pointer-events: auto;
   cursor: default;
 }
@@ -540,17 +402,15 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   flex-shrink: 0;
-  position: relative;
   pointer-events: auto;
   cursor: default;
 }
 
 /* Status is a stroke (no fill), so it shares no color with the filled
-   rating or category: complete = solid 1:1 square + check, in-progress =
-   dashed open outline that may grow wider than the square. */
+   rating or category. Both states are a 1:1 square holding a 12px glyph —
+   complete = check, in-progress = half-filled circle. */
 .statusPill {
-  position: relative;
-  min-width: 20px;
+  width: 20px;
   height: 20px;
   display: flex;
   align-items: center;
@@ -563,42 +423,69 @@
 }
 
 .statusDone {
-  width: 20px;
   border: 1px dashed var(--border-active);
 }
 
 .statusWip {
-  padding: 0 7px;
   border: 1px dashed var(--border-active);
 }
 
-/* Tooltip bubbles — below the strip item (row layout) */
-/* Single-line tooltip — matches RatingBadge / the rest of the site */
-.ratingLetter[data-tooltip]::after,
-.catLabel[data-tooltip]::after,
-.statusPill[data-tooltip]::after {
-  content: attr(data-tooltip);
+/* Over a dark image overlay (grid card): lighten the dashed pill + glyph so it
+   reads against the photo. Rating/category chips are solid and need no change. */
+.statusPillOnImage {
+  color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Two-tier tooltip bubble — bold title over a lighter description, identical
+   across all three badges. Matches the WorkCard signal-strip tooltip. */
+.tooltip {
   position: absolute;
   top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  /* Anchor to the badge's left edge and grow rightward — badges sit bottom-left,
+     so a centered wide tooltip would overflow the card/viewport on the left. */
+  left: 0;
   background: var(--text);
   color: var(--bg);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 4px;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
   transition: opacity 150ms ease;
   z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* Drop shadow for separation from the card/image behind it. */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28), 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-.ratingLetter[data-tooltip]:hover::after,
-.catLabel[data-tooltip]:hover::after,
-.statusPill[data-tooltip]:hover::after {
+/* Image mode: inverse the tooltip — light surface, dark text. */
+.stripOnImage .tooltip {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.tooltipTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.tooltipDesc {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.65;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.ratingLetter:hover .tooltip,
+.catLabel:hover .tooltip,
+.statusPill:hover .tooltip {
   opacity: 1;
 }
 

@@ -1,7 +1,6 @@
-import Link from 'next/link';
-import Image from 'next/image';
 import { Creator } from '@/lib/shelves';
-import { formatCount } from '@/lib/utils';
+import { CreatorCard } from './CreatorCard';
+import { ModeSwitchFlash } from './ModeSwitchFlash';
 import styles from '@/styles/components/CreatorRail.module.css';
 
 interface Props {
@@ -9,15 +8,9 @@ interface Props {
 }
 
 /**
- * @DUMMY — all creators share one generated placeholder portrait until real
- * profile photos exist. In production the whole card is the creator's face.
- */
-const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
-
-/**
- * Trending creators: cards of humans (per Devon, design review June 2026 --
- * "make the humans shine"). Same 2:3 thumbnail footprint as the story
- * shelves; each card links to a search for the author.
+ * Trending creators (server component): a horizontal rail of CreatorCards (per
+ * Devon, design review June 2026 — "make the humans shine"). ModeSwitchFlash
+ * flashes skeletons on a mode toggle; the cards pass through as its children.
  */
 export function CreatorRail({ creators }: Props) {
   if (creators.length === 0) return null;
@@ -26,29 +19,23 @@ export function CreatorRail({ creators }: Props) {
     <section className={styles.section} aria-label="Trending creators">
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          <h2 className={styles.title}>Trending creators</h2>
+          <h2 className={styles.title}>Trending creators ✍️</h2>
           <p className={styles.subtitle}>The humans behind the stories</p>
         </div>
       </div>
 
-      <div className={styles.row}>
-        {creators.map((c) => (
-          <Link key={c.name} href={c.href} className={styles.card} title={c.name}>
-            <span className={styles.coverWrap}>
-              <Image
-                src={CREATOR_PLACEHOLDER}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 124px, 150px"
-                className={styles.coverImg}
-              />
-            </span>
-            <span className={styles.name}>{c.name}</span>
-            <span className={styles.meta}>
-              {c.workCount} {c.workCount === 1 ? 'work' : 'works'} · ♥ {formatCount(c.kudos)}
-            </span>
-          </Link>
-        ))}
+      {/* .rail frames the scroller and carries the directional edge fades. */}
+      <div className={styles.rail}>
+        <div className={styles.row}>
+          <ModeSwitchFlash
+            count={creators.length}
+            cardClassName={styles.skelCard}
+            variant="library"
+            layout="grid"
+          >
+            {creators.map((c) => <CreatorCard key={c.name} creator={c} />)}
+          </ModeSwitchFlash>
+        </div>
       </div>
     </section>
   );

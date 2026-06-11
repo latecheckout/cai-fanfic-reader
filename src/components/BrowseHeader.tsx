@@ -5,7 +5,8 @@ import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import styles from '@/styles/components/BrowseHeader.module.css';
 import { MobileNav } from './MobileNav';
-import { Ao4TurboFab } from './Ao4TurboFab';
+import { Ao4TurboToggle } from './Ao4TurboToggle';
+import { BurstLayer } from './BurstLayer';
 
 const NAV_LINKS = [
   { href: '/', label: 'Discover' },
@@ -90,8 +91,10 @@ export function BrowseHeader({ search }: Props = {}) {
       </header>
       <MobileNav open={navOpen} onClose={() => setNavOpen(false)} pathname={pathname} navLinks={NAV_LINKS} />
 
-      {/* Global mode switch: floating bottom-right on every browse surface */}
-      <Ao4TurboFab />
+      {/* Global mode switch: draggable AO4 turbo toggle, bottom-right */}
+      <Ao4TurboToggle />
+      {/* Arms the card-disintegration burst on each mode flip */}
+      <BurstLayer />
     </>
   );
 }

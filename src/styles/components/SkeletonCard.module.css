@@ -1,59 +1,68 @@
 /* ============================================================
-   SKELETON PARTICLES: dust motes drifting up off the cover
-   placeholder while a surface remounts (mode switch, filter
-   change). E-ink restrained: tiny secondary-tone dots, no color.
+   SKELETON CARD — self-contained styles used when no `styles` prop is
+   passed (the home rails). Browse/Library pass their own module, so these
+   only apply to the default callsites. Mirrors the browse skeleton: a
+   bordered box; grid = 2:3 with bars bottom-left, list = taller stack.
    ============================================================ */
 
-/* The parent strip is dimmed to 50% opacity, which would crush the dots
-   (opacity inherits, there is no escape). The strip itself goes transparent
-   inline; this fill reproduces its dimmed look underneath the particles. */
-.stripFill {
-  position: absolute;
-  inset: 0;
-  border-radius: 2px;
-  background: var(--border-strong);
-  opacity: 0.5;
-}
-
-.particles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  left: var(--x);
-  bottom: var(--y);
-  width: var(--s);
-  height: var(--s);
-  border-radius: 50%;
-  background: var(--text);
+.skeletonCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
   opacity: 0;
-  will-change: transform, opacity;
-  animation: dustRise var(--dur) ease-out var(--delay) infinite;
 }
 
-@keyframes dustRise {
-  0% {
-    transform: translate3d(0, 0, 0) scale(0.6);
-    opacity: 0;
-  }
-  18% {
-    opacity: 0.5;
-  }
-  70% {
-    opacity: 0.22;
-  }
-  100% {
-    transform: translate3d(var(--dx), -72px, 0) scale(1);
-    opacity: 0;
-  }
+@media (prefers-reduced-motion: no-preference) {
+  .skeletonCard { animation: skeletonFadeIn 200ms var(--ease-out-expo) forwards; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  .particle {
-    display: none;
-  }
+  .skeletonCard { opacity: 1; }
+}
+
+@keyframes skeletonFadeIn {
+  to { opacity: 1; }
+}
+
+/* No cover block — both layouts are bordered boxes with shimmer bars. */
+.skeletonStrip { display: none; }
+
+.list { min-height: 300px; }
+
+.grid { aspect-ratio: 2 / 3; }
+.grid .skeletonContent {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  flex: none;
+}
+
+.skeletonContent {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonLine {
+  border-radius: 3px;
+  background: var(--border-strong);
+}
+
+.skeletonChip {
+  width: 48px;
+  height: 20px;
+  border-radius: 3px;
+  background: var(--border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeletonLine,
+  .skeletonChip { animation: caiSkeletonPulse 1.6s ease-in-out infinite; }
 }
