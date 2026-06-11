@@ -182,6 +182,13 @@
   display: none;
 }
 
+/* Children must keep their natural height so overflow goes to scroll.
+   Without this, flex shrinks them to fit first, and the clamped summary
+   (overflow: hidden gives it a zero minimum) collapses entirely. */
+.tcBody > * {
+  flex-shrink: 0;
+}
+
 /* ── Identity: title + author ── */
 .tcTitle {
   margin-top: var(--space-3);
