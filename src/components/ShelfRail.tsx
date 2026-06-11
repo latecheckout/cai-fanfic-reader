@@ -60,7 +60,10 @@ export function ShelfRail({ shelf, priority = false }: Props) {
                 <WorkCardCover work={work} view="grid" priority={priority && i < 4} />
               </div>
 
-              {/* ── Text variant: AO3 blurb in the enlarged thumbnail footprint ── */}
+              {/* ── Text variant: AO3 blurb in the enlarged thumbnail footprint.
+                  Hierarchy mirrors the list card: strip, title + author,
+                  summary, warnings + tags, stats, then fandom, ships,
+                  characters as the bottom discovery group. ── */}
               <div className={styles.textCard}>
                 <div className={styles.tcBadges}>
                   <span className={`${styles.ratingLetter} ${rClass}`} title={meta.rating}>
@@ -68,9 +71,6 @@ export function ShelfRail({ shelf, priority = false }: Props) {
                   </span>
                   {catLabel && <span className={styles.tcCat}>{catLabel}</span>}
                   <span className={styles.tcStatus}>{wip ? 'WIP' : 'Complete'}</span>
-                  {(meta.updated || meta.published) && (
-                    <span className={styles.tcDate}>{meta.updated || meta.published}</span>
-                  )}
                 </div>
 
                 <Link href={`/works/${slug}`} className={styles.tcTitle}>{meta.title}</Link>
@@ -78,32 +78,6 @@ export function ShelfRail({ shelf, priority = false }: Props) {
                   <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.tcAuthor}>
                     by {meta.author}
                   </Link>
-                )}
-
-                {meta.fandom.length > 0 && (
-                  <span className={styles.tcFandom}>
-                    {meta.fandom.map((f, fi) => (
-                      <span key={f}>
-                        {fi > 0 && ', '}
-                        <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.tcFandomLink}>
-                          {f}
-                        </Link>
-                      </span>
-                    ))}
-                  </span>
-                )}
-
-                {meta.relationships.length > 0 && (
-                  <span className={styles.tcShips}>
-                    {meta.relationships.slice(0, 2).map((r, ri) => (
-                      <span key={r}>
-                        {ri > 0 && <span className={styles.tcShipSep}> / </span>}
-                        <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.tcShipLink}>
-                          {r}
-                        </Link>
-                      </span>
-                    ))}
-                  </span>
                 )}
 
                 {meta.summary && <span className={styles.tcSummary}>{meta.summary}</span>}
@@ -125,9 +99,51 @@ export function ShelfRail({ shelf, priority = false }: Props) {
 
                 <span className={styles.tcStats}>
                   {formatWords(meta.words)} · {formatChapters(meta.chaptersPosted, meta.chapters)}
+                  {(meta.updated || meta.published) && <> · updated {meta.updated || meta.published}</>}
                   {meta.kudos > 0 && <> · ♥ {formatCount(meta.kudos)}</>}
                   {meta.bookmarks > 0 && <> · ⚑ {formatCount(meta.bookmarks)}</>}
                   {meta.hits > 0 && <> · {formatCount(meta.hits)} hits</>}
+                </span>
+
+                <span className={styles.tcBottom}>
+                  {meta.fandom.length > 0 && (
+                    <span className={styles.tcFandom}>
+                      {meta.fandom.map((f, fi) => (
+                        <span key={f}>
+                          {fi > 0 && ', '}
+                          <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.tcFandomLink}>
+                            {f}
+                          </Link>
+                        </span>
+                      ))}
+                    </span>
+                  )}
+
+                  {meta.relationships.length > 0 && (
+                    <span className={styles.tcShips}>
+                      {meta.relationships.slice(0, 2).map((r, ri) => (
+                        <span key={r}>
+                          {ri > 0 && <span className={styles.tcShipSep}> / </span>}
+                          <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.tcShipLink}>
+                            {r}
+                          </Link>
+                        </span>
+                      ))}
+                    </span>
+                  )}
+
+                  {meta.characters.length > 0 && (
+                    <span className={styles.tcCharacters}>
+                      {meta.characters.slice(0, 4).map((c, ci) => (
+                        <span key={`char-${ci}`}>
+                          {ci > 0 && ', '}
+                          <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.tcCharLink}>
+                            {c}
+                          </Link>
+                        </span>
+                      ))}
+                    </span>
+                  )}
                 </span>
               </div>
             </article>

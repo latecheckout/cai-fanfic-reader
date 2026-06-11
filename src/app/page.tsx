@@ -6,11 +6,10 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { buildShelves, buildFandomTiles, buildCreators } from '@/lib/shelves';
+import { buildShelves, buildCreators } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
-import { BrowseSearchBar } from '@/components/BrowseSearchBar';
 import styles from './browse.module.css';
 
 interface PageProps {
@@ -99,44 +98,42 @@ export default async function BrowsePage({ searchParams }: PageProps) {
 
   return (
     <div className={styles.page}>
-      {/* On the home, search lives in the nav. Results pages keep search in
-          the sticky toolbar, so the nav slot stays empty there. */}
-      <BrowseHeader
-        search={
-          !hasActiveFilters ? (
-            <Suspense>
-              <BrowseSearchBar options={searchOptions} />
-            </Suspense>
-          ) : undefined
-        }
-      />
+      <BrowseHeader />
 
       <main className={styles.main}>
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 
-        {!hasActiveFilters ? (
-          /* The global mode toggle restyles every card here via html[data-mode]:
-             visual = covers, text = AO3-style metadata cards. */
-          <BrowseHome
-            shelves={buildShelves(allWorks)}
-            creators={buildCreators(allWorks)}
-            fandoms={buildFandomTiles(allWorks)}
-            covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
-          />
-        ) : (
-          <Suspense>
-            <BrowseShell
-              works={filteredWorks}
-              options={filterOptions}
-              searchOptions={searchOptions}
-              currentFilters={params}
-              totalCount={allWorks.length}
-              filteredCount={filteredWorks.length}
-              from={params.from}
+        {/* Editorial zone: only on the unfiltered Discover page. The global
+            mode toggle restyles every card via html[data-mode]: visual =
+            covers, text = AO3-style metadata cards. */}
+        {!hasActiveFilters && (
+          <>
+            <BrowseHome
+              shelves={buildShelves(allWorks)}
+              creators={buildCreators(allWorks)}
+              covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
             />
-          </Suspense>
+            <div className={styles.forYouHeader}>
+              <h2 className={styles.forYouTitle}>Stories for you</h2>
+              <p className={styles.forYouSubtitle}>The whole archive, ready to filter</p>
+            </div>
+          </>
         )}
+
+        {/* The browse zone: search, sort, and filters live in its sticky
+            toolbar. With filters active it is the entire page. */}
+        <Suspense>
+          <BrowseShell
+            works={filteredWorks}
+            options={filterOptions}
+            searchOptions={searchOptions}
+            currentFilters={params}
+            totalCount={allWorks.length}
+            filteredCount={filteredWorks.length}
+            from={params.from}
+          />
+        </Suspense>
       </main>
     </div>
   );

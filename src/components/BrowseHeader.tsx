@@ -8,7 +8,7 @@ import { MobileNav } from './MobileNav';
 import { Ao4TurboFab } from './Ao4TurboFab';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Stories' },
+  { href: '/', label: 'Discover' },
   { href: '/reading', label: 'Library' },
   { href: '/characters', label: 'Characters' },
 ];

@@ -201,15 +201,7 @@
   color: var(--secondary);
 }
 
-.tcDate {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--secondary);
-}
-
-/* ── Identity: title, author, fandom, ships ── */
+/* ── Identity: title + author ── */
 .tcTitle {
   margin-top: var(--space-3);
   font-family: var(--font-serif);
@@ -244,30 +236,44 @@
   text-underline-offset: 2px;
 }
 
+/* ── Bottom discovery group: fandom, ships, characters (list-card order),
+   pinned to the card foot like the list card's whitespace-separated block ── */
+.tcBottom {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: auto;
+  padding-top: var(--space-2);
+  min-height: 0;
+  overflow: hidden;
+}
+
 .tcFandom {
-  margin-top: var(--space-2);
-  font-family: var(--font-sans);
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   line-height: 1.4;
+  color: var(--secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .tcFandomLink {
-  color: var(--accent);
+  color: inherit;
   text-decoration: none;
 }
 
 .tcFandomLink:hover {
+  color: var(--text);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .tcShips {
-  margin-top: 2px;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.4;
   white-space: nowrap;
@@ -287,6 +293,27 @@
 
 .tcShipSep {
   color: var(--secondary);
+}
+
+.tcCharacters {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tcCharLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tcCharLink:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* ── Summary ── */
@@ -345,10 +372,9 @@
   color: #fff;
 }
 
-/* ── Stats footer ── */
+/* ── Stats line: sits after tags, before the bottom discovery group ── */
 .tcStats {
-  margin-top: auto;
-  padding-top: var(--space-2);
+  margin-top: var(--space-2);
   font-family: var(--font-mono);
   font-size: 11.5px;
   font-variant-numeric: tabular-nums;
