@@ -131,7 +131,7 @@
 }
 
 :global(html[data-mode='text']) .card {
-  width: 300px;
+  width: 360px;
 }
 
 :global(html[data-mode='text']) .slot {
@@ -389,6 +389,6 @@
 
 @media (max-width: 768px) {
   :global(html[data-mode='text']) .card {
-    width: 260px;
+    width: 300px;
   }
 }
