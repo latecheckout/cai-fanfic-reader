@@ -52,6 +52,7 @@
 /* ── Card row ── */
 .row {
   display: flex;
+  align-items: flex-start; /* an expanded text card grows alone; siblings stay put */
   gap: var(--space-3);
   overflow-x: auto;
   padding-bottom: var(--space-2);
@@ -155,11 +156,13 @@
   border-color: var(--border-strong);
 }
 
-/* Expanding the tags lets the card scroll internally instead of growing
-   the rail; the bottom discovery group un-pins so all content is reachable. */
+/* Expanding drops the 2:3 lock and lets the card grow downward to fit all
+   tags, rather than overflowing the fixed box. The bottom discovery group
+   un-pins so it follows the content instead of floating to a fixed foot. */
 :global(html[data-mode='text']) .textCardExpanded {
-  overflow-y: auto;
-  scrollbar-width: thin;
+  aspect-ratio: auto;
+  height: auto;
+  overflow: visible;
 }
 
 .textCardExpanded .tcBottom {
