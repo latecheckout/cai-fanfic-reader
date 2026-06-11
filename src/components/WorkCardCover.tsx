@@ -203,11 +203,7 @@ export function WorkCardCover({ work, view, priority = false }: Props) {
 
   return (
     <article className={`${styles.card} ${styles.list}`}>
-      <div className={styles.coverWrap}>
-        {meta.cover && (
-          <Image src={meta.cover} alt="" fill sizes={COVER_SIZES.list} priority={priority} className={styles.coverImg} />
-        )}
-      </div>
+      {/* List view is imageless: all metadata, no cover bias. */}
 
       {/* Content — identity-first: strip → title → author → summary → tags → fandom → ships → characters → stats */}
       <div className={styles.content}>

@@ -163,7 +163,7 @@
   border-bottom: 1px solid var(--border);
 }
 .list .skeletonCard:last-child { border-bottom: none; }
-.list .skeletonStrip { width: 43px; }
+.list .skeletonStrip { display: none; }
 
 /* Grid: large cover on top + content below */
 .grid .skeletonCard {

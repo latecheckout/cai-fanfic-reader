@@ -25,8 +25,7 @@
   background: rgba(229, 225, 216, 0.03);
 }
 
-/* List: small cover thumbnail on the left */
-.list { --cover-w: 43px; }
+/* List: imageless, text only */
 
 /* Grid: cover-led vertical card — cover on top, text below */
 .grid {
@@ -683,5 +682,5 @@
 
 /* ── Mobile — list keeps a small left thumbnail (smaller gap on phones) ── */
 @media (max-width: 768px) {
-  .list { --cover-w: 37px; gap: var(--space-4); }
+  .list { gap: var(--space-4); }
 }
