@@ -539,6 +539,8 @@
   cursor: default;
 }
 
+/* Filled badge, matching the rating letter's footprint (white glyph),
+   with its own status colors: green = complete, amber = in progress. */
 .statusPill {
   position: relative;
   width: 20px;
@@ -547,19 +549,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 2px;
-  font-family: var(--font-sans);
-  font-size: 10px;
-  color: var(--secondary);
+  flex-shrink: 0;
+  color: #fff;
   pointer-events: auto;
   cursor: default;
 }
 
 .statusDone {
-  border: 1px solid var(--border-chip, var(--border));
+  background: var(--rating-g);
 }
 
 .statusWip {
-  border: 1px dashed var(--border-chip, var(--border));
+  background: var(--rating-t);
 }
 
 /* Tooltip bubbles — below the strip item (row layout) */

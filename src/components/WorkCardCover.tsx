@@ -59,6 +59,14 @@ const CheckGlyph = () => (
   </svg>
 );
 
+/** In-progress counterpart to the check: a half-filled circle (partial = WIP). */
+const ProgressGlyph = () => (
+  <svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true">
+    <circle cx="5" cy="5" r="4" fill="none" stroke="currentColor" strokeWidth="1.3" />
+    <path d="M5 1.2 A3.8 3.8 0 0 1 5 8.8 Z" fill="currentColor" />
+  </svg>
+);
+
 /** Views/reads eye icon. */
 function EyeIcon() {
   return (
@@ -94,8 +102,9 @@ function StatsLine({ items, className }: { items: ReactNode[]; className: string
   );
 }
 
-/** List signal row — rating · category · status, with single-line tooltips. */
-function SignalStrip({
+/** Signal row — rating · category · status, with single-line tooltips.
+ *  Exported so the AO4 text cards reuse the exact same badge components. */
+export function SignalStrip({
   rating, rClass, catLabel, category, isWip,
 }: {
   rating: string;
@@ -121,7 +130,7 @@ function SignalStrip({
         className={`${styles.statusPill} ${isWip ? styles.statusWip : styles.statusDone}`}
         data-tooltip={isWip ? 'Work in Progress' : 'Complete'}
       >
-        {isWip ? 'WIP' : <CheckGlyph />}
+        {isWip ? <ProgressGlyph /> : <CheckGlyph />}
       </div>
     </div>
   );

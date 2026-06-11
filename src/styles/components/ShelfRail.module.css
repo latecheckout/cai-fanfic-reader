@@ -52,7 +52,7 @@
 /* ── Card row ── */
 .row {
   display: flex;
-  gap: var(--space-4);
+  gap: var(--space-3);
   overflow-x: auto;
   padding-bottom: var(--space-2);
   scrollbar-width: none;
@@ -68,7 +68,7 @@
 
 .card {
   flex-shrink: 0;
-  width: 232px;
+  width: 252px;
   display: flex;
   flex-direction: column;
 }
@@ -86,27 +86,6 @@
 .slot article:hover {
   background: transparent;
 }
-
-/* ── Rating badge (text variant) ── */
-.ratingLetter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border-radius: 3px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.ratingG  { background: var(--rating-g); }
-.ratingT  { background: var(--rating-t); }
-.ratingM  { background: var(--rating-m); }
-.ratingE  { background: var(--rating-e); }
-.ratingNR { background: var(--rating-nr); }
 
 /* ── Page load stagger ── */
 @keyframes shelfFadeUp {
@@ -137,7 +116,7 @@
   }
 
   .card {
-    width: 156px;
+    width: 168px;
   }
 }
 
@@ -176,29 +155,15 @@
   border-color: var(--border-strong);
 }
 
-/* ── Badge row: rating, category, status, date ── */
-.tcBadges {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+/* Expanding the tags lets the card scroll internally instead of growing
+   the rail; the bottom discovery group un-pins so all content is reachable. */
+:global(html[data-mode='text']) .textCardExpanded {
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
-.tcCat {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--secondary);
-  border: 1px solid var(--border-chip);
-  border-radius: 3px;
-  padding: 1px 4px;
-}
-
-.tcStatus {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--secondary);
+.textCardExpanded .tcBottom {
+  margin-top: var(--space-3);
 }
 
 /* ── Identity: title + author ── */
@@ -221,11 +186,38 @@
   text-underline-offset: 2px;
 }
 
-.tcAuthor {
-  margin-top: 2px;
-  align-self: flex-start;
+/* Byline: "by" + circular avatar (circles mean humans) + author name.
+   Tight gap from "by" to the photo, a touch more from photo to name. */
+.tcByline {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-2);
   font-family: var(--font-sans);
   font-size: 13px;
+  color: var(--secondary);
+}
+
+.tcBy {
+  margin-right: 5px;
+}
+
+.tcAvatar {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 7px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.tcAvatarImg {
+  object-fit: cover;
+}
+
+.tcAuthor {
   color: var(--secondary);
   text-decoration: none;
 }
@@ -329,7 +321,7 @@
   overflow: hidden;
 }
 
-/* ── Warnings + tags: two rows max, individually clickable ── */
+/* ── Warnings + tags: two rows when collapsed, all when expanded ── */
 .tcTags {
   display: flex;
   flex-wrap: wrap;
@@ -339,8 +331,13 @@
   overflow: hidden;
 }
 
+.textCardExpanded .tcTags {
+  max-height: none;
+}
+
 .tcTag,
-.tcWarn {
+.tcWarn,
+.tcTagsMore {
   display: inline-block;
   padding: 1px 7px;
   border-radius: 3px;
@@ -370,6 +367,19 @@
 .tcWarn:hover {
   background: var(--color-exclude);
   color: #fff;
+}
+
+/* Pill expander — mirrors the results card's "+N" tags-more control */
+.tcTagsMore {
+  border: 1px solid var(--border-chip);
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+}
+
+.tcTagsMore:hover {
+  color: var(--text);
+  border-color: var(--border-active);
 }
 
 /* ── Stats line: sits after tags, before the bottom discovery group ── */
