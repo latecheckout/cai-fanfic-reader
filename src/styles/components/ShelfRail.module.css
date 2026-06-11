@@ -399,6 +399,12 @@
   color: var(--secondary);
 }
 
+/* A stat and its trailing separator wrap as one unit: lines break only
+   between whole stats, so a glyph never strands at the end of a line. */
+.tcStatItem {
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   :global(html[data-mode='text']) .card {
     width: 300px;

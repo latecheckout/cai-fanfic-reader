@@ -42,6 +42,17 @@ export function ShelfTextCard({ work }: Props) {
   const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, COLLAPSED_TAGS);
   const hiddenCount = meta.tags.length - COLLAPSED_TAGS;
 
+  /* Each stat is one atomic segment so the line can only wrap between
+     whole stats, never between a glyph and its count. Zero counts hide. */
+  const stats = [
+    formatWords(meta.words),
+    formatChapters(meta.chaptersPosted, meta.chapters),
+    (meta.updated || meta.published) && `updated ${meta.updated || meta.published}`,
+    meta.kudos > 0 && `♥ ${formatCount(meta.kudos)}`,
+    meta.bookmarks > 0 && `⚑ ${formatCount(meta.bookmarks)}`,
+    meta.hits > 0 && `${formatCount(meta.hits)} hits`,
+  ].filter((s): s is string => Boolean(s));
+
   return (
     <div className={`${styles.textCard} ${tagsExpanded ? styles.textCardOpen : ''}`}>
       <SignalStrip
@@ -91,14 +102,13 @@ export function ShelfTextCard({ work }: Props) {
         </span>
       )}
 
-      {/* Every segment renders even at zero so the icon set is uniform
-          across cards. */}
       <span className={styles.tcStats}>
-        {formatWords(meta.words)} · {formatChapters(meta.chaptersPosted, meta.chapters)}
-        {(meta.updated || meta.published) && <> · updated {meta.updated || meta.published}</>}
-        <> · ♥ {formatCount(meta.kudos)}</>
-        <> · ⚑ {formatCount(meta.bookmarks)}</>
-        <> · {formatCount(meta.hits)} hits</>
+        {stats.map((s, si) => (
+          <span key={s} className={styles.tcStatItem}>
+            {s}
+            {si < stats.length - 1 && ' · '}
+          </span>
+        ))}
       </span>
 
       <span className={styles.tcBottom}>
