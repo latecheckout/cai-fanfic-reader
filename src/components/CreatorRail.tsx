@@ -1,6 +1,5 @@
 import { Creator } from '@/lib/shelves';
 import { CreatorCard } from './CreatorCard';
-import { ModeSwitchFlash } from './ModeSwitchFlash';
 import styles from '@/styles/components/CreatorRail.module.css';
 
 interface Props {
@@ -9,8 +8,7 @@ interface Props {
 
 /**
  * Trending creators (server component): a horizontal rail of CreatorCards (per
- * Devon, design review June 2026 — "make the humans shine"). ModeSwitchFlash
- * flashes skeletons on a mode toggle; the cards pass through as its children.
+ * Devon, design review June 2026 — "make the humans shine").
  */
 export function CreatorRail({ creators }: Props) {
   if (creators.length === 0) return null;
@@ -27,14 +25,7 @@ export function CreatorRail({ creators }: Props) {
       {/* .rail frames the scroller and carries the directional edge fades. */}
       <div className={styles.rail}>
         <div className={styles.row}>
-          <ModeSwitchFlash
-            count={creators.length}
-            cardClassName={styles.skelCard}
-            variant="library"
-            layout="grid"
-          >
-            {creators.map((c) => <CreatorCard key={c.name} creator={c} />)}
-          </ModeSwitchFlash>
+          {creators.map((c) => <CreatorCard key={c.name} creator={c} />)}
         </div>
       </div>
     </section>

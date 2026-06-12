@@ -2,7 +2,6 @@
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
-import { useModeSwitch } from '@/lib/useModeSwitch';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
@@ -33,7 +32,6 @@ interface RawBookmark {
 export function ContinueReadingSection({ covers }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const { switching } = useModeSwitch();
 
   useIsomorphicLayoutEffect(() => {
     try {
@@ -91,8 +89,8 @@ export function ContinueReadingSection({ covers }: Props) {
           .rail frames the scroller and carries the directional edge fades. */}
       <div className={styles.rail}>
         <div className={styles.cards}>
-          {pending || switching
-            ? Array.from({ length: pending ? PENDING_SKELETONS : bookmarks.length }, (_, i) => (
+          {pending
+            ? Array.from({ length: PENDING_SKELETONS }, (_, i) => (
                 <ContinueCardSkeleton key={i} />
               ))
             : bookmarks.map((item) => (
