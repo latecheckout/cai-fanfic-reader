@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useReading } from '@/context/ReadingContext';
-import { RatingBadge } from './RatingBadge';
 import { TagChip } from './TagChip';
-import { formatWords, readingTime } from '@/lib/utils';
+import { SignalStrip, Avatar } from './WorkCardCover';
+import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import styles from '@/styles/components/MetadataOverlay.module.css';
 
 interface Props {
@@ -15,12 +17,22 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
   function MetadataOverlay({ onClose }, ref) {
     const { workMeta, totalChapters } = useReading();
 
+    const rClass = ratingClass(workMeta.rating);
+    const catLabel = categoryLabel(workMeta.category);
+    const isWip = isWipStatus(workMeta.status);
+    const seriesStr = workMeta.series
+      ? `Part ${workMeta.series.position} of ${workMeta.series.name}`
+      : null;
+
+    // Same stats line as the work header (status lives in the badge strip now).
     const statsLine = [
-      workMeta.status,
       formatWords(workMeta.words),
       readingTime(workMeta.words),
-      totalChapters > 1 ? `${totalChapters} chapters` : null,
+      totalChapters > 1 ? formatChapters(workMeta.chaptersPosted, workMeta.chapters) : null,
+      seriesStr,
       workMeta.language !== 'English' ? workMeta.language : null,
+      workMeta.kudos > 0 ? `♥ ${formatCount(workMeta.kudos)}` : null,
+      workMeta.bookmarks > 0 ? `⚑ ${formatCount(workMeta.bookmarks)}` : null,
     ]
       .filter(Boolean)
       .join(' · ');
@@ -44,15 +56,34 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
             </button>
           </div>
 
-          {/* Scrollable body */}
+          {/* Scrollable body — same hierarchy as the work header, in modal form:
+              thumbnail → badges → title → author (avatar) → stats → summary → tags */}
           <div className={styles.body}>
+            {workMeta.cover && (
+              <div className={styles.cover}>
+                <Image src={workMeta.cover} alt="" fill sizes="120px" className={styles.coverImg} />
+              </div>
+            )}
+
             {/* Zone 1: Identity */}
             <div className={styles.zone1}>
-              <div className={styles.titleRow}>
-                <RatingBadge rating={workMeta.rating} />
-                <h2 className={styles.title}>{workMeta.title}</h2>
+              <div className={styles.badgeRow}>
+                <SignalStrip
+                  rating={workMeta.rating}
+                  rClass={rClass}
+                  catLabel={catLabel}
+                  category={workMeta.category}
+                  isWip={isWip}
+                />
               </div>
-              <p className={styles.byline}>by {workMeta.author}</p>
+              <h2 className={styles.title}>{workMeta.title}</h2>
+              <p className={styles.byline}>
+                <span className={styles.bylineBy}>by</span>
+                <Avatar />
+                <Link href={`/?q=${encodeURIComponent(workMeta.author)}`} className={styles.bylineAuthor}>
+                  {workMeta.author}
+                </Link>
+              </p>
               <p className={styles.stats}>{statsLine}</p>
             </div>
 

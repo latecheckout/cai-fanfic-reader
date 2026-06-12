@@ -1,12 +1,15 @@
 /* Base chip */
 .chip {
   display: inline-block;
+  max-width: 100%;
   border: 1px solid var(--border-chip);
   border-radius: 3px;
   padding: 3px 8px;
   background: transparent;
   color: var(--text);
-  white-space: nowrap;
+  /* Let long single chips (e.g. full fandom names) wrap instead of bleeding
+     past a narrow container. */
+  overflow-wrap: anywhere;
   font-family: var(--font-sans);
   line-height: 1.4;
   transition: border-color var(--transition-micro);
