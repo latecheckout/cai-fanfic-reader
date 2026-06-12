@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fanfic Reader — Handoff &amp; Migration Notes</title>
+<style>
+  :root {
+    --ink: #1a1816; --muted: #6b675f; --line: #e6e1d8; --bg: #faf8f4;
+    --card: #ffffff; --accent: #8b4040; --chip: #f1ede6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 48px 24px 96px; }
+  header.doc { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 36px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0; }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 44px 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 { font-size: 17px; margin: 22px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 14px; padding-left: 20px; }
+  li { margin: 4px 0; }
+  code { background: var(--chip); padding: 1px 6px; border-radius: 4px; font-size: 13.5px;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  td code { font-size: 12.5px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 14px 0; }
+  .pill { display: inline-block; background: var(--chip); color: var(--muted);
+    border-radius: 999px; padding: 2px 10px; font-size: 12px; margin-right: 6px; }
+  .flag { border-left: 3px solid var(--accent); background: #fbf3f3; border-radius: 0 8px 8px 0;
+    padding: 12px 16px; margin: 14px 0; }
+  .flag strong { color: var(--accent); }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps li { counter-increment: step; position: relative; padding-left: 34px; margin: 10px 0; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: 1px;
+    width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff;
+    font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <h1>Fanfic Reader — Handoff &amp; Migration Notes</h1>
+  <p class="sub">Front-end redesign of the Character.ai fanfic reader · June 2026</p>
+  <p class="sub" style="margin-top:8px">
+    <span class="pill">branch: 0612-handoff</span>
+    <span class="pill">compare against: main</span>
+  </p>
+</header>
+
+<p>
+  This branch is a visual redesign of the reader front-end. Everything here is presentation —
+  the underlying content model and filtering logic are unchanged. To see exactly what moved,
+  compare this branch against <code>main</code> (that is the version you already know).
+</p>
+
+<h2>What changed</h2>
+
+<h3>1 · Home page (Discover)</h3>
+<p>The landing page was rebuilt as a browsable, editorial home that sits on top of the existing
+  filter engine — nothing about how works are filtered or loaded changed underneath it.</p>
+<ul>
+  <li>A rotating hero banner at the top.</li>
+  <li>Horizontal “shelves” (Trending, Featured) and a Creators row, each swipeable with arrow buttons.</li>
+  <li>A “Continue Reading” row driven by the reader’s saved progress.</li>
+  <li>Two card styles: an image/cover card and a text-only list card; the page swaps between them.</li>
+</ul>
+
+<h3>2 · Visual / Text mode toggle</h3>
+<p>A floating toggle in the bottom-right switches the whole site between an image-led “visual” mode and
+  a text-led mode. Switching plays a brief full-screen colour sweep (a small WebGL animation) as the
+  transition, replacing the old grey loading placeholders.</p>
+
+<h3>3 · Reading page</h3>
+<ul>
+  <li>The work header was reordered to a clear hierarchy: cover → tags/badges → title → author (with photo) → description → stats.</li>
+  <li>Each chapter shows a small author line (work title · author) so a reader who lands deep in a story still sees who wrote it.</li>
+  <li>The “story info” pop-up now mirrors that same header layout.</li>
+  <li>Spacing and font sizes were aligned between the header, the cards, and the pop-up.</li>
+</ul>
+
+<h3>4 · Search, filters &amp; navigation polish</h3>
+<ul>
+  <li>Refined the search dropdown and the sort menu (padding, rounded corners, consistent widths).</li>
+  <li>Centered the top navigation; renamed the first nav item to “Stories.”</li>
+</ul>
+
+<h3>5 · Cleanup</h3>
+<p>Removed unused components and the old loading-placeholder code path that the new transition made obsolete.
+  No behaviour was lost — verified with a full production build.</p>
+
+<h2>Where it lives</h2>
+<table>
+  <tr><th>Area</th><th>Key files</th></tr>
+  <tr><td>Home / Discover</td><td><code>src/components/BrowseHome.tsx</code>, <code>HeroCarousel</code>, <code>ShelfRail</code>, <code>CreatorRail</code>, <code>ContinueReadingSection</code>, <code>RailViewport</code> (swipe arrows)</td></tr>
+  <tr><td>Cards</td><td><code>WorkCardGrid.tsx</code> (cover), <code>WorkCardCover.tsx</code> (list), <code>CreatorCard.tsx</code>, <code>ContinueCard.tsx</code></td></tr>
+  <tr><td>Mode toggle + transition</td><td><code>src/components/Ao4TurboToggle.tsx</code>, set up in <code>src/app/layout.tsx</code></td></tr>
+  <tr><td>Reading page</td><td><code>WorkHeader.tsx</code>, <code>ChapterContent.tsx</code>, <code>MetadataOverlay.tsx</code></td></tr>
+  <tr><td>Home data (shelves/creators)</td><td><code>src/lib/shelves.ts</code>, <code>src/lib/covers.ts</code></td></tr>
+  <tr><td>Styles &amp; design tokens</td><td><code>src/styles/components/*.module.css</code>, <code>src/styles/tokens.css</code></td></tr>
+  <tr><td>Images</td><td><code>public/covers</code>, <code>public/hero</code>, <code>public/fandoms</code>, <code>public/creators</code></td></tr>
+</table>
+
+<h2>How to migrate</h2>
+<p>This is a static Next.js 15 front-end. There is no database or API in this repo — every story is a
+  Markdown file in <code>content/works</code>, and reader state (progress, preferences, mode) is kept in the
+  browser’s local storage. So an authentic migration is mostly about connecting these surfaces to real data.</p>
+
+<ol class="steps">
+  <li><strong>Diff this branch against <code>main</code></strong> to get the exact, file-level list of changes — that is the source of truth, this page is the summary.</li>
+  <li><strong>Wire the placeholder data to real sources.</strong> Comments, the user’s library/bookmarks, and recommendations are currently sample data. The shapes and exact spots are documented in <code>.claude/docs/wiring-guide.md</code> and <code>.claude/docs/api-contracts.md</code> (look for <code>@DUMMY</code> / <code>@TODO-DEV</code> markers in code).</li>
+  <li><strong>Add real auth + persistence.</strong> Reading progress and saved works are local-storage only today; they’ll need to move to real per-user storage.</li>
+  <li><strong>Replace the placeholder images</strong> under <code>public/</code> (covers, hero banners, fandom art, the author photo placeholder) with real assets.</li>
+  <li><strong>Decide on the transition animation.</strong> The mode-switch sweep uses a third-party package, <code>glimm</code> — see the note below before keeping it.</li>
+</ol>
+
+<div class="flag">
+  <strong>Note on the <code>glimm</code> dependency.</strong> The colour-sweep transition relies on a small,
+  newly-published, single-maintainer package that is published under a proprietary (all-rights-reserved)
+  licence. Confirm the licence is acceptable for your distribution before shipping. It is only used in two
+  places (<code>src/app/layout.tsx</code> and the mode toggle), so it’s straightforward to swap for a CSS
+  transition or remove if needed.
+</div>
+
+<h2>Run it</h2>
+<p>Node 22 LTS. <code>npm install</code> then <code>npm run dev</code> (or <code>npm run build</code> for a production build).
+  The production build currently passes with all pages generated.</p>
+
+<footer>
+  Generated 2026-06-12 · summary only — the branch diff against <code>main</code> is authoritative.
+</footer>
+
+</div>
+</body>
+</html>
