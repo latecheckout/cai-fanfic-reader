@@ -22,7 +22,10 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: var(--vv-bottom-inset, 0px);
+  /* Pinned to the very bottom (not lifted by --vv-bottom-inset like the
+     toggle) so the fade always reaches the edge and never disconnects when
+     the iOS toolbar expands at the top of the page. */
+  bottom: 0;
   height: 220px;
   z-index: calc(var(--z-sticky) - 1);
   pointer-events: none;
