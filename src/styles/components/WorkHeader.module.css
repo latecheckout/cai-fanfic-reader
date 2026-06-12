@@ -185,13 +185,9 @@
     font-size: 24px;
   }
 
-  .byline {
-    font-size: 12px;
-  }
-
-  .stats {
-    font-size: 10px;
-  }
+  /* byline (14px) + stats (13px) intentionally keep their desktop sizes on
+     mobile so they match the list card's author/social-metrics fonts, which
+     don't shrink on mobile either. */
 
   /* Tag rows: stack label above chips so chips don't overflow right */
   .tagRow {
