@@ -146,7 +146,11 @@
       color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%);
 }
 
-.thumb:hover .glow { opacity: 1; }
+/* Only on real pointers — on touch, :hover sticks after a tap and the glow
+   would linger stuck on. */
+@media (hover: hover) and (pointer: fine) {
+  .thumb:hover .glow { opacity: 1; }
+}
 
 /* OFF (image mode is active): grey fill so it reads as off. The oklch hover
    glow still comes through on top. ON keeps the magenta fill. */
