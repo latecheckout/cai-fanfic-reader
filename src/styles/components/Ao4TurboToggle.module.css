@@ -14,43 +14,31 @@
   z-index: var(--z-sticky);
 }
 
-/* Ambient radial glow emanating from the corner, behind the toggle — gives the
-   toggle a sense of depth, like there's space between it and the page. */
+/* Full-width fade-to-bg bar across the bottom of the site — solid page colour
+   at the very bottom (reads continuous with the area under the browser UI),
+   easing up to transparent. The toggle sits in this band instead of a corner
+   radial pool. Multi-stop ease so there's no banding. */
 .aura {
   position: fixed;
+  left: 0;
   right: 0;
   bottom: var(--vv-bottom-inset, 0px);
-  width: 380px;
-  height: 300px;
+  height: 150px;
   z-index: calc(var(--z-sticky) - 1);
   pointer-events: none;
-  background:
-    /* concentrated pool right under the tab, at the site edge — multi-stop
-       ease-out falloff so the halo fades smoothly with no banding rings */
-    radial-gradient(72% 92% at 66% 100%,
-      var(--bg) 0%,
-      color-mix(in srgb, var(--bg), transparent 12%) 16%,
-      color-mix(in srgb, var(--bg), transparent 30%) 30%,
-      color-mix(in srgb, var(--bg), transparent 52%) 44%,
-      color-mix(in srgb, var(--bg), transparent 74%) 56%,
-      color-mix(in srgb, var(--bg), transparent 90%) 64%,
-      transparent 70%),
-    /* broad corner pool behind it — both in the site bg colour, so the toggle
-       sits in a soft halo of the page (separates it from images behind) */
-    radial-gradient(130% 130% at 100% 100%,
-      var(--bg) 0%,
-      color-mix(in srgb, var(--bg), transparent 14%) 18%,
-      color-mix(in srgb, var(--bg), transparent 34%) 34%,
-      color-mix(in srgb, var(--bg), transparent 56%) 48%,
-      color-mix(in srgb, var(--bg), transparent 76%) 60%,
-      color-mix(in srgb, var(--bg), transparent 91%) 70%,
-      transparent 78%);
+  background: linear-gradient(to top,
+    var(--bg) 0%,
+    color-mix(in srgb, var(--bg), transparent 8%) 16%,
+    color-mix(in srgb, var(--bg), transparent 24%) 32%,
+    color-mix(in srgb, var(--bg), transparent 46%) 48%,
+    color-mix(in srgb, var(--bg), transparent 68%) 64%,
+    color-mix(in srgb, var(--bg), transparent 88%) 82%,
+    transparent 100%);
 }
 
 @media (max-width: 768px) {
   .aura {
-    width: 280px;
-    height: 240px;
+    height: 120px;
   }
 }
 
