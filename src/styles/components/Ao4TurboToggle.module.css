@@ -112,10 +112,11 @@
   overflow: hidden;
   cursor: grab;
   will-change: transform;
-  /* Stronger shadow so the pill stays legible over images. */
+  /* Shadow keeps the pill legible over images — trimmed a little so it casts
+     less onto the fade bar beneath the toggle. */
   box-shadow:
-    0 2px 6px -1px rgba(0, 0, 0, 0.3),
-    0 12px 26px -10px rgba(0, 0, 0, 0.45);
+    0 2px 5px -1px rgba(0, 0, 0, 0.26),
+    0 9px 20px -9px rgba(0, 0, 0, 0.38);
 }
 
 .thumb:active { cursor: grabbing; }
@@ -165,12 +166,13 @@
   z-index: 1;
 }
 
-/* ── Mobile: clear the bottom reading bar; shrink to ~FAB size ── */
+/* ── Mobile: clear the bottom reading bar; a touch larger for easier tapping.
+   Track width must stay thumb-width + TRAVEL(48) + padding(6) = 206. ── */
 @media (max-width: 768px) {
   .root {
     right: 16px;
     bottom: calc(18px + var(--safe-bottom) + var(--vv-bottom-inset, 0px));
   }
-  .track { height: 46px; }
-  .thumb { height: 40px; }
+  .track { width: 206px; height: 54px; }
+  .thumb { width: 152px; height: 48px; font-size: 15px; }
 }
