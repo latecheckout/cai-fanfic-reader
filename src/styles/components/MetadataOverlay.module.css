@@ -166,11 +166,10 @@
   color: var(--secondary);
 }
 
-/* ── Zone 2: Signals ── */
+/* ── Zone 2: Signals (tag taxonomy) — last block, divider above ── */
 .zone2 {
   border-top: 1px dashed var(--border);
   padding-top: var(--space-4);
-  margin-bottom: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -203,11 +202,12 @@
   min-width: 0;
 }
 
-/* ── Summary — between identity and the tag taxonomy ── */
+/* ── Summary — between identity and the tag taxonomy (no divider; it flows
+   straight from the identity block) ── */
 .zone3 {
-  border-top: 1px dashed var(--border);
-  padding-top: var(--space-4);
-  margin-bottom: var(--space-5);
+  /* Balanced with .zone2's padding-top so the dashed divider has even space
+     above and below. */
+  margin-bottom: var(--space-4);
 }
 
 .summaryText {
