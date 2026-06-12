@@ -8,7 +8,9 @@
 .root {
   position: fixed;
   right: 28px;
-  bottom: calc(24px + var(--safe-bottom));
+  /* --vv-bottom-inset (set by the toggle from VisualViewport) lifts it above
+     the iOS bottom toolbar as that chrome collapses/expands. */
+  bottom: calc(24px + var(--safe-bottom) + var(--vv-bottom-inset, 0px));
   z-index: var(--z-sticky);
 }
 
@@ -17,7 +19,7 @@
 .aura {
   position: fixed;
   right: 0;
-  bottom: 0;
+  bottom: var(--vv-bottom-inset, 0px);
   width: 380px;
   height: 300px;
   z-index: calc(var(--z-sticky) - 1);
@@ -169,7 +171,7 @@
 @media (max-width: 768px) {
   .root {
     right: 16px;
-    bottom: calc(18px + var(--safe-bottom));
+    bottom: calc(18px + var(--safe-bottom) + var(--vv-bottom-inset, 0px));
   }
   .track { height: 46px; }
   .thumb { height: 40px; }

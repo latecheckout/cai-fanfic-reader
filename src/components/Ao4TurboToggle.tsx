@@ -38,6 +38,29 @@ export function Ao4TurboToggle() {
     x.set(initial ? TRAVEL : 0);
   }, [x]);
 
+  // iOS Safari anchors `position: fixed; bottom` to the *layout* viewport, which
+  // grows/shrinks as the bottom browser toolbar collapses — so a bottom-pinned
+  // element drifts and tucks behind the chrome. Track the VisualViewport and
+  // publish the toolbar's height as --vv-bottom-inset so the toggle stays a
+  // fixed gap above the *visible* bottom on every scroll/toolbar transition.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const root = document.documentElement;
+    const update = () => {
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      root.style.setProperty('--vv-bottom-inset', `${inset}px`);
+    };
+    update();
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    return () => {
+      vv.removeEventListener('resize', update);
+      vv.removeEventListener('scroll', update);
+      root.style.removeProperty('--vv-bottom-inset');
+    };
+  }, []);
+
   const applyMode = (next: boolean) => {
     const mode: SiteMode = next ? 'text' : 'visual';
     document.documentElement.setAttribute('data-mode', mode);
