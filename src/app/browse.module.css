@@ -7,6 +7,9 @@
   max-width: var(--browse-max-width);
   margin: 0 auto;
   padding: var(--space-8) var(--space-6);
+  /* Extra scroll space at the bottom so the last works clear the floating
+     toggle + fade bar. */
+  padding-bottom: calc(128px + var(--safe-bottom));
 }
 
 .workList {
