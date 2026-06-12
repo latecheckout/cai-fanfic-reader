@@ -52,16 +52,18 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                 <RatingBadge rating={workMeta.rating} />
                 <h2 className={styles.title}>{workMeta.title}</h2>
               </div>
-              <p className={styles.byline}>
-                by {workMeta.author}
-                {workMeta.fandom.length > 0 && (
-                  <> &middot; <span className={styles.fandom}>{workMeta.fandom.join(', ')}</span></>
-                )}
-              </p>
+              <p className={styles.byline}>by {workMeta.author}</p>
               <p className={styles.stats}>{statsLine}</p>
             </div>
 
-            {/* Zone 2: Signals */}
+            {/* Zone 2: Summary — sits right under identity, above the tag taxonomy */}
+            {workMeta.summary && (
+              <div className={styles.zone3}>
+                <p className={styles.summaryText}>{workMeta.summary}</p>
+              </div>
+            )}
+
+            {/* Zone 3: Signals */}
             <div className={styles.zone2}>
               {workMeta.warnings.length > 0 && (
                 <div className={styles.tagRow}>
@@ -114,13 +116,6 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                 </div>
               )}
             </div>
-
-            {/* Zone 3: Summary */}
-            {workMeta.summary && (
-              <div className={styles.zone3}>
-                <p className={styles.summaryText}>{workMeta.summary}</p>
-              </div>
-            )}
           </div>
         </div>
       </div>

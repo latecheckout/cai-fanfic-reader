@@ -85,7 +85,10 @@
 /* ── Scrollable body ── */
 .body {
   overflow-y: auto;
+  /* Never scroll sideways — content wraps instead (kills the horizontal scroll). */
+  overflow-x: hidden;
   flex: 1;
+  min-width: 0;
   padding: var(--space-5) var(--space-6);
 }
 
@@ -108,11 +111,13 @@
   line-height: 1.2;
   color: var(--text);
   letter-spacing: -0.01em;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .byline {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--secondary);
   margin-bottom: 4px;
 }
@@ -126,7 +131,7 @@
 
 .stats {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
 }
 
@@ -162,12 +167,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  /* Allow the group to shrink in the flex row so chips wrap instead of
+     forcing the panel wider (was a horizontal-scroll source). */
+  min-width: 0;
 }
 
-/* ── Zone 3: Summary ── */
+/* ── Summary — between identity and the tag taxonomy ── */
 .zone3 {
   border-top: 1px dashed var(--border);
   padding-top: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .summaryText {
