@@ -38,6 +38,7 @@
   font-family: var(--font-serif);
   font-size: 14px;
   color: var(--secondary);
+  opacity: 0.65;
 }
 
 /* Work title — truncates so the byline stays on one line */
