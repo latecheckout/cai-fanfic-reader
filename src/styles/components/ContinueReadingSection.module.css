@@ -4,24 +4,17 @@
    Covers only; title/chapter live in the link tooltip.
    ============================================================ */
 
-@keyframes expandIn {
-  from { max-height: 0; opacity: 0; }
-  to   { max-height: 400px; opacity: 1; }
-}
-
 .section {
   margin-bottom: var(--space-10);
   border-bottom: 1px solid var(--border);
-  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .section {
-    animation: expandIn 200ms var(--ease-out-expo) both;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .section { overflow: visible; }
+/* Pre-hydration placeholder: reserve the rail's space only for users who
+   actually have a reading list (data-has-reading is set by ThemeScript before
+   paint). Everyone else sees nothing — no flash, no late push-down. The
+   skeletons then swap to real cards in place once localStorage is read. */
+html:not([data-has-reading]) .pending {
+  display: none;
 }
 
 /* ── Section header band ── */
@@ -146,12 +139,12 @@
 
 /* The card itself lives in ContinueCard / ContinueCard.module.css. */
 
-/* ── Page load stagger ── */
+/* ── Page load stagger — DROPPED (cards no longer fade in one by one).
+   To restore, uncomment:
 @keyframes fadeUp {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   .cards > * { animation: fadeUp 650ms var(--ease-out-expo) both; }
   .cards > *:nth-child(1) { animation-delay: 30ms; }
@@ -163,6 +156,7 @@
   .cards > *:nth-child(7) { animation-delay: 210ms; }
   .cards > *:nth-child(8) { animation-delay: 240ms; }
 }
+*/
 
 /* ── Mobile ── */
 @media (max-width: 768px) {

@@ -6,10 +6,9 @@ import { usePathname } from 'next/navigation';
 import styles from '@/styles/components/BrowseHeader.module.css';
 import { MobileNav } from './MobileNav';
 import { Ao4TurboToggle } from './Ao4TurboToggle';
-import { BurstLayer } from './BurstLayer';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Discover' },
+  { href: '/', label: 'Stories' },
   { href: '/reading', label: 'Library' },
   { href: '/characters', label: 'Characters' },
 ];
@@ -93,8 +92,6 @@ export function BrowseHeader({ search }: Props = {}) {
 
       {/* Global mode switch: draggable AO4 turbo toggle, bottom-right */}
       <Ao4TurboToggle />
-      {/* Arms the card-disintegration burst on each mode flip */}
-      <BurstLayer />
     </>
   );
 }

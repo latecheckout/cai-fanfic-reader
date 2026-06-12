@@ -22,12 +22,27 @@
   height: 300px;
   z-index: calc(var(--z-sticky) - 1);
   pointer-events: none;
-  background: radial-gradient(
-    125% 125% at 100% 100%,
-    color-mix(in oklch, #d90082 24%, transparent) 0%,
-    color-mix(in oklch, #ae00d9 12%, transparent) 38%,
-    transparent 68%
-  );
+  background:
+    /* concentrated pool right under the tab, at the site edge — multi-stop
+       ease-out falloff so the halo fades smoothly with no banding rings */
+    radial-gradient(72% 92% at 66% 100%,
+      var(--bg) 0%,
+      color-mix(in srgb, var(--bg), transparent 12%) 16%,
+      color-mix(in srgb, var(--bg), transparent 30%) 30%,
+      color-mix(in srgb, var(--bg), transparent 52%) 44%,
+      color-mix(in srgb, var(--bg), transparent 74%) 56%,
+      color-mix(in srgb, var(--bg), transparent 90%) 64%,
+      transparent 70%),
+    /* broad corner pool behind it — both in the site bg colour, so the toggle
+       sits in a soft halo of the page (separates it from images behind) */
+    radial-gradient(130% 130% at 100% 100%,
+      var(--bg) 0%,
+      color-mix(in srgb, var(--bg), transparent 14%) 18%,
+      color-mix(in srgb, var(--bg), transparent 34%) 34%,
+      color-mix(in srgb, var(--bg), transparent 56%) 48%,
+      color-mix(in srgb, var(--bg), transparent 76%) 60%,
+      color-mix(in srgb, var(--bg), transparent 91%) 70%,
+      transparent 78%);
 }
 
 @media (max-width: 768px) {
@@ -68,9 +83,10 @@
 
 /* The draggable thumb — ActionButton plush + oklch glow. */
 .thumb {
-  --ab-magenta: #d90082;
-  --ab-hot-pink: #ff4dc9;
-  --ab-alt-violet: #ae00d9;
+  /* On fill + the two hover-glow radials. */
+  --ab-magenta: #652E1F;   /* on (AO4) fill */
+  --ab-hot-pink: #AE00D9;  /* glow radial 1 */
+  --ab-alt-violet: #6B2E63;/* glow radial 2 */
   --mx: 50%;
   --my: 50%;
 
@@ -96,7 +112,10 @@
   overflow: hidden;
   cursor: grab;
   will-change: transform;
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.18), 0 14px 28px -12px rgba(0, 0, 0, 0.22);
+  /* Stronger shadow so the pill stays legible over images. */
+  box-shadow:
+    0 2px 6px -1px rgba(0, 0, 0, 0.3),
+    0 12px 26px -10px rgba(0, 0, 0, 0.45);
 }
 
 .thumb:active { cursor: grabbing; }

@@ -3,6 +3,7 @@ import { HeroCarousel } from './HeroCarousel';
 import { ContinueReadingSection } from './ContinueReadingSection';
 import { ShelfRail } from './ShelfRail';
 import { CreatorRail } from './CreatorRail';
+import { CreatorCTABanner } from './CreatorCTABanner';
 
 interface Props {
   shelves: Shelf[];
@@ -31,6 +32,8 @@ export function BrowseHome({ shelves, creators, covers }: Props) {
       {trending && <ShelfRail shelf={trending} priority />}
 
       {featured && <ShelfRail shelf={featured} />}
+
+      <CreatorCTABanner />
 
       <CreatorRail creators={creators} />
     </>

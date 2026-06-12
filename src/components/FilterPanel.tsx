@@ -773,7 +773,16 @@ export function FilterPanel({
                 <path d="M3.5 9V3M3.5 3L1.5 5M3.5 3L5.5 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M8.5 3v6M8.5 9L6.5 7M8.5 9l2-2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              {SORT_OPTIONS.find((o) => o.value === currentSortValue)?.label ?? 'sort'}
+              {/* Width-stable label: all options stacked in one grid cell so the
+                  button reserves the widest label's width and never resizes on switch. */}
+              <span className={styles.sortLabel}>
+                {SORT_OPTIONS.map((o) => (
+                  <span key={o.value} className={styles.sortLabelSizer} aria-hidden="true">{o.label}</span>
+                ))}
+                <span className={styles.sortLabelCurrent}>
+                  {SORT_OPTIONS.find((o) => o.value === currentSortValue)?.label ?? 'sort'}
+                </span>
+              </span>
               <kbd className={styles.sortBtnKbd}>S</kbd>
             </button>
             {sortOpen && (

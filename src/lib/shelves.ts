@@ -29,6 +29,8 @@ export interface Creator {
   hits: number;
   /** Filter URL: searches the archive for this creator. */
   href: string;
+  /** @DUMMY — derived one-line bio (top fandom + tags) until real bios exist. */
+  bio?: string;
 }
 
 export interface FandomTile {
@@ -126,6 +128,23 @@ export function buildShelves(works: WorkSummary[]): Shelf[] {
   }).filter((shelf) => shelf.works.length >= MIN_SHELF_WORKS);
 }
 
+/** @DUMMY — author bios (6–8 words each) until real ones exist; assigned in
+ *  order so each card reads differently. */
+const CREATOR_BIOS = [
+  'Slow-burn specialist with a soft spot for angst',
+  'Writes cozy one-shots between long enemies-to-lovers epics',
+  'Chronically online, perpetually working on chapter twelve',
+  'Hurt/comfort enthusiast who always promises happy endings',
+  'Fluff, found family, and the occasional plot twist',
+  'Reformed lurker turned prolific late-night fanfic author',
+  'Canon-divergent storyteller obsessed with morally grey characters',
+  'Tags everything, regrets nothing, updates on Sundays',
+  'Coffee-fueled author of unreasonably long slow burns',
+  'Soft prose, sharp banter, devastating mid-fic cliffhangers',
+  'Here for the yearning, staying for the payoff',
+  'Writes comfort fic you didn\'t know you needed',
+];
+
 /** Aggregate authors into creator cards, ranked by total kudos. */
 export function buildCreators(works: WorkSummary[], maxCreators = 12): Creator[] {
   const byAuthor = new Map<string, { workCount: number; kudos: number; hits: number }>();
@@ -138,13 +157,10 @@ export function buildCreators(works: WorkSummary[], maxCreators = 12): Creator[]
     byAuthor.set(w.meta.author, cur);
   }
   return Array.from(byAuthor.entries())
-    .map(([name, stats]) => ({
-      name,
-      ...stats,
-      href: buildHref({ q: name }),
-    }))
+    .map(([name, stats]) => ({ name, ...stats, href: buildHref({ q: name }) }))
     .sort((a, b) => b.kudos - a.kudos)
-    .slice(0, maxCreators);
+    .slice(0, maxCreators)
+    .map((c, i) => ({ ...c, bio: CREATOR_BIOS[i % CREATOR_BIOS.length] }));
 }
 
 /** Shorten a canonical fandom tag for tile display. */

@@ -11,7 +11,6 @@
   flex-direction: column;
   gap: 10px;
   padding: var(--space-3);
-  border: 1px solid var(--card-border);
   border-radius: 14px;
   background: color-mix(in srgb, var(--card-bg), #fff 35%);
   opacity: 0;
@@ -50,19 +49,34 @@
   gap: 10px;
 }
 
-.skeletonLine {
+/* X/Twitter-style shimmer — each bar is a base→highlight→base gradient that's
+   wider than the bar; sliding its background-position sweeps a light band
+   across continuously (visible immediately, regardless of the short window). */
+.skeletonLine,
+.skeletonChip {
   border-radius: 3px;
-  background: var(--border-strong);
+  background-color: var(--border-strong);
+  background-image: linear-gradient(
+    90deg,
+    var(--border-strong) 0%,
+    color-mix(in srgb, var(--border-strong), #fff 60%) 50%,
+    var(--border-strong) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
 }
 
 .skeletonChip {
   width: 48px;
   height: 20px;
-  border-radius: 3px;
-  background: var(--border-strong);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .skeletonLine,
-  .skeletonChip { animation: caiSkeletonPulse 1.6s ease-in-out infinite; }
+  .skeletonChip { animation: skeletonShimmer 1.3s linear infinite; }
+}
+
+@keyframes skeletonShimmer {
+  0%   { background-position: 150% 0; }
+  100% { background-position: -150% 0; }
 }

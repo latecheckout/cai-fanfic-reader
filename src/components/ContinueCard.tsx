@@ -33,7 +33,6 @@ export function ContinueCard({ item, cover }: Props) {
       className={styles.card}
       title={`${item.title} · Ch. ${item.chapterIndex + 1} of ${item.totalChapters}`}
       aria-label={`Continue reading ${item.title}, chapter ${item.chapterIndex + 1} of ${item.totalChapters}`}
-      data-flip-card=""
     >
       {/* Visual: cover + title/chapter at the top + progress at the bottom */}
       <span className={styles.slot}>

@@ -23,6 +23,8 @@
 
 /* ── Left zone ── */
 .zoneLeft {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
 }
@@ -44,11 +46,11 @@
   display: block;
 }
 
-/* ── Nav links: sit directly right of the logo ── */
+/* ── Nav links: centered in the header (left & right zones flex:1 flank it) ── */
 .zoneCenter {
   display: flex;
   align-items: stretch;
-  margin-left: var(--space-5);
+  justify-content: center;
 }
 
 .navLink {

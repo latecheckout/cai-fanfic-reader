@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { WorkMeta } from '@/types';
-import { formatWords, formatCount, formatChapters, readingTime } from '@/lib/utils';
-import { RatingBadge } from './RatingBadge';
+import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { TagChip } from './TagChip';
+import { SignalStrip, Avatar } from './WorkCardCover';
 import styles from '@/styles/components/WorkHeader.module.css';
 
 interface Props {
@@ -14,36 +15,17 @@ interface Props {
   totalChapters: number;
 }
 
-function clamp(val: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, val));
-}
-
 export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
-  const [scrollPx, setScrollPx] = useState(0);
-
-  useEffect(() => {
-    function onScroll() {
-      setScrollPx(window.scrollY);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   const [summaryExpanded, setSummaryExpanded] = useState(false);
-
-  // Scroll-fade: signals fade first, the top block (cover + identity + description) last
-  const z2 = 1 - clamp((scrollPx - 40) / 80, 0, 1);       // signals fade 40→120px
-  const z1 = 1 - clamp((scrollPx - 80) / 80, 0, 1);       // top block fades 80→160px
 
   const chaptersStr = formatChapters(meta.chaptersPosted, meta.chapters);
   const seriesStr = meta.series
     ? `Part ${meta.series.position} of ${meta.series.name}`
     : null;
 
-  const isWip =
-    meta.status.toLowerCase().includes('progress') ||
-    meta.status.toLowerCase() === 'wip' ||
-    meta.status.toLowerCase() === 'in-progress';
+  const isWip = isWipStatus(meta.status);
+  const rClass = ratingClass(meta.rating);
+  const catLabel = categoryLabel(meta.category);
 
   const statsLine = [
     formatWords(meta.words),
@@ -65,33 +47,33 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
 
   return (
     <header className={styles.header} aria-label="Work information">
-      {/* Top block: cover + identity + description */}
-      <div className={styles.headerRow} style={{ opacity: z1 }}>
+      {/* Top block — identity-first, mirroring the list card hierarchy:
+          thumbnail → badges → title → author (with avatar) → summary → stats */}
+      <div className={styles.headerRow}>
         {meta.cover && (
           <div className={styles.cover}>
             <Image src={meta.cover} alt="" fill sizes="180px" className={styles.coverImg} />
-            {/* Rating + completion badges on the cover (like the home cards) */}
-            <span className={styles.coverBadges}>
-              <RatingBadge rating={meta.rating} />
-              <span
-                className={styles.statusBadge}
-                aria-label={isWip ? 'Work in progress' : 'Complete'}
-              >
-                {isWip ? (
-                  'WIP'
-                ) : (
-                  <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor"
-                    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="1.5 4.5 3.5 6.5 7.5 2.5" />
-                  </svg>
-                )}
-              </span>
-            </span>
           </div>
         )}
         <div className={styles.headerMain}>
+          {/* Badges above the h1 — same strip as the home/list cards */}
+          <div className={styles.badgeRow}>
+            <SignalStrip
+              rating={meta.rating}
+              rClass={rClass}
+              catLabel={catLabel}
+              category={meta.category}
+              isWip={isWip}
+            />
+          </div>
           <h1 className={styles.title}>{meta.title}</h1>
-          <p className={styles.byline}>by <span>{meta.author}</span></p>
+          <p className={styles.byline}>
+            <span className={styles.bylineBy}>by</span>
+            <Avatar />
+            <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
+              {meta.author}
+            </Link>
+          </p>
           {meta.summary && (
             <p className={styles.summaryText}>
               {shownSummary}
@@ -111,23 +93,13 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
       </div>
 
       {/* Signals — full width below the cover + content */}
-      <div className={styles.zone2} style={{ opacity: z2 }}>
+      <div className={styles.zone2}>
         {meta.warnings.length > 0 && (
           <div className={styles.tagRow}>
             <span className={styles.tagLabel}>Warnings</span>
             <div className={styles.tagGroup}>
               {meta.warnings.map((w) => (
                 <TagChip key={w} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
-              ))}
-            </div>
-          </div>
-        )}
-        {meta.category.length > 0 && (
-          <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Category</span>
-            <div className={styles.tagGroup}>
-              {meta.category.map((c) => (
-                <TagChip key={c} tag={c} category="category" clickable href={`/?category=${encodeURIComponent(c)}`} />
               ))}
             </div>
           </div>

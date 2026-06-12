@@ -30,7 +30,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
   const tags = meta.tags.slice(0, MAX_TAGS);
 
   return (
-    <article className={styles.card} data-flip-card="">
+    <article className={styles.card}>
       {/* Clipping (rounded corners + hover zoom) lives on this inner wrapper so
           the card itself can stay overflow-visible — otherwise it clips the
           badge tooltips. */}

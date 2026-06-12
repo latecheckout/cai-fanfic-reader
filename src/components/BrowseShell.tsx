@@ -84,8 +84,8 @@ export function BrowseShell({
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const { mode } = (e as CustomEvent).detail;
-      handleViewChange(mode === 'text' ? 'list' : 'grid');
+      const { mode, sweep } = (e as CustomEvent).detail;
+      handleViewChange(mode === 'text' ? 'list' : 'grid', sweep);
     };
     window.addEventListener('cai-mode-change', handler);
     return () => window.removeEventListener('cai-mode-change', handler);
@@ -107,10 +107,16 @@ export function BrowseShell({
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [filterKey]);
 
-  const handleViewChange = (v: LayoutView) => {
+  const handleViewChange = (v: LayoutView, skipSkeleton = false) => {
     if (v === view) return;
     setView(v);
     localStorage.setItem(VIEW_PREF_KEY, v);
+    // A glimm sweep covers the swap on mode toggles — skip the skeleton flash.
+    if (skipSkeleton) {
+      setViewSwitching(false);
+      if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+      return;
+    }
     // Brief skeleton in the new layout, then cards fade/stagger in (character-brain feel).
     setViewSwitching(true);
     if (viewTimerRef.current) clearTimeout(viewTimerRef.current);

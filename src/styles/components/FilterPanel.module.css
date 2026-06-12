@@ -67,6 +67,20 @@
   flex-shrink: 0;
 }
 
+/* Stacks every option label in one grid cell: the (hidden) sizers reserve the
+   widest label's width, the current one shows — so the button never resizes
+   when the sort changes, while still scaling with font size. */
+.sortLabel {
+  display: grid;
+  justify-items: start;
+}
+.sortLabel > * {
+  grid-area: 1 / 1;
+}
+.sortLabelSizer {
+  visibility: hidden;
+}
+
 .sortBtn:hover {
   color: var(--text);
   border-color: var(--border-active);
@@ -99,11 +113,12 @@
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
-  min-width: 160px;
+  right: 0;
   background: var(--card-bg);
   border: 1px solid var(--border-strong);
-  border-radius: 8px;
+  border-radius: 14px;
   box-shadow: 0 4px 16px rgba(26,24,22,0.10);
+  padding: 6px 0;
   overflow: hidden;
   z-index: var(--z-dropdown);
 }
@@ -120,7 +135,7 @@
 .sortOption {
   display: block;
   width: 100%;
-  padding: 9px 14px;
+  padding: 9px 18px;
   text-align: left;
   font-family: var(--font-sans);
   font-size: 14px;

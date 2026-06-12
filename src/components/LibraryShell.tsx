@@ -97,17 +97,23 @@ export function LibraryShell({
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const { mode } = (e as CustomEvent).detail;
-      handleViewChange(mode === 'text' ? 'list' : 'grid');
+      const { mode, sweep } = (e as CustomEvent).detail;
+      handleViewChange(mode === 'text' ? 'list' : 'grid', sweep);
     };
     window.addEventListener('cai-mode-change', handler);
     return () => window.removeEventListener('cai-mode-change', handler);
   });
 
-  const handleViewChange = (v: LayoutView) => {
+  const handleViewChange = (v: LayoutView, skipSkeleton = false) => {
     if (v === view) return;
     setView(v);
     localStorage.setItem(VIEW_PREF_KEY, v);
+    // A glimm sweep covers the swap — skip the skeleton flash on mode toggles.
+    if (skipSkeleton) {
+      setViewSwitching(false);
+      if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+      return;
+    }
     setViewSwitching(true);
     if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
     // 500ms so the skeleton dust-particle moment reads on mode switches.

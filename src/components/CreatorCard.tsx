@@ -18,12 +18,13 @@ interface Props {
  */
 export function CreatorCard({ creator }: Props) {
   return (
-    <Link href={creator.href} className={styles.card} title={creator.name} data-flip-card="">
+    <Link href={creator.href} className={styles.card} title={creator.name}>
       <span className={styles.avatar} aria-hidden="true">
         <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="96px" className={styles.avatarImg} />
         <span className={styles.avatarRing} />
       </span>
       <span className={styles.name}>{creator.name}</span>
+      {creator.bio && <span className={styles.bio}>{creator.bio}</span>}
       <span className={styles.meta}>
         {creator.workCount} {creator.workCount === 1 ? 'work' : 'works'} · ♥ {formatCount(creator.kudos)}
       </span>

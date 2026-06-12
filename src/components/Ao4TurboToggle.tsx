@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
+import { useGlimm } from 'glimm/next';
 import styles from '@/styles/components/Ao4TurboToggle.module.css';
 
 export type SiteMode = 'visual' | 'text';
@@ -21,14 +22,15 @@ const BoltIcon = () => (
 /**
  * AO4 turbo toggle — the global mode switch. ON = text mode. Drag the "AO4
  * turbo" thumb left/right, or tap it, to flip. Same side-effects as the old
- * FAB (data-mode + localStorage + cai-mode-change event). The mode-switch
- * effect lives on the skeletons (their bars burst into particles). The thumb
- * carries the ActionButton plush/oklch styling.
+ * FAB (data-mode + localStorage + cai-mode-change event). During the switch
+ * the cards flash shimmering skeletons. The thumb carries the ActionButton
+ * plush/oklch styling.
  */
 export function Ao4TurboToggle() {
   const [on, setOn] = useState(false); // on === text mode
   const dragged = useRef(false);
   const x = useMotionValue(0);
+  const { sweep } = useGlimm();
 
   useEffect(() => {
     const initial = localStorage.getItem(SITE_MODE_KEY) === 'text';
@@ -42,7 +44,9 @@ export function Ao4TurboToggle() {
     localStorage.setItem(SITE_MODE_KEY, mode);
     // The results layer derives card density from the same switch.
     localStorage.setItem('cai_view_pref', next ? 'list' : 'grid');
-    window.dispatchEvent(new CustomEvent(SITE_MODE_EVENT, { detail: { mode } }));
+    // `sweep: true` signals consumers that a glimm band is covering this swap,
+    // so they skip their skeleton flash — the colour sweep is the transition.
+    window.dispatchEvent(new CustomEvent(SITE_MODE_EVENT, { detail: { mode, sweep: true } }));
   };
 
   // Snap to a position; flip mode + fire side-effects only when it actually changes.
@@ -50,7 +54,10 @@ export function Ao4TurboToggle() {
     animate(x, next ? TRAVEL : 0, SNAP);
     if (next === on) return;
     setOn(next);
-    applyMode(next);
+    // Play the glimm sweep; the mode swaps at the band's midpoint so the new
+    // layout is revealed as the band passes (replaces the old skeleton flash).
+    // Palette + dimming inherited from GlimmProvider defaults (see layout).
+    sweep(() => applyMode(next));
   };
 
   const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {

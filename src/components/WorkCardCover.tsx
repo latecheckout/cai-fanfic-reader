@@ -181,7 +181,7 @@ export function WorkCardCover({ work }: Props) {
   const warnings = meta.warnings.filter((w) => w !== 'No Archive Warnings Apply');
 
   return (
-    <article className={`${styles.card} ${styles.list}`} data-flip-card="">
+    <article className={`${styles.card} ${styles.list}`}>
       {/* List view is imageless: all metadata, no cover bias. */}
 
       {/* Content — identity-first: strip → title → author → summary → tags → fandom → ships → characters → stats */}

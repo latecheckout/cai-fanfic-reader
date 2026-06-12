@@ -24,6 +24,10 @@ export function ThemeScript() {
     }
     var siteMode = localStorage.getItem('cai_site_mode');
     root.setAttribute('data-mode', siteMode === 'text' ? 'text' : 'visual');
+    // Reserve the Continue Reading rail's space before paint when the reading
+    // list is non-empty, so it doesn't pop in late after hydration reads it.
+    var bm = localStorage.getItem('fanfic-bookmarks');
+    if (bm) { try { if (Object.keys(JSON.parse(bm)).length > 0) root.setAttribute('data-has-reading', ''); } catch(e) {} }
     var font = localStorage.getItem('fanfic-font') || 'serif';
     var fontSize = localStorage.getItem('fanfic-font-size') || '19';
     var lineWidth = localStorage.getItem('fanfic-line-width');

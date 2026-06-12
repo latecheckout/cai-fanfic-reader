@@ -16,6 +16,13 @@
   --accent: #8B4040;
   --accent-subtle: rgba(139, 64, 64, 0.12);
 
+  /* Brand accent — Character.ai duller secondaries (dark-sage family).
+     Used by the AO4 toggle, mode-switch particles, and reading progress.
+     Constant across themes (only listed vars are overridden below). */
+  --brand: #65a98f;        /* dark-sage */
+  --brand-deep: #2b9247;   /* midnight-forest */
+  --brand-soft: #abf5ed;   /* icy-sky */
+
   /* Card surface ("page on paper") — solid colours for cross-browser safety */
   --card-bg: #FBFAF8;
   --card-border: rgba(26, 24, 22, 0.09);

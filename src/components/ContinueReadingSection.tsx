@@ -59,31 +59,42 @@ export function ContinueReadingSection({ covers }: Props) {
     setLoaded(true);
   }, []);
 
-  if (!loaded || bookmarks.length === 0) return null;
+  // Confirmed empty after the read → render nothing.
+  if (loaded && bookmarks.length === 0) return null;
+
+  // Pre-hydration / pre-read: reserve the rail's height with skeletons. The
+  // `pending` class is hidden via CSS unless <html data-has-reading> is set by
+  // ThemeScript, so users with no reading list never see this flash. Once
+  // loaded, the skeletons swap to real cards in place — no late push-down.
+  const pending = !loaded;
 
   return (
-    <section className={styles.section}>
+    <section className={`${styles.section} ${pending ? styles.pending : ''}`}>
       {/* Section header band */}
       <div className={styles.band}>
         <span className={styles.bandLabel}>Continue Reading</span>
-        <span className={styles.bandMeta}>
-          {bookmarks.length} in progress{' · '}
-          <a href="/reading" className={styles.bandLink}>
-            view reading list
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
-              strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="3 1.5 7 5 3 8.5" />
-            </svg>
-          </a>
-        </span>
+        {!pending && (
+          <span className={styles.bandMeta}>
+            {bookmarks.length} in progress{' · '}
+            <a href="/reading" className={styles.bandLink}>
+              view reading list
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
+                strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="3 1.5 7 5 3 8.5" />
+              </svg>
+            </a>
+          </span>
+        )}
       </div>
 
       {/* Card rail — visual covers or text cards, by the global mode.
           .rail frames the scroller and carries the directional edge fades. */}
       <div className={styles.rail}>
         <div className={styles.cards}>
-          {switching
-            ? bookmarks.map((item) => <ContinueCardSkeleton key={item.slug} />)
+          {pending || switching
+            ? Array.from({ length: pending ? PENDING_SKELETONS : bookmarks.length }, (_, i) => (
+                <ContinueCardSkeleton key={i} />
+              ))
             : bookmarks.map((item) => (
                 <ContinueCard key={item.slug} item={item} cover={covers?.[item.slug]} />
               ))}
@@ -92,3 +103,7 @@ export function ContinueReadingSection({ covers }: Props) {
     </section>
   );
 }
+
+// Single-row rail height is constant, so a fixed skeleton count is enough to
+// reserve the right vertical space; it just fills the visible width.
+const PENDING_SKELETONS = 6;

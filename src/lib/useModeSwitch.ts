@@ -23,9 +23,17 @@ function set(next: Partial<ModeState>) {
 }
 
 function onSwitch(e: Event) {
-  const next = (e as CustomEvent).detail?.mode as SiteMode | undefined;
-  if (timer) clearTimeout(timer);
-  set({ switching: true, mode: next === 'text' ? 'text' : next === 'visual' ? 'visual' : state.mode });
+  const detail = (e as CustomEvent).detail ?? {};
+  const next = detail.mode as SiteMode | undefined;
+  const mode = next === 'text' ? 'text' : next === 'visual' ? 'visual' : state.mode;
+  if (timer) { clearTimeout(timer); timer = null; }
+  // A glimm sweep is covering this swap — skip the skeleton flash, just update
+  // the mode so the rails render their real cards under the colour band.
+  if (detail.sweep) {
+    set({ switching: false, mode });
+    return;
+  }
+  set({ switching: true, mode });
   timer = setTimeout(() => set({ switching: false }), SWITCH_MS);
 }
 
