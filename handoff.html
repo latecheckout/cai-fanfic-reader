@@ -39,6 +39,11 @@
   .flag { border-left: 3px solid var(--accent); background: #fbf3f3; border-radius: 0 8px 8px 0;
     padding: 12px 16px; margin: 14px 0; }
   .flag strong { color: var(--accent); }
+  .prompt { background: #1a1816; color: #f1ede6; border-radius: 12px; padding: 20px 22px; margin: 14px 0;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.7;
+    white-space: pre-wrap; }
+  .prompt .lbl { display: block; color: #b8b2a8; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 12px; font-family: inherit; }
   .steps { counter-reset: step; list-style: none; padding-left: 0; }
   .steps li { counter-increment: step; position: relative; padding-left: 34px; margin: 10px 0; }
   .steps li::before { content: counter(step); position: absolute; left: 0; top: 1px;
@@ -62,42 +67,51 @@
 
 <p>
   This branch is a visual redesign of the reader front-end. Everything here is presentation —
-  the underlying content model and filtering logic are unchanged. To see exactly what moved,
-  compare this branch against <code>main</code> (that is the version you already know).
+  the underlying content model and filtering logic are unchanged.
 </p>
 
 <h2>What changed</h2>
 
-<h3>1 · Home page (Discover)</h3>
+<h3>1 · Two ways to view every story — image vs list <span class="pill">biggest change</span></h3>
+<p>This is the largest departure from <code>main</code>. Every work now renders through one of two
+  brand-new card components, and the whole site flips between them:</p>
+<ul>
+  <li><strong>Image view</strong> — a full-bleed cover card (the artwork carries it).</li>
+  <li><strong>List view</strong> — a dense, text-first card (title, author, tags, stats) with no image.</li>
+</ul>
+<p>The same two components are reused everywhere works appear — the home shelves, the browse results,
+  and the library — so the look stays consistent across the site. This replaces the single card style
+  that exists on <code>main</code>.</p>
+
+<h3>2 · Home page (Discover)</h3>
 <p>The landing page was rebuilt as a browsable, editorial home that sits on top of the existing
   filter engine — nothing about how works are filtered or loaded changed underneath it.</p>
 <ul>
   <li>A rotating hero banner at the top.</li>
   <li>Horizontal “shelves” (Trending, Featured) and a Creators row, each swipeable with arrow buttons.</li>
   <li>A “Continue Reading” row driven by the reader’s saved progress.</li>
-  <li>Two card styles: an image/cover card and a text-only list card; the page swaps between them.</li>
 </ul>
 
-<h3>2 · Visual / Text mode toggle</h3>
-<p>A floating toggle in the bottom-right switches the whole site between an image-led “visual” mode and
-  a text-led mode. Switching plays a brief full-screen colour sweep (a small WebGL animation) as the
+<h3>3 · Visual / Text mode toggle</h3>
+<p>A floating toggle in the bottom-right is what flips the whole site between the image view and the
+  list view (above). Switching plays a brief full-screen colour sweep (a small WebGL animation) as the
   transition, replacing the old grey loading placeholders.</p>
 
-<h3>3 · Reading page</h3>
+<h3>4 · Reading page</h3>
 <ul>
-  <li>The work header was reordered to a clear hierarchy: cover → tags/badges → title → author (with photo) → description → stats.</li>
+  <li>The work header was reordered to a clear hierarchy: cover → tags/badges → title → author (with photo) → description → stats. This same hierarchy is now used consistently across the entire site — the cards and the story-info pop-up follow it too.</li>
   <li>Each chapter shows a small author line (work title · author) so a reader who lands deep in a story still sees who wrote it.</li>
   <li>The “story info” pop-up now mirrors that same header layout.</li>
   <li>Spacing and font sizes were aligned between the header, the cards, and the pop-up.</li>
 </ul>
 
-<h3>4 · Search, filters &amp; navigation polish</h3>
+<h3>5 · Search, filters &amp; navigation polish</h3>
 <ul>
   <li>Refined the search dropdown and the sort menu (padding, rounded corners, consistent widths).</li>
   <li>Centered the top navigation; renamed the first nav item to “Stories.”</li>
 </ul>
 
-<h3>5 · Cleanup</h3>
+<h3>6 · Cleanup</h3>
 <p>Removed unused components and the old loading-placeholder code path that the new transition made obsolete.
   No behaviour was lost — verified with a full production build.</p>
 
@@ -114,24 +128,42 @@
 </table>
 
 <h2>How to migrate</h2>
-<p>This is a static Next.js 15 front-end. There is no database or API in this repo — every story is a
-  Markdown file in <code>content/works</code>, and reader state (progress, preferences, mode) is kept in the
-  browser’s local storage. So an authentic migration is mostly about connecting these surfaces to real data.</p>
+<p>This is a static Next.js 15 front-end — no database or API in this repo. Every story is a Markdown file
+  in <code>content/works</code>, and reader state (progress, preferences, mode) lives in browser local storage.
+  An authentic migration is mostly about connecting these surfaces to your real data. Hand the prompt below
+  to your coding agent to drive it:</p>
 
-<ol class="steps">
-  <li><strong>Diff this branch against <code>main</code></strong> to get the exact, file-level list of changes — that is the source of truth, this page is the summary.</li>
-  <li><strong>Wire the placeholder data to real sources.</strong> Comments, the user’s library/bookmarks, and recommendations are currently sample data. The shapes and exact spots are documented in <code>.claude/docs/wiring-guide.md</code> and <code>.claude/docs/api-contracts.md</code> (look for <code>@DUMMY</code> / <code>@TODO-DEV</code> markers in code).</li>
-  <li><strong>Add real auth + persistence.</strong> Reading progress and saved works are local-storage only today; they’ll need to move to real per-user storage.</li>
-  <li><strong>Replace the placeholder images</strong> under <code>public/</code> (covers, hero banners, fandom art, the author photo placeholder) with real assets.</li>
-  <li><strong>Decide on the transition animation.</strong> The mode-switch sweep uses a third-party package, <code>glimm</code> — see the note below before keeping it.</li>
-</ol>
+<div class="prompt"><span class="lbl">Prompt for your coding agent</span>You are migrating a front-end redesign into our codebase.
+The redesign is on branch `0612-handoff`; our current production version is `main`.
+
+1. Diff `0612-handoff` against `main` to get the full, file-level scope of the change.
+   Treat that diff as the source of truth.
+
+2. The redesign is presentation-only — do not change how our data is fetched or filtered,
+   only re-wire the new UI to our real sources.
+
+3. Replace the sample/placeholder data with our real backend:
+   - Comments, the signed-in user's library/bookmarks, and recommendations are dummy data.
+     Locate them via the `@DUMMY` and `@TODO-DEV` markers in the code and the notes in
+     `.claude/docs/wiring-guide.md` and `.claude/docs/api-contracts.md`. Point them at our APIs,
+     keeping the documented data shapes.
+   - Reading progress, preferences, and the visual/text mode are stored in browser local storage
+     with no auth. Move per-user state onto our authentication + persistence.
+
+4. Swap the placeholder images in `public/` (covers, hero banners, fandom art, the author photo
+   placeholder) for real assets.
+
+5. The mode-switch animation uses a third-party package, `glimm` (proprietary licence, single
+   maintainer). Decide whether to keep it or replace it with a CSS transition — it is used only in
+   `src/app/layout.tsx` and the mode toggle.
+
+6. Run `npm install && npm run build` on Node 22 and confirm a clean build before opening your PR.</div>
 
 <div class="flag">
   <strong>Note on the <code>glimm</code> dependency.</strong> The colour-sweep transition relies on a small,
-  newly-published, single-maintainer package that is published under a proprietary (all-rights-reserved)
-  licence. Confirm the licence is acceptable for your distribution before shipping. It is only used in two
-  places (<code>src/app/layout.tsx</code> and the mode toggle), so it’s straightforward to swap for a CSS
-  transition or remove if needed.
+  newly-published, single-maintainer package published under a proprietary (all-rights-reserved) licence.
+  Confirm the licence is acceptable for your distribution before shipping. It’s used in only two places, so
+  it’s straightforward to swap for a CSS transition or remove.
 </div>
 
 <h2>Run it</h2>
