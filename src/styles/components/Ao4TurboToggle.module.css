@@ -23,22 +23,26 @@
   left: 0;
   right: 0;
   bottom: var(--vv-bottom-inset, 0px);
-  height: 150px;
+  height: 220px;
   z-index: calc(var(--z-sticky) - 1);
   pointer-events: none;
+  /* Solid only at the very bottom, then a long gentle ease up — so the toggle
+     (which sits ~50px off the bottom) lands inside the fade, not the solid. */
   background: linear-gradient(to top,
     var(--bg) 0%,
-    color-mix(in srgb, var(--bg), transparent 8%) 16%,
-    color-mix(in srgb, var(--bg), transparent 24%) 32%,
-    color-mix(in srgb, var(--bg), transparent 46%) 48%,
-    color-mix(in srgb, var(--bg), transparent 68%) 64%,
-    color-mix(in srgb, var(--bg), transparent 88%) 82%,
+    var(--bg) 7%,
+    color-mix(in srgb, var(--bg), transparent 14%) 20%,
+    color-mix(in srgb, var(--bg), transparent 30%) 34%,
+    color-mix(in srgb, var(--bg), transparent 48%) 48%,
+    color-mix(in srgb, var(--bg), transparent 66%) 62%,
+    color-mix(in srgb, var(--bg), transparent 82%) 78%,
+    color-mix(in srgb, var(--bg), transparent 93%) 90%,
     transparent 100%);
 }
 
 @media (max-width: 768px) {
   .aura {
-    height: 120px;
+    height: 180px;
   }
 }
 
