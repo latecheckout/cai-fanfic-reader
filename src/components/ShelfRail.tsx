@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Shelf } from '@/lib/shelves';
 import { WorkCardGrid } from './WorkCardGrid';
 import { WorkCardCover } from './WorkCardCover';
+import { RailViewport } from './RailViewport';
 import styles from '@/styles/components/ShelfRail.module.css';
 
 interface Props {
@@ -37,23 +38,22 @@ export function ShelfRail({ shelf, priority = false }: Props) {
       </div>
 
       {/* .rail is the non-scrolling frame that carries the edge-fade overlays;
-          .row is the actual horizontal scroller. */}
-      <div className={styles.rail}>
-        <div className={styles.row}>
-          {shelf.works.map((work, i) => (
-            <div key={work.slug} className={styles.card}>
-              {/* Visual: the exact browse grid card (2:3 image, browse width) */}
-              <div className={styles.slot}>
-                <WorkCardGrid work={work} priority={priority && i < 4} />
-              </div>
-              {/* Text: the exact browse list card (browse 2-up width) */}
-              <div className={styles.slotText}>
-                <WorkCardCover work={work} />
-              </div>
+          .row is the actual horizontal scroller. RailViewport adds prev/next
+          scroll arrows (in addition to swipe). */}
+      <RailViewport railClassName={styles.rail} rowClassName={styles.row}>
+        {shelf.works.map((work, i) => (
+          <div key={work.slug} className={styles.card}>
+            {/* Visual: the exact browse grid card (2:3 image, browse width) */}
+            <div className={styles.slot}>
+              <WorkCardGrid work={work} priority={priority && i < 4} />
             </div>
-          ))}
-        </div>
-      </div>
+            {/* Text: the exact browse list card (browse 2-up width) */}
+            <div className={styles.slotText}>
+              <WorkCardCover work={work} />
+            </div>
+          </div>
+        ))}
+      </RailViewport>
     </section>
   );
 }

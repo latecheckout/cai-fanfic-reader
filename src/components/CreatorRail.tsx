@@ -1,5 +1,6 @@
 import { Creator } from '@/lib/shelves';
 import { CreatorCard } from './CreatorCard';
+import { RailViewport } from './RailViewport';
 import styles from '@/styles/components/CreatorRail.module.css';
 
 interface Props {
@@ -22,12 +23,11 @@ export function CreatorRail({ creators }: Props) {
         </div>
       </div>
 
-      {/* .rail frames the scroller and carries the directional edge fades. */}
-      <div className={styles.rail}>
-        <div className={styles.row}>
-          {creators.map((c) => <CreatorCard key={c.name} creator={c} />)}
-        </div>
-      </div>
+      {/* .rail frames the scroller and carries the directional edge fades;
+          RailViewport adds prev/next scroll arrows (in addition to swipe). */}
+      <RailViewport railClassName={styles.rail} rowClassName={styles.row}>
+        {creators.map((c) => <CreatorCard key={c.name} creator={c} />)}
+      </RailViewport>
     </section>
   );
 }

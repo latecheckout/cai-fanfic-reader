@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
+import { RailViewport } from './RailViewport';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
@@ -86,18 +87,17 @@ export function ContinueReadingSection({ covers }: Props) {
       </div>
 
       {/* Card rail — visual covers or text cards, by the global mode.
-          .rail frames the scroller and carries the directional edge fades. */}
-      <div className={styles.rail}>
-        <div className={styles.cards}>
-          {pending
-            ? Array.from({ length: PENDING_SKELETONS }, (_, i) => (
-                <ContinueCardSkeleton key={i} />
-              ))
-            : bookmarks.map((item) => (
-                <ContinueCard key={item.slug} item={item} cover={covers?.[item.slug]} />
-              ))}
-        </div>
-      </div>
+          .rail frames the scroller and carries the directional edge fades;
+          RailViewport adds prev/next scroll arrows (in addition to swipe). */}
+      <RailViewport railClassName={styles.rail} rowClassName={styles.cards}>
+        {pending
+          ? Array.from({ length: PENDING_SKELETONS }, (_, i) => (
+              <ContinueCardSkeleton key={i} />
+            ))
+          : bookmarks.map((item) => (
+              <ContinueCard key={item.slug} item={item} cover={covers?.[item.slug]} />
+            ))}
+      </RailViewport>
     </section>
   );
 }
