@@ -28,6 +28,32 @@
   text-align: center;
 }
 
+/* "by [avatar] username" under the chapter title */
+.chapterByline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-3);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--secondary);
+}
+
+.bylineBy {
+  margin-right: 6px;
+}
+
+.bylineAuthor {
+  color: inherit;
+  text-decoration: none;
+}
+
+.bylineAuthor:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Author notes */
 .authorNote {
   border-left: 2px solid var(--border-strong);
