@@ -206,6 +206,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
               chapterHtml={chapterHtmls[i]}
               totalChapters={chapters.length}
               author={workMeta.author}
+              workTitle={workMeta.title}
             />
           </section>
 
