@@ -2,14 +2,18 @@
 
 A front-end exploration for reading AI-generated fanfiction, built for Character.ai. Inspired by AO3's information density and reading experience — rebuilt with intentional typography, a rich metadata system, and a book-like reading view.
 
+> **Redesign branch (`0612-handoff`).** This is a front-end visual redesign. See **[`handoff.html`](handoff.html)** (open in a browser) for a plain-language summary of what changed, where it lives, and how to migrate. The diff against `main` is the authoritative change list.
+
 ---
 
 ## Overview
 
 This is a static Next.js application that renders a library of fanfic works from markdown files. It covers two core surfaces:
 
-- **Browse page** — Filterable list of works with rich metadata cards (rating, category, length indicator, status, fandom, ships, characters, tags, summary)
-- **Reading page** — Editorial reading view with a sticky HUD cluster, morph-animated panels for chapter navigation and reading preferences, and a three-zone scroll-fade header
+- **Home / Discover** — An editorial home (hero banner, swipeable shelves, creators row, continue-reading row) over the filter engine, plus a filterable results view. Every work renders as either an image/cover card or a text list card, toggled site-wide.
+- **Reading page** — Editorial reading view with a sticky HUD cluster and morph-animated panels for chapter navigation and reading preferences.
+
+A floating visual/text mode toggle flips the whole site between the image and list card styles, playing a brief WebGL colour-sweep transition (via the `glimm` package — see `handoff.html` for the licence note).
 
 Content lives entirely in markdown files with YAML frontmatter — no database, no API. All pages are statically generated at build time.
 
