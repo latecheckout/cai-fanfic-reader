@@ -6,7 +6,8 @@
    ============================================================ */
 
 .header {
-  padding: 80px var(--space-6) var(--space-8);
+  /* More room below the tags before the chapter content begins. */
+  padding: 80px var(--space-6) calc(var(--space-12) + var(--space-4));
   max-width: var(--reader-line-width);
   margin: 0 auto;
 }
