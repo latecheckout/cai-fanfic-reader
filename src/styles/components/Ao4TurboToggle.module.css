@@ -8,9 +8,7 @@
 .root {
   position: fixed;
   right: 28px;
-  /* --vv-bottom-inset (set by the toggle from VisualViewport) lifts it above
-     the iOS bottom toolbar as that chrome collapses/expands. */
-  bottom: calc(24px + var(--safe-bottom) + var(--vv-bottom-inset, 0px));
+  bottom: calc(24px + var(--safe-bottom));
   z-index: var(--z-sticky);
 }
 
@@ -22,9 +20,7 @@
   position: fixed;
   left: 0;
   right: 0;
-  /* Pinned to the very bottom (not lifted by --vv-bottom-inset like the
-     toggle) so the fade always reaches the edge and never disconnects when
-     the iOS toolbar expands at the top of the page. */
+  /* Pinned to the very bottom so the fade always reaches the edge. */
   bottom: 0;
   height: 220px;
   z-index: calc(var(--z-sticky) - 1);
@@ -174,7 +170,7 @@
 @media (max-width: 768px) {
   .root {
     right: 16px;
-    bottom: calc(18px + var(--safe-bottom) + var(--vv-bottom-inset, 0px));
+    bottom: calc(18px + var(--safe-bottom));
   }
   .track { width: 206px; height: 54px; }
   .thumb { width: 152px; height: 48px; font-size: 15px; }
