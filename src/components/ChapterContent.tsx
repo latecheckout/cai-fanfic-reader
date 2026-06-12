@@ -29,11 +29,13 @@ export function ChapterContent({ chapter, chapterHtml, totalChapters, author, wo
                   <span className={styles.bylineSep} aria-hidden="true">|</span>
                 </>
               )}
-              <span className={styles.bylineBy}>by</span>
-              <Avatar />
-              <Link href={`/?q=${encodeURIComponent(author)}`} className={styles.bylineAuthor}>
-                {author}
-              </Link>
+              <span className={styles.bylineAuthorGroup}>
+                <span className={styles.bylineBy}>by</span>
+                <Avatar />
+                <Link href={`/?q=${encodeURIComponent(author)}`} className={styles.bylineAuthor}>
+                  {author}
+                </Link>
+              </span>
             </p>
           )}
         </header>

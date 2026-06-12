@@ -59,9 +59,33 @@
   opacity: 0.45;
 }
 
+/* Keeps "by · avatar · author" together as one unit (so it stacks as a row
+   under the title on mobile). */
+.bylineAuthorGroup {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .bylineBy {
   flex-shrink: 0;
   margin-right: 6px;
+}
+
+/* Mobile: stack the title over the author so the byline isn't too wide. */
+@media (max-width: 768px) {
+  .chapterByline {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bylineSep {
+    display: none;
+  }
+
+  .bylineWork {
+    max-width: 100%;
+  }
 }
 
 .bylineAuthor {
