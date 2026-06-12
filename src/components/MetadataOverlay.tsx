@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useReading } from '@/context/ReadingContext';
@@ -16,6 +16,13 @@ interface Props {
 export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
   function MetadataOverlay({ onClose }, ref) {
     const { workMeta, totalChapters } = useReading();
+    const [summaryExpanded, setSummaryExpanded] = useState(false);
+
+    // Description "see more" — first 4 sentences, expandable (same as the header).
+    const sentences = workMeta.summary.match(/[^.!?]+[.!?]+/g) ?? (workMeta.summary ? [workMeta.summary] : []);
+    const summaryHasMore = sentences.length > 4;
+    const shownSummary =
+      summaryHasMore && !summaryExpanded ? sentences.slice(0, 4).join('').trim() : workMeta.summary;
 
     const rClass = ratingClass(workMeta.rating);
     const catLabel = categoryLabel(workMeta.category);
@@ -84,17 +91,25 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   {workMeta.author}
                 </Link>
               </p>
+              {/* Description with see-more, then social metrics under it — same as header */}
+              {workMeta.summary && (
+                <p className={styles.summaryText}>
+                  {shownSummary}
+                  {summaryHasMore && (
+                    <button
+                      type="button"
+                      className={styles.seeMore}
+                      onClick={() => setSummaryExpanded((v) => !v)}
+                    >
+                      {summaryExpanded ? 'see less' : '… see more'}
+                    </button>
+                  )}
+                </p>
+              )}
               <p className={styles.stats}>{statsLine}</p>
             </div>
 
-            {/* Zone 2: Summary — sits right under identity, above the tag taxonomy */}
-            {workMeta.summary && (
-              <div className={styles.zone3}>
-                <p className={styles.summaryText}>{workMeta.summary}</p>
-              </div>
-            )}
-
-            {/* Zone 3: Signals */}
+            {/* Signals */}
             <div className={styles.zone2}>
               {workMeta.warnings.length > 0 && (
                 <div className={styles.tagRow}>

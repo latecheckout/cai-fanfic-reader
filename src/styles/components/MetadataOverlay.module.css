@@ -160,7 +160,38 @@
   letter-spacing: 0.06em;
 }
 
+/* Description — between byline and stats, with a see-more expander */
+.summaryText {
+  margin-top: var(--space-4);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--secondary);
+}
+
+.seeMore {
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.seeMore:hover {
+  opacity: 0.7;
+}
+
+/* Social metrics — under the description */
 .stats {
+  margin-top: var(--space-4);
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--secondary);
@@ -202,18 +233,3 @@
   min-width: 0;
 }
 
-/* ── Summary — between identity and the tag taxonomy (no divider; it flows
-   straight from the identity block) ── */
-.zone3 {
-  /* Balanced with .zone2's padding-top so the dashed divider has even space
-     above and below. */
-  margin-bottom: var(--space-4);
-}
-
-.summaryText {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--secondary);
-}
