@@ -43,6 +43,9 @@
   content: '';
   position: absolute;
   inset: 0;
+  /* Above the scrim (z-index 1) so the bottom of the ring isn't washed out —
+     the stroke reads as a complete outline, not cut off by the gradient. */
+  z-index: 2;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 14px;
   pointer-events: none;

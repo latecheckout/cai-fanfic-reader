@@ -34,6 +34,18 @@
   background: var(--border);
 }
 
+/* Hairline ring matching the work cards — sits above the scrim so the banner
+   reads as a framed card. */
+.slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  pointer-events: none;
+}
+
 .bg {
   object-fit: cover;
 }

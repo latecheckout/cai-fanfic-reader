@@ -131,6 +131,12 @@
   outline-offset: -1.25px;
 }
 
+/* Dark mode: the white inset shadow reads brighter against the darker thumb —
+   dial it back so it matches the light-mode intensity. */
+[data-theme="dark"] .plush {
+  box-shadow: inset 0 -2.5px 5px 0 rgba(255, 255, 255, 0.24), inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.24);
+}
+
 /* Mouse-tracked dual-radial oklch glow on hover. */
 .glow {
   position: absolute;

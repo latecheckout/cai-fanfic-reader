@@ -437,6 +437,17 @@
   border-color: rgba(255, 255, 255, 0.45);
 }
 
+/* Dark mode: --secondary is near the card colour, so the category pill and the
+   status glyph almost vanish. Lighten the category fill and the glyph. */
+[data-theme="dark"] .catLabel {
+  background: color-mix(in srgb, var(--secondary) 80%, var(--bg));
+  color: #fff;
+}
+
+[data-theme="dark"] .statusPill:not(.statusPillOnImage) {
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
 /* Two-tier tooltip bubble — bold title over a lighter description, identical
    across all three badges. Matches the WorkCard signal-strip tooltip. */
 .tooltip {
