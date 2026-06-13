@@ -6,16 +6,42 @@
    ============================================================ */
 
 .header {
-  padding: 80px var(--space-6) var(--space-8);
+  /* More room below the tags before the chapter content begins. */
+  padding: 80px var(--space-6) calc(var(--space-12) + var(--space-4));
   max-width: var(--reader-line-width);
   margin: 0 auto;
 }
 
-/* Zones: JS controls opacity directly via inline style */
-.zone1,
-.zone2,
-.zone3 {
-  will-change: opacity;
+/* Thumbnail stacks above the identity/metadata block (mirrors the cards) */
+.headerRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.headerMain {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Badge strip sits above the h1, like the list/home cards */
+.badgeRow {
+  margin-bottom: var(--space-3);
+}
+
+.cover {
+  position: relative;
+  width: 132px;
+  flex-shrink: 0;
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+  background: var(--border);
+}
+
+.coverImg {
+  object-fit: cover;
+  border-radius: 14px;
 }
 
 /* ── Zone 1: Identity ── */
@@ -27,25 +53,46 @@
 }
 
 .title {
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--text);
 }
 
 .byline {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-2);
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--secondary);
+}
+
+.bylineBy {
+  margin-right: 6px;
+}
+
+/* Author name links to its search — clickable, like the cards' byline. */
+.authorLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.authorLink:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .stats {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--secondary);
-  margin-top: var(--space-2);
+  margin-top: var(--space-4);
 }
 
 /* ── Zone 2: Signals ── */
@@ -90,11 +137,31 @@
 }
 
 .summaryText {
+  margin-top: var(--space-4);
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--secondary);
+}
+
+.seeMore {
+  margin-left: 6px;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.seeMore:hover {
+  opacity: 0.7;
 }
 
 /* ── Mobile breakpoint ── */
@@ -105,17 +172,23 @@
     padding-right: var(--space-4);
   }
 
+  /* Stack the cover above the title on mobile */
+  .headerRow {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .cover {
+    width: 84px;
+  }
+
   .title {
     font-size: 24px;
   }
 
-  .byline {
-    font-size: 12px;
-  }
-
-  .stats {
-    font-size: 10px;
-  }
+  /* byline (14px) + stats (13px) intentionally keep their desktop sizes on
+     mobile so they match the list card's author/social-metrics fonts, which
+     don't shrink on mobile either. */
 
   /* Tag rows: stack label above chips so chips don't overflow right */
   .tagRow {

@@ -1,5 +1,6 @@
 ---
 title: "Low Orbit"
+cover: "/covers/cover-10.png"
 author: "static_orbit"
 rating: "General Audiences"
 warnings: ["No Archive Warnings Apply"]

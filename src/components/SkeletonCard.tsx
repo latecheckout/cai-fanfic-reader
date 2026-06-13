@@ -1,51 +1,49 @@
-/**
- * SkeletonCard — shared loading placeholder that matches WorkCard dimensions.
- *
- * Accepts the parent component's CSS module styles so each callsite keeps its
- * own scoped animation definitions without needing a shared CSS file.
- *
- * Usage:
- *   import { SkeletonCard } from './SkeletonCard';
- *   <SkeletonCard index={i} styles={styles} />                 // browse variant (default)
- *   <SkeletonCard index={i} styles={styles} variant="library" /> // library variant (no chip row)
- */
+import defaultStyles from '@/styles/components/SkeletonCard.module.css';
 
-// CSS Modules export { readonly [key: string]: string } — use that as the styles type
-// so TypeScript doesn't complain at call sites.
-// Required keys: skeletonCard, skeletonStrip, skeletonContent, skeletonLine
-// Optional key:  skeletonChip (browse variant only)
+/**
+ * SkeletonCard — shared loading placeholder shaped like a work card.
+ *
+ * Self-styled by default (the home rails just drop it in). Browse/Library pass
+ * their own scoped module via `styles`; in that case the parent container shapes
+ * the layout, so the layout class is only applied in the self-styled case.
+ *
+ * A simple shimmer sweep runs across the card while it's mounted (see the
+ * module CSS).
+ *
+ * Required style keys: skeletonCard, skeletonContent, skeletonLine.
+ * Optional: skeletonChip (browse variant), grid/list (self-styled layout).
+ */
 export type SkeletonCardStyles = Record<string, string>;
 
 interface Props {
   index: number;
-  styles: SkeletonCardStyles;
+  /** Optional CSS-module override (Browse/Library scope their own). */
+  styles?: SkeletonCardStyles;
   /** 'browse' (default) shows a chip row; 'library' omits it */
   variant?: 'browse' | 'library';
+  /** 'list' renders the taller text-card line set; 'grid' the compact one. */
+  layout?: 'grid' | 'list';
 }
 
-export function SkeletonCard({ index, styles, variant = 'browse' }: Props) {
+export function SkeletonCard({ index, styles: stylesProp, variant = 'browse', layout = 'grid' }: Props) {
+  const isList = layout === 'list';
+  const styles = stylesProp ?? defaultStyles;
+  const selfStyled = !stylesProp;
+  const cardClass = `${styles.skeletonCard}${selfStyled ? ` ${layout === 'grid' ? styles.grid : styles.list}` : ''}`;
+
   return (
-    <div className={styles.skeletonCard} style={{ animationDelay: `${index * 40}ms` }}>
-      <div className={styles.skeletonStrip} />
+    <div className={cardClass} style={{ animationDelay: `${index * 40}ms` }}>
       <div className={styles.skeletonContent}>
-        <div className={styles.skeletonLine} style={{ width: '45%', height: '10px', marginBottom: '10px' }} />
-        <div className={styles.skeletonLine} style={{ width: variant === 'browse' ? '85%' : '80%', height: '15px', marginBottom: '6px' }} />
-        <div className={styles.skeletonLine} style={{ width: '30%', height: '11px', marginBottom: '12px' }} />
-        {variant === 'browse' && styles.skeletonChip && (
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' as const }}>
-            <div className={styles.skeletonChip} />
-            <div className={styles.skeletonChip} style={{ width: '64px' }} />
-            <div className={styles.skeletonChip} style={{ width: '80px' }} />
-          </div>
-        )}
-        <div className={styles.skeletonLine} style={{ width: variant === 'browse' ? '70%' : '65%', height: '12px', marginTop: '14px' }} />
-        <div className={styles.skeletonLine} style={{ width: variant === 'browse' ? '55%' : undefined, height: '12px', marginTop: variant === 'browse' ? '5px' : undefined }} />
-        {variant === 'browse' && (
-          <div className={styles.skeletonLine} style={{ width: '40%', height: '10px', marginTop: '12px' }} />
-        )}
-        {variant === 'library' && (
-          <div className={styles.skeletonLine} style={{ width: '40%', height: '10px', marginTop: '12px' }} />
-        )}
+        {/* badges */}
+        <div className={styles.skeletonLine} style={{ width: '40%', height: '10px' }} />
+        {/* title */}
+        <div className={styles.skeletonLine} style={{ width: '82%', height: '16px' }} />
+        {/* byline */}
+        <div className={styles.skeletonLine} style={{ width: '28%', height: '11px' }} />
+        {/* summary — list only (the text card is taller) */}
+        {isList && <div className={styles.skeletonLine} style={{ width: '92%', height: '12px' }} />}
+        {/* stats / metrics */}
+        <div className={styles.skeletonLine} style={{ width: '46%', height: '12px' }} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 ---
 title: "Gravity's Edge"
+cover: "/covers/cover-16.png"
 author: "StardustNomad"
 rating: "General Audiences"
 warnings: ["No Archive Warnings Apply"]

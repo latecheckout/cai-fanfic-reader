@@ -41,8 +41,6 @@ interface Props {
   };
   totalCount: number;
   filteredCount: number;
-  view?: 'default' | 'split';
-  onViewChange?: (v: 'default' | 'split') => void;
   /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
   basePath?: string;
 }
@@ -201,10 +199,8 @@ export function FilterPanel({
   options: _options,
   searchOptions: _searchOptions,
   currentFilters,
-  totalCount,
+  totalCount: _totalCount,
   filteredCount,
-  view,
-  onViewChange,
   basePath = '/',
 }: Props) {
   const router = useRouter();
@@ -624,6 +620,9 @@ export function FilterPanel({
       } else if (pill.paramKey === 'date_custom') {
         params.delete('date_from');
         params.delete('date_to');
+      } else if (pill.paramKey === 'q') {
+        // Free-text search is a single value (may itself contain commas) — delete outright
+        params.delete('q');
       } else {
         const newVal = removeFromCommaList(params.get(pill.paramKey) ?? undefined, pill.value);
         if (newVal) params.set(pill.paramKey, newVal);
@@ -774,7 +773,16 @@ export function FilterPanel({
                 <path d="M3.5 9V3M3.5 3L1.5 5M3.5 3L5.5 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M8.5 3v6M8.5 9L6.5 7M8.5 9l2-2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              {SORT_OPTIONS.find((o) => o.value === currentSortValue)?.label ?? 'sort'}
+              {/* Width-stable label: all options stacked in one grid cell so the
+                  button reserves the widest label's width and never resizes on switch. */}
+              <span className={styles.sortLabel}>
+                {SORT_OPTIONS.map((o) => (
+                  <span key={o.value} className={styles.sortLabelSizer} aria-hidden="true">{o.label}</span>
+                ))}
+                <span className={styles.sortLabelCurrent}>
+                  {SORT_OPTIONS.find((o) => o.value === currentSortValue)?.label ?? 'sort'}
+                </span>
+              </span>
               <kbd className={styles.sortBtnKbd}>S</kbd>
             </button>
             {sortOpen && (
@@ -915,48 +923,6 @@ export function FilterPanel({
             </div>
           </div>
         )}
-
-        {/* Subrow: always visible — work count (left) + view toggle (right) */}
-        <div className={styles.subrow}>
-          <span className={styles.workCount} aria-live="polite" aria-atomic="true">
-            <span key={filteredCount} className={styles.countRoll}>
-              {filteredCount === totalCount
-                ? `${totalCount} works`
-                : `${filteredCount} of ${totalCount}`}
-            </span>
-          </span>
-          {onViewChange && (
-            <div className={styles.viewToggle} aria-label="View layout">
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'default' ? styles.viewBtnActive : ''}`}
-                onClick={() => onViewChange('default')}
-                aria-label="Default view"
-                aria-pressed={view === 'default'}
-                title="Default view"
-              >
-                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
-                  <rect x="0" y="0" width="14" height="1.5" fill="currentColor" />
-                  <rect x="0" y="5.25" width="14" height="1.5" fill="currentColor" />
-                  <rect x="0" y="10.5" width="14" height="1.5" fill="currentColor" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                className={`${styles.viewBtn} ${view === 'split' ? styles.viewBtnActive : ''}`}
-                onClick={() => onViewChange('split')}
-                aria-label="Split view"
-                aria-pressed={view === 'split'}
-                title="Split view"
-              >
-                <svg width="14" height="12" viewBox="0 0 14 12" fill="none" aria-hidden="true">
-                  <rect x="0" y="0" width="6" height="12" fill="currentColor" />
-                  <rect x="8" y="0" width="6" height="12" fill="currentColor" />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Filter Drawer — right-side slide panel, non-blocking on desktop */}

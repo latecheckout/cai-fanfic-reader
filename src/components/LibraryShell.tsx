@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { WorkSummary } from '@/types';
+import { WorkSummary, LayoutView } from '@/types';
 import { FilterOptions, SearchOptions } from '@/lib/filters';
 import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
 import { FilterPanel } from './FilterPanel';
-import { WorkCard } from './WorkCard';
+// (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
+import { WorkCardCover } from './WorkCardCover';
+import { WorkCardGrid } from './WorkCardGrid';
 import styles from '@/styles/components/LibraryShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
+
+const VIEW_PREF_KEY = 'cai_view_pref';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -70,6 +74,9 @@ export function LibraryShell({
   const searchParams = useSearchParams();
   const [removedSlugs, setRemovedSlugs] = useState<Set<string>>(new Set());
   const [isFiltering, setIsFiltering] = useState(false);
+  const [view, setView] = useState<LayoutView>('list');
+  const [viewSwitching, setViewSwitching] = useState(false);
+  const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterKey = JSON.stringify(currentFilters);
   const prevFilterKey = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -82,6 +89,36 @@ export function LibraryShell({
       setRemovedSlugs(new Set(Array.isArray(stored) ? stored : []));
     } catch { /* ignore */ }
   }, []);
+
+  // The global site mode (nav toggle) is the single source of layout truth.
+  useEffect(() => {
+    setView(localStorage.getItem('cai_site_mode') === 'text' ? 'list' : 'grid');
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { mode, sweep } = (e as CustomEvent).detail;
+      handleViewChange(mode === 'text' ? 'list' : 'grid', sweep);
+    };
+    window.addEventListener('cai-mode-change', handler);
+    return () => window.removeEventListener('cai-mode-change', handler);
+  });
+
+  const handleViewChange = (v: LayoutView, skipSkeleton = false) => {
+    if (v === view) return;
+    setView(v);
+    localStorage.setItem(VIEW_PREF_KEY, v);
+    // A glimm sweep covers the swap — skip the skeleton flash on mode toggles.
+    if (skipSkeleton) {
+      setViewSwitching(false);
+      if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+      return;
+    }
+    setViewSwitching(true);
+    if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
+    // 500ms so the skeleton dust-particle moment reads on mode switches.
+    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 500);
+  };
 
   // Show skeleton briefly when filters change (skip initial mount)
   useEffect(() => {
@@ -158,11 +195,21 @@ export function LibraryShell({
       />
 
       {/* ── Work list ── */}
-      <div className={styles.workList}>
-        {isFiltering ? (
-          Array.from({ length: SKELETON_COUNT }, (_, i) => (
-            <SkeletonCard key={i} index={i} styles={styles} variant="library" />
-          ))
+      <div className={`${styles.workList} ${styles[view]}`}>
+        {isFiltering || viewSwitching ? (
+          // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
+          Array.from(
+            { length: viewSwitching ? Math.max(SKELETON_COUNT, displayedWorks.length) : SKELETON_COUNT },
+            (_, i) => (
+              <SkeletonCard
+                key={i}
+                index={i}
+                styles={styles}
+                variant="library"
+                layout={isFiltering ? 'list' : view}
+              />
+            ),
+          )
         ) : displayedWorks.length === 0 ? (
           <div className={styles.empty}>
             <p className={styles.emptyHeading}>
@@ -178,10 +225,7 @@ export function LibraryShell({
           displayedWorks.map((work) =>
             activeTab === 'bookmarked' ? (
               <div key={work.slug} className={styles.cardWrapper}>
-                <WorkCard
-                  work={work}
-                  activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }}
-                />
+                {view === 'grid' ? <WorkCardGrid work={work} /> : <WorkCardCover work={work} />}
                 <button
                   className={styles.bookmarkBtn}
                   onClick={() => handleRemove(work.slug)}
@@ -193,12 +237,10 @@ export function LibraryShell({
                   </svg>
                 </button>
               </div>
+            ) : view === 'grid' ? (
+              <WorkCardGrid key={work.slug} work={work} />
             ) : (
-              <WorkCard
-                key={work.slug}
-                work={work}
-                activeFilters={{ tag: currentFilters.tag, warning: currentFilters.warning }}
-              />
+              <WorkCardCover key={work.slug} work={work} />
             )
           )
         )}

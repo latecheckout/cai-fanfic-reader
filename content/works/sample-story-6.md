@@ -1,5 +1,6 @@
 ---
 title: "the kids aren't alright (but they will be)"
+cover: "/covers/cover-13.png"
 author: "spideywhump"
 rating: "Teen And Up"
 warnings: ["Creator Chose Not To Use Archive Warnings"]

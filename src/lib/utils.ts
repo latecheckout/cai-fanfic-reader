@@ -64,3 +64,9 @@ export function categoryLabel(cats: string[]): string {
   // Gen = no pairing; the missing Ships row already signals this
   return '';
 }
+
+/** True when a work is still being posted (any "in progress" phrasing). */
+export function isWipStatus(status: string): boolean {
+  const s = status.toLowerCase();
+  return s.includes('progress') || s === 'wip' || s === 'in-progress';
+}

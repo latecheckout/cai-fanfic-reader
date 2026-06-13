@@ -1,5 +1,6 @@
 ---
 title: "Teach Me How to Pray"
+cover: "/covers/cover-14.png"
 author: "falling_grace"
 rating: "Mature"
 warnings: ["No Archive Warnings Apply"]

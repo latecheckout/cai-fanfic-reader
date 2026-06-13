@@ -1,12 +1,15 @@
 /* Base chip */
 .chip {
   display: inline-block;
+  max-width: 100%;
   border: 1px solid var(--border-chip);
   border-radius: 3px;
   padding: 3px 8px;
   background: transparent;
   color: var(--text);
-  white-space: nowrap;
+  /* Let long single chips (e.g. full fandom names) wrap instead of bleeding
+     past a narrow container. */
+  overflow-wrap: anywhere;
   font-family: var(--font-sans);
   line-height: 1.4;
   transition: border-color var(--transition-micro);
@@ -14,26 +17,26 @@
 
 /* Category: fandom */
 .fandom {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 
 /* Category: relationship */
 .relationship {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   font-style: italic;
 }
 
 /* Category: character */
 .character {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
 }
 
 /* Category: additional / trope */
 .additional {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 300;
 }
 
@@ -44,14 +47,11 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--secondary);
-  border-color: transparent;
-  padding-left: 0;
-  padding-right: 0;
 }
 
 /* Category: category (M/F, F/F, etc) */
 .category {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--secondary);
 }

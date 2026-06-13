@@ -11,6 +11,7 @@ export interface WorkMeta {
   summary: string;
   language: string;
   status: string;
+  cover?: string;           // cover image path e.g. '/covers/cover-01.png'; always populated after load (pool fallback)
   chapters: number;
   chaptersPosted?: number;  // posted count for WIPs; if absent, assume all chapters posted
   series?: { name: string; position: number; total?: number };
@@ -22,6 +23,9 @@ export interface WorkMeta {
   hits: number;
   comments: number;
 }
+
+/** Browse layout mode — detailed list or cover grid. */
+export type LayoutView = 'list' | 'grid';
 
 export interface Chapter {
   title: string;

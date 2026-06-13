@@ -1,5 +1,6 @@
 ---
 title: "After the Storm Season"
+cover: "/covers/cover-07.png"
 author: "road_out_of_nowhere"
 rating: "Explicit"
 warnings: ["Rape/Non-Con"]

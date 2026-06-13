@@ -1,5 +1,6 @@
 ---
 title: "Sufficient Unto the Day"
+cover: "/covers/cover-22.png"
 author: "enterprising_spock"
 rating: "General Audiences"
 warnings: ["No Archive Warnings Apply"]

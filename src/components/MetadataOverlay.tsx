@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useReading } from '@/context/ReadingContext';
-import { RatingBadge } from './RatingBadge';
 import { TagChip } from './TagChip';
-import { formatWords, readingTime } from '@/lib/utils';
+import { SignalStrip, Avatar } from './WorkCardCover';
+import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import styles from '@/styles/components/MetadataOverlay.module.css';
 
 interface Props {
@@ -14,13 +16,30 @@ interface Props {
 export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
   function MetadataOverlay({ onClose }, ref) {
     const { workMeta, totalChapters } = useReading();
+    const [summaryExpanded, setSummaryExpanded] = useState(false);
 
+    // Description "see more" — first 4 sentences, expandable (same as the header).
+    const sentences = workMeta.summary.match(/[^.!?]+[.!?]+/g) ?? (workMeta.summary ? [workMeta.summary] : []);
+    const summaryHasMore = sentences.length > 4;
+    const shownSummary =
+      summaryHasMore && !summaryExpanded ? sentences.slice(0, 4).join('').trim() : workMeta.summary;
+
+    const rClass = ratingClass(workMeta.rating);
+    const catLabel = categoryLabel(workMeta.category);
+    const isWip = isWipStatus(workMeta.status);
+    const seriesStr = workMeta.series
+      ? `Part ${workMeta.series.position} of ${workMeta.series.name}`
+      : null;
+
+    // Same stats line as the work header (status lives in the badge strip now).
     const statsLine = [
-      workMeta.status,
       formatWords(workMeta.words),
       readingTime(workMeta.words),
-      totalChapters > 1 ? `${totalChapters} chapters` : null,
+      totalChapters > 1 ? formatChapters(workMeta.chaptersPosted, workMeta.chapters) : null,
+      seriesStr,
       workMeta.language !== 'English' ? workMeta.language : null,
+      workMeta.kudos > 0 ? `♥ ${formatCount(workMeta.kudos)}` : null,
+      workMeta.bookmarks > 0 ? `⚑ ${formatCount(workMeta.bookmarks)}` : null,
     ]
       .filter(Boolean)
       .join(' · ');
@@ -44,24 +63,53 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
             </button>
           </div>
 
-          {/* Scrollable body */}
+          {/* Scrollable body — same hierarchy as the work header, in modal form:
+              thumbnail → badges → title → author (avatar) → stats → summary → tags */}
           <div className={styles.body}>
+            {workMeta.cover && (
+              <div className={styles.cover}>
+                <Image src={workMeta.cover} alt="" fill sizes="120px" className={styles.coverImg} />
+              </div>
+            )}
+
             {/* Zone 1: Identity */}
             <div className={styles.zone1}>
-              <div className={styles.titleRow}>
-                <RatingBadge rating={workMeta.rating} />
-                <h2 className={styles.title}>{workMeta.title}</h2>
+              <div className={styles.badgeRow}>
+                <SignalStrip
+                  rating={workMeta.rating}
+                  rClass={rClass}
+                  catLabel={catLabel}
+                  category={workMeta.category}
+                  isWip={isWip}
+                />
               </div>
+              <h2 className={styles.title}>{workMeta.title}</h2>
               <p className={styles.byline}>
-                by {workMeta.author}
-                {workMeta.fandom.length > 0 && (
-                  <> &middot; <span className={styles.fandom}>{workMeta.fandom.join(', ')}</span></>
-                )}
+                <span className={styles.bylineBy}>by</span>
+                <Avatar />
+                <Link href={`/?q=${encodeURIComponent(workMeta.author)}`} className={styles.bylineAuthor}>
+                  {workMeta.author}
+                </Link>
               </p>
+              {/* Description with see-more, then social metrics under it — same as header */}
+              {workMeta.summary && (
+                <p className={styles.summaryText}>
+                  {shownSummary}
+                  {summaryHasMore && (
+                    <button
+                      type="button"
+                      className={styles.seeMore}
+                      onClick={() => setSummaryExpanded((v) => !v)}
+                    >
+                      {summaryExpanded ? 'see less' : '… see more'}
+                    </button>
+                  )}
+                </p>
+              )}
               <p className={styles.stats}>{statsLine}</p>
             </div>
 
-            {/* Zone 2: Signals */}
+            {/* Signals */}
             <div className={styles.zone2}>
               {workMeta.warnings.length > 0 && (
                 <div className={styles.tagRow}>
@@ -114,13 +162,6 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                 </div>
               )}
             </div>
-
-            {/* Zone 3: Summary */}
-            {workMeta.summary && (
-              <div className={styles.zone3}>
-                <p className={styles.summaryText}>{workMeta.summary}</p>
-              </div>
-            )}
           </div>
         </div>
       </div>

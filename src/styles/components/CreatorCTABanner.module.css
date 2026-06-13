@@ -1,0 +1,13 @@
+/* ============================================================
+   CREATOR CTA BANNER — painted-door promo amid the shelves.
+   Reuses the hero banner's slide treatment (HeroCarousel.module.css);
+   this wrapper just constrains it to a narrower width and clips the
+   rounded corners (the hero gets its radius from the carousel viewport).
+   ============================================================ */
+
+.banner {
+  display: flex;               /* the reused .slide is flex:0 0 100% — needs a flex parent */
+  margin: 0 0 var(--space-12);
+  border-radius: 14px;         /* match the cards / hero */
+  overflow: hidden;            /* clip the reused image slide to the radius */
+}

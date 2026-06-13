@@ -28,6 +28,78 @@
   text-align: center;
 }
 
+/* "{work title} | by [avatar] username" under the chapter title */
+.chapterByline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  margin-top: var(--space-3);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--secondary);
+  opacity: 0.65;
+}
+
+/* Work title — truncates so the byline stays on one line */
+.bylineWork {
+  min-width: 0;
+  max-width: 24ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.bylineSep {
+  flex-shrink: 0;
+  margin: 0 8px;
+  color: var(--secondary);
+  opacity: 0.45;
+}
+
+/* Keeps "by · avatar · author" together as one unit (so it stacks as a row
+   under the title on mobile). */
+.bylineAuthorGroup {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.bylineBy {
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
+/* Mobile: stack the title over the author so the byline isn't too wide. */
+@media (max-width: 768px) {
+  .chapterByline {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bylineSep {
+    display: none;
+  }
+
+  .bylineWork {
+    max-width: 100%;
+  }
+}
+
+.bylineAuthor {
+  flex-shrink: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.bylineAuthor:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Author notes */
 .authorNote {
   border-left: 2px solid var(--border-strong);

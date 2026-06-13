@@ -1,5 +1,6 @@
 ---
 title: "The Long Way Home"
+cover: "/covers/cover-12.png"
 author: "brooklynbridge"
 rating: "Mature"
 warnings: ["Graphic Depictions Of Violence"]

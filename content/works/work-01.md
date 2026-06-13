@@ -1,5 +1,6 @@
 ---
 title: "The Shape of Flame"
+cover: "/covers/cover-01.png"
 author: "undercityblues"
 rating: "Mature"
 warnings: ["No Archive Warnings Apply"]

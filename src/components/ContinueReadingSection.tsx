@@ -1,8 +1,14 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState } from 'react';
-import Link from 'next/link';
+import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
+import { RailViewport } from './RailViewport';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
+
+interface Props {
+  /** slug → cover path, passed from the page (localStorage bookmarks lack meta.cover). */
+  covers?: Record<string, string | undefined>;
+}
 
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -24,7 +30,7 @@ interface RawBookmark {
   totalChapters?: number;
 }
 
-export function ContinueReadingSection() {
+export function ContinueReadingSection({ covers }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -43,7 +49,7 @@ export function ContinueReadingSection() {
             timestamp: b.timestamp,
           }))
           .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 3);
+          .slice(0, 8);
         setBookmarks(items);
       }
     } catch {
@@ -52,49 +58,50 @@ export function ContinueReadingSection() {
     setLoaded(true);
   }, []);
 
-  if (!loaded || bookmarks.length === 0) return null;
+  // Confirmed empty after the read → render nothing.
+  if (loaded && bookmarks.length === 0) return null;
+
+  // Pre-hydration / pre-read: reserve the rail's height with skeletons. The
+  // `pending` class is hidden via CSS unless <html data-has-reading> is set by
+  // ThemeScript, so users with no reading list never see this flash. Once
+  // loaded, the skeletons swap to real cards in place — no late push-down.
+  const pending = !loaded;
 
   return (
-    <section className={styles.section}>
+    <section className={`${styles.section} ${pending ? styles.pending : ''}`}>
       {/* Section header band */}
       <div className={styles.band}>
         <span className={styles.bandLabel}>Continue Reading</span>
-        <span className={styles.bandMeta}>
-          {bookmarks.length} in progress{' · '}
-          <a href="/reading" className={styles.bandLink}>
-            view reading list
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
-              strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="3 1.5 7 5 3 8.5" />
-            </svg>
-          </a>
-        </span>
+        {!pending && (
+          <span className={styles.bandMeta}>
+            {bookmarks.length} in progress{' · '}
+            <a href="/reading" className={styles.bandLink}>
+              view reading list
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
+                strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="3 1.5 7 5 3 8.5" />
+              </svg>
+            </a>
+          </span>
+        )}
       </div>
 
-      {/* Cards — up to 3 equal columns */}
-      <div className={styles.cards}>
-        {bookmarks.map((item, i) => (
-          <Link
-            key={item.slug}
-            href={`/works/${item.slug}`}
-            className={`${styles.card} ${i < bookmarks.length - 1 ? styles.cardDivider : ''}`}
-          >
-            <div className={styles.cardBody}>
-              <div className={styles.title}>{item.title}</div>
-              <div className={styles.chapterLine}>
-                Ch. {item.chapterIndex + 1} of {item.totalChapters}
-              </div>
-            </div>
-            {/* 3px progress bar flush to card bottom */}
-            <div className={styles.progressTrack}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${Math.min(item.scrollPercent * 100, 100).toFixed(1)}%` }}
-              />
-            </div>
-          </Link>
-        ))}
-      </div>
+      {/* Card rail — visual covers or text cards, by the global mode.
+          .rail frames the scroller and carries the directional edge fades;
+          RailViewport adds prev/next scroll arrows (in addition to swipe). */}
+      <RailViewport railClassName={styles.rail} rowClassName={styles.cards}>
+        {pending
+          ? Array.from({ length: PENDING_SKELETONS }, (_, i) => (
+              <ContinueCardSkeleton key={i} />
+            ))
+          : bookmarks.map((item) => (
+              <ContinueCard key={item.slug} item={item} cover={covers?.[item.slug]} />
+            ))}
+      </RailViewport>
     </section>
   );
 }
+
+// Single-row rail height is constant, so a fixed skeleton count is enough to
+// reserve the right vertical space; it just fills the visible width.
+const PENDING_SKELETONS = 6;

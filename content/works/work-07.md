@@ -1,5 +1,6 @@
 ---
 title: "The Long Campaign"
+cover: "/covers/cover-21.png"
 author: "exandrian_ink"
 rating: "Teen And Up Audiences"
 warnings: ["No Archive Warnings Apply"]

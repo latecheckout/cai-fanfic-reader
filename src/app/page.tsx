@@ -6,9 +6,10 @@ import {
   buildSearchOptions,
 } from '@/lib/filters';
 import { FilterState } from '@/types';
+import { buildShelves, buildCreators } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
-import { ContinueReadingSection } from '@/components/ContinueReadingSection';
+import { BrowseHome } from '@/components/BrowseHome';
 import styles from './browse.module.css';
 
 interface PageProps {
@@ -80,7 +81,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
   const filterOptions = buildFilterOptions(allWorks);
   const searchOptions = buildSearchOptions(allWorks);
 
-  // Only show editorial sections when no active filters (include or exclude)
+  // Layer split: any filter, search, or sort param means the visitor has
+  // expressed intent, so they get the full results surface (layer one).
+  // A bare / gets the browse-first home (layer zero).
   const hasActiveFilters = !!(
     params.fandom || params.relationship || params.tag || params.character ||
     params.rating || params.status || params.q ||
@@ -90,7 +93,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     params.ex_character || params.ex_rating || params.ex_status ||
     params.ex_category || params.ex_warning ||
     params.date_preset || params.date_from || params.date_to ||
-    params.preset
+    params.preset || params.sort || params.order
   );
 
   return (
@@ -101,9 +104,25 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 
-        {/* Continue Reading — hidden when filters are active */}
-        {!hasActiveFilters && <ContinueReadingSection />}
+        {/* Editorial zone: only on the unfiltered Discover page. The global
+            mode toggle restyles every card via html[data-mode]: visual =
+            covers, text = AO3-style metadata cards. */}
+        {!hasActiveFilters && (
+          <>
+            <BrowseHome
+              shelves={buildShelves(allWorks)}
+              creators={buildCreators(allWorks)}
+              covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
+            />
+            <div className={styles.forYouHeader}>
+              <h2 className={styles.forYouTitle}>Stories for you 📚</h2>
+              <p className={styles.forYouSubtitle}>The whole archive, ready to filter</p>
+            </div>
+          </>
+        )}
 
+        {/* The browse zone: search, sort, and filters live in its sticky
+            toolbar. With filters active it is the entire page. */}
         <Suspense>
           <BrowseShell
             works={filteredWorks}

@@ -34,7 +34,7 @@
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   color: var(--secondary);
   transition: color 120ms ease, border-color 120ms ease;
@@ -53,7 +53,7 @@
 
 .tabCount {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   color: inherit;
   opacity: 0.55;
 }
@@ -63,6 +63,27 @@
   display: flex;
   flex-direction: column;
 }
+
+/* Per-view layouts — identical to Browse: list = 1-then-2 columns, grid = 4→3→2→1. */
+.list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 1100px) {
+  .list { grid-template-columns: repeat(2, 1fr); }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px) { .grid { grid-template-columns: 1fr; } }
 
 /* ── Card wrapper (for bookmarked tab — adds remove button) ── */
 .cardWrapper {
@@ -98,20 +119,20 @@
   padding: var(--space-12) 0;
   text-align: center;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
 }
 
 .emptyHeading {
   margin: 0 0 8px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
 .emptyHint {
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--secondary);
 }
 
@@ -131,11 +152,17 @@
   100% { background-position: 400px 0; }
 }
 
+/* Matches Browse: both loaders are bordered boxes with the card chrome; only
+   the shape differs (list = auto height, grid = 2:3 with bars bottom-left). */
 .skeletonCard {
+  position: relative;
   display: flex;
-  gap: 20px;
-  padding: var(--space-5) 0;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
   opacity: 0;
 }
 
@@ -146,47 +173,32 @@
   .skeletonCard { opacity: 1; }
 }
 
-.skeletonCard:last-child {
-  border-bottom: none;
-}
-
 @keyframes skeletonFadeIn {
   to { opacity: 1; }
 }
 
-.skeletonStrip {
-  width: 48px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 4px;
-}
+/* No cover block — both layouts are bordered boxes with shimmer bars. */
+.skeletonStrip { display: none; }
 
-.skeletonStrip::before,
-.skeletonStrip::after {
-  content: '';
-  display: block;
-  border-radius: 2px;
-}
+/* List: matches the list card footprint; bars stack from the top. */
+.list .skeletonCard { min-height: 300px; }
 
-.skeletonStrip::before {
-  width: 20px;
-  height: 20px;
-  background: var(--border-strong);
-  opacity: 0.5;
-}
-
-.skeletonStrip::after {
-  width: 20px;
-  height: 20px;
-  background: var(--border);
-  opacity: 0.5;
+/* Grid: 2:3 box; bar cluster sits bottom-left like the image card. */
+.grid .skeletonCard { aspect-ratio: 2 / 3; }
+.grid .skeletonContent {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  flex: none;
 }
 
 .skeletonContent {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .skeletonLine {

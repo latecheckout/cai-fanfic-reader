@@ -1,5 +1,6 @@
 ---
 title: "An Arrangement of Stars"
+cover: "/covers/cover-25.png"
 author: "south_downs_forever"
 rating: "General Audiences"
 warnings: ["No Archive Warnings Apply"]

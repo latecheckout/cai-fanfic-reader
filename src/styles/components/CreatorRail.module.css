@@ -1,0 +1,170 @@
+/* ============================================================
+   CREATOR RAIL: trending creators on the browse-first home.
+   Cards of humans; avatars are initials placeholders until
+   real profiles exist. Identical in both site modes (already
+   textual). Type sizes follow the +2px accessibility bump.
+   ============================================================ */
+
+.section {
+  margin-bottom: var(--space-12);
+}
+
+/* ── Header (matches ShelfRail) ── */
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.titleWrap {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--secondary);
+}
+
+/* ── Card row ── */
+.row {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Directional edge fades (matches ShelfRail) ──────────────────────────
+   .rail frames the scroller; two gradient overlays fade content into the
+   page background, their opacity driven continuously by the row's scroll
+   position via a scroll-driven animation (no JS, no snap). Fallback without
+   scroll-timeline support: right fade shown, left hidden. */
+.rail {
+  position: relative;
+}
+
+.rail::before,
+.rail::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.rail::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+  opacity: 0;
+}
+
+.rail::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+  opacity: 1;
+}
+
+@supports (animation-timeline: scroll()) {
+  .rail {
+    timeline-scope: --creator-rail-x;
+  }
+
+  .row {
+    scroll-timeline: --creator-rail-x inline;
+  }
+
+  .rail::before,
+  .rail::after {
+    animation-duration: 1ms;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --creator-rail-x;
+  }
+
+  .rail::before {
+    animation-name: creatorRailFadeLeft;
+  }
+
+  .rail::after {
+    animation-name: creatorRailFadeRight;
+  }
+}
+
+@keyframes creatorRailFadeLeft {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes creatorRailFadeRight {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* The card itself lives in CreatorCard / CreatorCard.module.css. */
+
+/* ── Entry stagger — matches the Continue Reading rail's card cascade. ── */
+@keyframes railFadeUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .row > * { animation: railFadeUp 650ms var(--ease-out-expo) both; }
+  .row > *:nth-child(1) { animation-delay: 30ms; }
+  .row > *:nth-child(2) { animation-delay: 60ms; }
+  .row > *:nth-child(3) { animation-delay: 90ms; }
+  .row > *:nth-child(4) { animation-delay: 120ms; }
+  .row > *:nth-child(5) { animation-delay: 150ms; }
+  .row > *:nth-child(6) { animation-delay: 180ms; }
+  .row > *:nth-child(7) { animation-delay: 210ms; }
+  .row > *:nth-child(8) { animation-delay: 240ms; }
+}
+
+/* Skeleton slot — matches the creator card width so the shared SkeletonCard
+   (2:3) sizes correctly inside the flex rail. */
+.skelCard {
+  flex-shrink: 0;
+  width: 200px;
+}
+
+@media (max-width: 768px) {
+  .skelCard { width: 168px; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: var(--space-10);
+  }
+
+  .title {
+    font-size: 21px;
+  }
+
+  /* Narrower edge fades to match the smaller cards. */
+  .rail::before,
+  .rail::after {
+    width: 40px;
+  }
+}

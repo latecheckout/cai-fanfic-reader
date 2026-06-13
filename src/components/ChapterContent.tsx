@@ -1,20 +1,43 @@
+import Link from 'next/link';
 import { Chapter } from '@/types';
+import { Avatar } from './WorkCardCover';
 import styles from '@/styles/components/ChapterContent.module.css';
 
 interface Props {
   chapter: Chapter;
   chapterHtml: string;
   totalChapters: number;
+  /** Work author — shown as a byline under each chapter title. */
+  author?: string;
+  /** Work title — shown (truncated) before the author in the byline. */
+  workTitle?: string;
 }
 
-export function ChapterContent({ chapter, chapterHtml, totalChapters }: Props) {
+export function ChapterContent({ chapter, chapterHtml, totalChapters, author, workTitle }: Props) {
   return (
     <div className={styles.container}>
-      {/* Chapter title */}
+      {/* Chapter title + author byline */}
       {totalChapters > 1 && (
         <header className={styles.chapterHeader}>
           <p className={styles.chapterNumber}>Chapter {chapter.index + 1}</p>
           <h2 className={styles.chapterTitle}>{chapter.title}</h2>
+          {author && (
+            <p className={styles.chapterByline}>
+              {workTitle && (
+                <>
+                  <span className={styles.bylineWork}>{workTitle}</span>
+                  <span className={styles.bylineSep} aria-hidden="true">|</span>
+                </>
+              )}
+              <span className={styles.bylineAuthorGroup}>
+                <span className={styles.bylineBy}>by</span>
+                <Avatar />
+                <Link href={`/?q=${encodeURIComponent(author)}`} className={styles.bylineAuthor}>
+                  {author}
+                </Link>
+              </span>
+            </p>
+          )}
         </header>
       )}
 

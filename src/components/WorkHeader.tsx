@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { WorkMeta } from '@/types';
-import { formatWords, formatCount, formatChapters, readingTime } from '@/lib/utils';
-import { RatingBadge } from './RatingBadge';
+import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { TagChip } from './TagChip';
+import { SignalStrip, Avatar } from './WorkCardCover';
 import styles from '@/styles/components/WorkHeader.module.css';
 
 interface Props {
@@ -13,33 +15,19 @@ interface Props {
   totalChapters: number;
 }
 
-function clamp(val: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, val));
-}
-
 export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
-  const [scrollPx, setScrollPx] = useState(0);
-
-  useEffect(() => {
-    function onScroll() {
-      setScrollPx(window.scrollY);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Wider fade range for taller editorial header
-  const z3 = 1 - clamp(scrollPx / 80, 0, 1);              // summary fades 0→80px
-  const z2 = 1 - clamp((scrollPx - 40) / 80, 0, 1);       // signals fades 40→120px
-  const z1 = 1 - clamp((scrollPx - 80) / 80, 0, 1);       // identity fades 80→160px
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
 
   const chaptersStr = formatChapters(meta.chaptersPosted, meta.chapters);
   const seriesStr = meta.series
     ? `Part ${meta.series.position} of ${meta.series.name}`
     : null;
 
+  const isWip = isWipStatus(meta.status);
+  const rClass = ratingClass(meta.rating);
+  const catLabel = categoryLabel(meta.category);
+
   const statsLine = [
-    meta.status,
     formatWords(meta.words),
     readingTime(meta.words),
     totalChapters > 1 ? chaptersStr : null,
@@ -51,20 +39,61 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
     .filter(Boolean)
     .join(' · ');
 
+  // Description: show first 4 sentences, expandable via "see more"
+  const sentences = meta.summary.match(/[^.!?]+[.!?]+/g) ?? (meta.summary ? [meta.summary] : []);
+  const summaryHasMore = sentences.length > 4;
+  const shownSummary =
+    summaryHasMore && !summaryExpanded ? sentences.slice(0, 4).join('').trim() : meta.summary;
+
   return (
     <header className={styles.header} aria-label="Work information">
-      {/* Zone 1: Identity — fades last (80→160px) */}
-      <div className={styles.zone1} style={{ opacity: z1 }}>
-        <div className={styles.titleRow}>
-          <RatingBadge rating={meta.rating} />
+      {/* Top block — identity-first, mirroring the list card hierarchy:
+          thumbnail → badges → title → author (with avatar) → summary → stats */}
+      <div className={styles.headerRow}>
+        {meta.cover && (
+          <div className={styles.cover}>
+            <Image src={meta.cover} alt="" fill sizes="180px" className={styles.coverImg} />
+          </div>
+        )}
+        <div className={styles.headerMain}>
+          {/* Badges above the h1 — same strip as the home/list cards */}
+          <div className={styles.badgeRow}>
+            <SignalStrip
+              rating={meta.rating}
+              rClass={rClass}
+              catLabel={catLabel}
+              category={meta.category}
+              isWip={isWip}
+            />
+          </div>
           <h1 className={styles.title}>{meta.title}</h1>
+          <p className={styles.byline}>
+            <span className={styles.bylineBy}>by</span>
+            <Avatar />
+            <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
+              {meta.author}
+            </Link>
+          </p>
+          {meta.summary && (
+            <p className={styles.summaryText}>
+              {shownSummary}
+              {summaryHasMore && (
+                <button
+                  type="button"
+                  className={styles.seeMore}
+                  onClick={() => setSummaryExpanded((v) => !v)}
+                >
+                  {summaryExpanded ? 'see less' : '… see more'}
+                </button>
+              )}
+            </p>
+          )}
+          <p className={styles.stats}>{statsLine}</p>
         </div>
-        <p className={styles.byline}>by <span>{meta.author}</span></p>
-        <p className={styles.stats}>{statsLine}</p>
       </div>
 
-      {/* Zone 2: Signals — fades mid (40→120px) */}
-      <div className={styles.zone2} style={{ opacity: z2 }}>
+      {/* Signals — full width below the cover + content */}
+      <div className={styles.zone2}>
         {meta.warnings.length > 0 && (
           <div className={styles.tagRow}>
             <span className={styles.tagLabel}>Warnings</span>
@@ -117,12 +146,6 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
         )}
       </div>
 
-      {/* Zone 3: Summary — fades first (0→80px) */}
-      {meta.summary && (
-        <div className={styles.zone3} style={{ opacity: z3 }}>
-          <p className={styles.summaryText}>{meta.summary}</p>
-        </div>
-      )}
     </header>
   );
 }

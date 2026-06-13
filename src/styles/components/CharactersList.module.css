@@ -33,7 +33,7 @@
   border-radius: 999px;
   background: transparent;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text);
   outline: none;
   transition: border-color 150ms ease;
@@ -74,7 +74,7 @@
 
 .resultCount {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   flex-shrink: 0;
 }
@@ -101,7 +101,7 @@
   width: 24px;
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--secondary);
@@ -139,7 +139,7 @@
 
 .charName {
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 400;
   color: var(--text);
   min-width: 0;
@@ -147,7 +147,7 @@
 
 .charCount {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--secondary);
   flex-shrink: 0;
 }
@@ -155,7 +155,7 @@
 /* ── Empty state ── */
 .empty {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
   padding: var(--space-8) 0;
 }

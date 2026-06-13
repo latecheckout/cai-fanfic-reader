@@ -1,0 +1,187 @@
+/* ============================================================
+   AO4 TURBO TOGGLE — the global mode switch as a draggable toggle.
+   Combines: NavSwitch track + DragSlider drag/snap + ActionButton
+   plush-oklch thumb. The thumb ("AO4 turbo") slides/taps on↔off; ON
+   = text mode. Replaces the old Ao4 FAB (same corner + behaviour).
+   ============================================================ */
+
+.root {
+  position: fixed;
+  right: 28px;
+  bottom: calc(24px + var(--safe-bottom));
+  z-index: var(--z-sticky);
+}
+
+/* Full-width fade-to-bg bar across the bottom of the site — solid page colour
+   at the very bottom (reads continuous with the area under the browser UI),
+   easing up to transparent. The toggle sits in this band instead of a corner
+   radial pool. Multi-stop ease so there's no banding. */
+.aura {
+  position: fixed;
+  left: 0;
+  right: 0;
+  /* Pinned to the very bottom so the fade always reaches the edge. */
+  bottom: 0;
+  height: 220px;
+  z-index: calc(var(--z-sticky) - 1);
+  pointer-events: none;
+  /* Solid only at the very bottom, then a long gentle ease up — so the toggle
+     (which sits ~50px off the bottom) lands inside the fade, not the solid. */
+  background: linear-gradient(to top,
+    var(--bg) 0%,
+    var(--bg) 7%,
+    color-mix(in srgb, var(--bg), transparent 14%) 20%,
+    color-mix(in srgb, var(--bg), transparent 30%) 34%,
+    color-mix(in srgb, var(--bg), transparent 48%) 48%,
+    color-mix(in srgb, var(--bg), transparent 66%) 62%,
+    color-mix(in srgb, var(--bg), transparent 82%) 78%,
+    color-mix(in srgb, var(--bg), transparent 93%) 90%,
+    transparent 100%);
+}
+
+@media (max-width: 768px) {
+  .aura {
+    height: 180px;
+  }
+}
+
+/* NavSwitch-style muted pill track. */
+.track {
+  position: relative;
+  width: 194px;   /* thumb 140 + travel 48 + padding 6 */
+  height: 50px;
+  padding: 3px;
+  border-radius: 999px;
+  /* Solid site-bg base underneath, with the original translucent wash painted
+     on top — same track colour as before, now fully opaque (no content shows
+     through). */
+  background-color: var(--bg);
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--text) 8%, transparent),
+    color-mix(in srgb, var(--text) 8%, transparent));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  touch-action: none;
+}
+
+/* On/off marks living in the track's negative space — the thumb covers the
+   active side, leaving the other symbol showing (off = ring, on = bar). */
+.sym {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--secondary);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.symLeft { left: 26px; }
+.symRight { right: 26px; }
+
+/* The draggable thumb — ActionButton plush + oklch glow. */
+.thumb {
+  /* On fill + the two hover-glow radials. */
+  --ab-magenta: #652E1F;   /* on (AO4) fill */
+  --ab-hot-pink: #AE00D9;  /* glow radial 1 */
+  --ab-alt-violet: #6B2E63;/* glow radial 2 */
+  --mx: 50%;
+  --my: 50%;
+
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 140px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--ab-magenta);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: grab;
+  will-change: transform;
+  /* Shadow keeps the pill legible over images — trimmed a little so it casts
+     less onto the fade bar beneath the toggle. */
+  box-shadow:
+    0 2px 5px -1px rgba(0, 0, 0, 0.26),
+    0 9px 20px -9px rgba(0, 0, 0, 0.38);
+}
+
+.thumb:active { cursor: grabbing; }
+
+/* Plush inner drop-shadow + glass stroke (the ActionButton signature). */
+.plush {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 -2.5px 5px 0 rgba(255, 255, 255, 0.44), inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.44);
+  outline: 1.25px solid rgba(255, 255, 255, 0.22);
+  outline-offset: -1.25px;
+}
+
+/* Dark mode: the white inset shadow reads brighter against the darker thumb —
+   dial it back so it matches the light-mode intensity. */
+[data-theme="dark"] .plush {
+  box-shadow: inset 0 -2.5px 5px 0 rgba(255, 255, 255, 0.24), inset 0 2.5px 5px 0 rgba(255, 255, 255, 0.24);
+}
+
+/* Mouse-tracked dual-radial oklch glow on hover. */
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  background:
+    radial-gradient(120px circle at var(--mx) var(--my),
+      color-mix(in oklch, var(--ab-hot-pink) 85%, transparent), transparent 60%),
+    radial-gradient(200px circle at calc(100% - var(--mx)) calc(100% - var(--my)),
+      color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%);
+}
+
+/* Only on real pointers — on touch, :hover sticks after a tap and the glow
+   would linger stuck on. */
+@media (hover: hover) and (pointer: fine) {
+  .thumb:hover .glow { opacity: 1; }
+}
+
+/* OFF (image mode is active): grey fill so it reads as off. The oklch hover
+   glow still comes through on top. ON keeps the magenta fill. */
+.off {
+  background: var(--secondary);
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+}
+
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Mobile: clear the bottom reading bar; a touch larger for easier tapping.
+   Track width must stay thumb-width + TRAVEL(48) + padding(6) = 206. ── */
+@media (max-width: 768px) {
+  .root {
+    right: 16px;
+    bottom: calc(18px + var(--safe-bottom));
+  }
+  .track { width: 206px; height: 54px; }
+  .thumb { width: 152px; height: 48px; font-size: 15px; }
+}

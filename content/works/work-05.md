@@ -1,5 +1,6 @@
 ---
 title: "Cross the Distance"
+cover: "/covers/cover-19.png"
 author: "settersandspikers"
 rating: "Teen And Up Audiences"
 warnings: ["No Archive Warnings Apply"]

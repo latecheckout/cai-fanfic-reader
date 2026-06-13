@@ -4,8 +4,6 @@
 }
 
 .workList {
-  display: flex;
-  flex-direction: column;
   transition: opacity 180ms ease;
 }
 
@@ -15,12 +13,51 @@
   }
 }
 
+/* ── Layout modes (driven by the view toggle) ── */
+/* Single column by default; two columns on wide desktops so the detailed
+   text cards fill the extra width instead of stretching to one long row. */
+.list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  /* Default (stretch) so paired cells in a row share the tallest height —
+     no ragged short cards next to tall ones. */
+}
+
+@media (min-width: 1100px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Image-background cards are self-contained (rounded, own scrim), so the grid
+   is a plain gapped lattice: 4 up on desktop, collapsing to 3 then 2. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+/* Collapse columns on narrower viewports — drop early so the image cards keep
+   a comfortable width: 3-up ≤1100, 2-up ≤768, then a single column on phones. */
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 460px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
 /* ── Back link (e.g. "← Characters" when navigating from characters page) ── */
 .backLink {
   display: inline-block;
   margin-bottom: var(--space-4);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   color: var(--secondary);
   text-decoration: none;
@@ -33,23 +70,24 @@
 
 /* ── Empty state ── */
 .empty {
+  grid-column: 1 / -1; /* span all columns in grid views so it centers full-width */
   padding: var(--space-12) 0;
   text-align: center;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   color: var(--secondary);
 }
 
 .emptyHeading {
   margin: 0 0 8px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
 .emptyHint {
   margin: 0;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--secondary);
 }
 
@@ -69,11 +107,19 @@
   50%       { opacity: 0.85; }
 }
 
+/* Both loaders share the exact card chrome — same fill, border (stroke), radius,
+   padding and gap as the real cards. Only the shape differs (list = auto height,
+   grid = 2:3) and where the bars sit. box-sizing: border-box (global) keeps the
+   footprint identical to the cards. */
 .skeletonCard {
+  position: relative;
   display: flex;
-  gap: 20px;
-  padding: var(--space-5) 0;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--card-bg), #fff 35%);
   opacity: 0;
 }
 
@@ -84,49 +130,42 @@
   .skeletonCard { opacity: 1; }
 }
 
-.skeletonCard:last-child {
-  border-bottom: none;
-}
-
 @keyframes skeletonFadeIn {
   to { opacity: 1; }
 }
 
-.skeletonStrip {
-  width: 48px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 4px;
+/* No cover block on either loader — both are bordered boxes with shimmer bars. */
+.skeletonStrip { display: none; }
+
+/* List: matches the list card's footprint. Bars stack from the top; min-height
+   approximates a populated list card (badges → title → byline → summary →
+   tags → stats → discovery) so there's no jump when content loads. */
+.list .skeletonCard {
+  min-height: 300px;
 }
 
-.skeletonStrip::before,
-.skeletonStrip::after {
-  content: '';
-  display: block;
-  border-radius: 2px;
+/* Grid: same chrome, locked to the image card's 2:3 box; the bar cluster sits
+   at the bottom-left where the card's overlay lives. */
+.grid .skeletonCard {
+  aspect-ratio: 2 / 3;
 }
-
-.skeletonStrip::before {
-  width: 20px;
-  height: 20px;
-  background: var(--border-strong);
-  opacity: 0.5;
-}
-
-.skeletonStrip::after {
-  width: 20px;
-  height: 20px;
-  background: var(--border);
-  opacity: 0.5;
+.grid .skeletonContent {
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  flex: none;
 }
 
 .skeletonContent {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+/* Shared shimmer-bar fill — identical on both loaders. */
 .skeletonLine {
   border-radius: 3px;
   background: var(--border-strong);

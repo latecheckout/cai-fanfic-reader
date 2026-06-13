@@ -1,5 +1,6 @@
 ---
 title: "Static"
+cover: "/covers/cover-05.png"
 author: "AnonymousWriter"
 rating: "General Audiences"
 warnings: ["No Archive Warnings Apply"]
