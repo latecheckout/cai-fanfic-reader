@@ -70,3 +70,18 @@ export function isWipStatus(status: string): boolean {
   const s = status.toLowerCase();
   return s.includes('progress') || s === 'wip' || s === 'in-progress';
 }
+
+/**
+ * Split a summary into sentences and keep the first `max`. Returns the shown
+ * text plus whether anything was trimmed (so callers can offer "see more").
+ */
+export function truncateSummary(summary: string, max = 4): { text: string; hasMore: boolean } {
+  const sentences = summary.match(/[^.!?]+[.!?]+/g) ?? (summary ? [summary] : []);
+  const hasMore = sentences.length > max;
+  return { text: hasMore ? sentences.slice(0, max).join('').trim() : summary, hasMore };
+}
+
+/** Drop a leading "Chapter N:" from a title — the number is already shown separately. */
+export function stripChapterPrefix(title: string): string {
+  return title.replace(/^\s*chapter\s+\d+\s*:\s*/i, '') || title;
+}

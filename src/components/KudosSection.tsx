@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import styles from '@/styles/components/KudosSection.module.css';
 
 interface Props {
   slug: string;
@@ -40,26 +39,29 @@ export function KudosSection({ slug, totalKudos }: Props) {
   }
 
   return (
-    <div className={styles.zone}>
-      <p className={styles.endMark}>— end of work —</p>
+    <div className="flex flex-col items-center pt-20 px-6 pb-[100px] gap-5">
+      <p className="font-mono text-[10px] tracking-[0.12em] text-secondary opacity-40 m-0">— end of work —</p>
       <button
         className={[
-          styles.button,
-          given ? styles.given : '',
-          animating ? styles.pop : '',
+          'relative overflow-visible font-sans text-sm font-medium tracking-[0.02em] py-[14px] px-10 rounded-full border-[1.5px] border-text bg-transparent text-text cursor-pointer min-w-[200px] flex items-center justify-center transition-colors duration-200 hover:not-disabled:bg-[color-mix(in_srgb,var(--text)_6%,transparent)]',
+          given ? 'bg-text text-bg cursor-default' : '',
+          animating ? 'kudos-pop' : '',
         ].filter(Boolean).join(' ')}
         onClick={handleKudos}
         disabled={given}
         aria-label={given ? 'Kudos given' : 'Leave kudos for this work'}
       >
         {Array.from({ length: 12 }).map((_, i) => (
-          <span key={i} className={styles.heart} aria-hidden="true">♥</span>
+          <span key={i} className="kudos-heart absolute top-1/2 left-1/2 text-[10px] text-text opacity-0 pointer-events-none -translate-x-1/2 -translate-y-1/2 select-none leading-none" aria-hidden="true">♥</span>
         ))}
-        <span className={styles.label}>
+        <span className="relative z-[1] pointer-events-none">
           {given ? '♥ Kudos left' : '♥ Leave Kudos'}
         </span>
       </button>
-      <p className={[styles.count, animating ? styles.countPop : ''].filter(Boolean).join(' ')}>
+      <p className={[
+        'font-mono text-[11px] tracking-[0.08em] text-secondary m-0 transition-opacity duration-200',
+        animating ? 'kudos-count-pop !opacity-[0.85]' : 'opacity-50',
+      ].filter(Boolean).join(' ')}>
         {displayCount.toLocaleString()} kudos
       </p>
     </div>

@@ -6,12 +6,12 @@ import { ReadingCluster } from '@/components/ReadingCluster';
 import { ChapterList } from '@/components/ChapterList';
 import { ReadingHUD } from '@/components/ReadingHUD';
 import { ReadingActions } from '@/components/ReadingActions';
+import { SelectionToolbar } from '@/components/SelectionToolbar';
 import { ReturnToPositionFAB } from '@/components/ReturnToPositionFAB';
 import { FocusEffect } from '@/components/FocusEffect';
 import { MobileReadingBar } from '@/components/MobileReadingBar';
 import { ReadingProvider } from '@/context/ReadingContext';
 import { WorkSummary } from '@/types';
-import styles from './reader.module.css';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -78,7 +78,7 @@ export default async function ReaderPage({ params }: PageProps) {
   const recommendations = getRecommendations(slug, meta.fandom);
 
   return (
-    <div className={styles.page}>
+    <div className="min-h-screen">
       <FocusEffect />
 
       <ReadingProvider
@@ -87,22 +87,28 @@ export default async function ReaderPage({ params }: PageProps) {
         totalChapters={chapters.length}
         slug={slug}
       >
-        {/* Always-visible floating HUD — left: back, right: bookmark */}
-        <ReadingHUD />
-        <ReadingActions />
+        {/* Fixed HUD — back (left) + actions (right), over a gradient scrim */}
+        <div
+          className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-reading-bar)] flex items-start justify-between p-4 max-md:hidden"
+          style={{ background: 'linear-gradient(to bottom, var(--bg), transparent)' }}
+        >
+          <ReadingHUD />
+          <ReadingActions />
+        </div>
         <ReturnToPositionFAB />
         <MobileReadingBar />
+        <SelectionToolbar />
 
-        {/* Main reading content */}
-        <main className={styles.main}>
+        {/* Main reading content — no opacity animation here: it would create a
+            stacking context and trap the sticky cluster's z-index below the bar. */}
+        <main className="p-0 max-md:pb-[calc(44px+20px+var(--safe-bottom)+24px)]">
           {/* Work header — three-zone scroll animation */}
           <WorkHeader
             meta={meta}
-            slug={slug}
             totalChapters={chapters.length}
           />
 
-          {/* Sticky reading cluster — in-flow below header, sticks on scroll */}
+          {/* Reading cluster — in-flow below the header, sticks to top on scroll */}
           <ReadingCluster />
 
           {/* All chapters in one continuous scroll */}

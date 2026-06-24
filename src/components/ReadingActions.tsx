@@ -1,104 +1,100 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
-import styles from '@/styles/components/ReadingActions.module.css';
+import { SAVED_KEY } from '@/lib/constants';
+import { HUD_BUBBLE } from './readingChrome';
+import { FilterIcon, BookmarkIcon, BookmarkCheckIcon } from './icons';
+import { Tooltip } from './Tooltip';
+import { Popover } from './Popover';
+import { PrefsPanel } from './PrefsPanel';
 
-const SAVED_KEY = 'fanfic-saved-works';
+function readSavedList(): string[] {
+  try {
+    const raw = localStorage.getItem(SAVED_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Cross-fades between two icons whenever `swapKey` changes — outgoing blurs and
+ * shrinks out, incoming blurs and scales in (spring, duration 0.3, bounce 0).
+ */
+function CrossfadeSwap({ swapKey, children }: { swapKey: string; children: React.ReactNode }) {
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span
+        key={swapKey}
+        initial={{ opacity: 0, scale: 0.25, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        exit={{ opacity: 0, scale: 0.25, filter: 'blur(4px)' }}
+        transition={{ type: 'spring', duration: 0.3, bounce: 0 }}
+        className="relative inline-flex items-center justify-center"
+      >
+        {children}
+      </motion.span>
+    </AnimatePresence>
+  );
+}
 
 export function ReadingActions() {
-  const { slug, externalPrefsRef, prefsToggleFnRef } = useReading();
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { slug } = useReading();
+  const [inList, setInList] = useState(false);
 
-  // Load bookmark state on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(SAVED_KEY);
-      const saved: string[] = raw ? JSON.parse(raw) : [];
-      setIsBookmarked(saved.includes(slug));
-    } catch {
-      // fail silently
-    }
+    setInList(readSavedList().includes(slug));
   }, [slug]);
 
-  function handleBookmark() {
+  function toggleReadingList() {
+    const saved = readSavedList();
+    const next = saved.includes(slug) ? saved.filter((s) => s !== slug) : [...saved, slug];
+    setInList(next.includes(slug));
     try {
-      const raw = localStorage.getItem(SAVED_KEY);
-      const saved: string[] = raw ? JSON.parse(raw) : [];
-      let updated: string[];
-      if (saved.includes(slug)) {
-        updated = saved.filter((s) => s !== slug);
-        setIsBookmarked(false);
-        // No animation on remove
-      } else {
-        updated = [...saved, slug];
-        setIsBookmarked(true);
-        // Trigger pop + sparkle animation
-        if (animTimerRef.current) clearTimeout(animTimerRef.current);
-        setIsAnimating(true);
-        animTimerRef.current = setTimeout(() => setIsAnimating(false), 420);
-      }
-      localStorage.setItem(SAVED_KEY, JSON.stringify(updated));
+      localStorage.setItem(SAVED_KEY, JSON.stringify(next));
     } catch {
       // fail silently
     }
   }
 
   return (
-    <div className={styles.actions}>
-      {/* Prefs button — morphs prefs panel from this button's position */}
-      <button
-        ref={externalPrefsRef}
-        className={styles.prefsBubble}
-        onClick={() => prefsToggleFnRef.current?.()}
-        aria-label="Reading preferences"
+    <div className="pointer-events-auto flex flex-row items-center gap-2">
+      {/* Prefs/filter button — anchored popover (shared Popover lens) */}
+      <Popover
+        align="right"
+        ariaLabel="Reading preferences"
+        contentClassName="w-[284px] p-4"
+        renderTrigger={({ open, toggle }) => (
+          <Tooltip label="Reading preferences" align="center" disabled={open}>
+            <button
+              onClick={toggle}
+              aria-label="Reading preferences"
+              aria-expanded={open}
+              className={`${HUD_BUBBLE} ${open ? 'shadow-bubble-hover [&_svg]:opacity-100' : ''}`}
+            >
+              <FilterIcon width={18} height={18} />
+            </button>
+          </Tooltip>
+        )}
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          aria-hidden="true"
-        >
-          <line x1="2" y1="4" x2="12" y2="4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          <circle cx="5" cy="4" r="1.5" fill="currentColor" />
-          <line x1="2" y1="8" x2="12" y2="8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          <circle cx="9" cy="8" r="1.5" fill="currentColor" />
-          <line x1="2" y1="12" x2="12" y2="12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          <circle cx="6" cy="12" r="1.5" fill="currentColor" />
-        </svg>
-      </button>
+        <PrefsPanel />
+      </Popover>
 
-      {/* Bookmark button — with pop + sparkle animation */}
-      <button
-        className={`${styles.bookmarkBubble} ${isAnimating ? styles.pop : ''}`}
-        onClick={handleBookmark}
-        aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark this work'}
-        aria-pressed={isBookmarked}
-      >
-        {/* Sparkle particles — animate outward on bookmark add */}
-        <span className={styles.spark} aria-hidden="true" />
-        <span className={styles.spark} aria-hidden="true" />
-        <span className={styles.spark} aria-hidden="true" />
-        <span className={styles.spark} aria-hidden="true" />
-        {/* Bookmark ribbon icon — filled when saved, outline when not */}
-        <svg
-          width="13"
-          height="16"
-          viewBox="0 0 13 16"
-          fill={isBookmarked ? 'currentColor' : 'none'}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-          className={isBookmarked ? styles.filled : styles.outline}
+      {/* Reading-list button — crossfade between bookmark and bookmark-added */}
+      <Tooltip label={inList ? 'In reading list' : 'Add to reading list'} align="right">
+        <button
+          onClick={toggleReadingList}
+          aria-label={inList ? 'In reading list' : 'Add to reading list'}
+          aria-pressed={inList}
+          className={HUD_BUBBLE}
         >
-          <path d="M2 1.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5V14l-4.5-3-4.5 3V1.5z" />
-        </svg>
-      </button>
+          <CrossfadeSwap swapKey={inList ? 'yes' : 'no'}>
+            {inList ? <BookmarkCheckIcon width={20} height={20} /> : <BookmarkIcon width={20} height={20} />}
+          </CrossfadeSwap>
+        </button>
+      </Tooltip>
     </div>
   );
 }

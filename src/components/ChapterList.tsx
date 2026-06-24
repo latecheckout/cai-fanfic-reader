@@ -8,7 +8,7 @@ import { ChapterComments } from './ChapterComments';
 import { EndOfStory } from './EndOfStory';
 import { KudosSection } from './KudosSection';
 import { useReading } from '@/context/ReadingContext';
-import styles from '@/styles/components/ChapterList.module.css';
+import { BOOKMARKS_KEY } from '@/lib/constants';
 
 interface Props {
   chapters: Chapter[];
@@ -20,8 +20,10 @@ interface Props {
 // How far from the top of the viewport to consider a chapter "active"
 const HUD_OFFSET = 90;
 
+const CHAPTER = 'mx-auto max-w-[var(--reader-line-width)] px-6 pt-8 max-md:px-4';
+
 export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta }: Props) {
-  const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex, activeChapterIndex, chapterTitles, scrollToChapter } = useReading();
+  const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex, chapterTitles, scrollToChapter } = useReading();
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didRestoreRef = useRef(false);
@@ -38,25 +40,21 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
     if (didRestoreRef.current) return;
     didRestoreRef.current = true;
     try {
-      const raw = localStorage.getItem('fanfic-bookmarks');
+      const raw = localStorage.getItem(BOOKMARKS_KEY);
       if (raw) {
         const bookmarks = JSON.parse(raw);
         const saved = bookmarks[slug];
         if (saved) {
-          // Restore last position
           if (typeof saved.scrollPercent === 'number' && saved.scrollPercent > 0) {
             const target =
-              saved.scrollPercent *
-              (document.documentElement.scrollHeight - window.innerHeight);
+              saved.scrollPercent * (document.documentElement.scrollHeight - window.innerHeight);
             requestAnimationFrame(() => {
               window.scrollTo({ top: target, behavior: 'instant' });
             });
           }
-          // Store furthest for tracking
           if (typeof saved.furthestScrollPercent === 'number') {
             furthestPctRef.current = saved.furthestScrollPercent;
           }
-          // Track last-read chapter for the inline banner
           if (typeof saved.activeChapterIndex === 'number') {
             setLastReadChapterIndex(saved.activeChapterIndex);
           }
@@ -65,7 +63,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
     } catch {
       // Fail silently
     }
-  }, [slug]);
+  }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll-based active chapter detection
   const updateActiveChapter = useCallback(() => {
@@ -103,12 +101,10 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         if (maxScroll <= 0) return;
         const scrollPct = window.scrollY / maxScroll;
-
-        // Furthest only moves forward
         const newFurthest = Math.max(furthestPctRef.current, scrollPct);
         furthestPctRef.current = newFurthest;
 
-        const raw = localStorage.getItem('fanfic-bookmarks');
+        const raw = localStorage.getItem(BOOKMARKS_KEY);
         const bookmarks = raw ? JSON.parse(raw) : {};
         bookmarks[slug] = {
           ...bookmarks[slug],
@@ -119,7 +115,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
           activeChapterIndex: activeRef.current,
           totalChapters,
         };
-        localStorage.setItem('fanfic-bookmarks', JSON.stringify(bookmarks));
+        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
       } catch {
         // Fail silently
       }
@@ -162,7 +158,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchend', onTouchEnd);
     };
-  }, [totalChapters, scrollToChapter]);
+  }, [totalChapters, scrollToChapter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function showFlash(idx: number) {
     setFlashChapter(idx);
@@ -180,61 +176,72 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
 
   return (
     <>
-    {/* Chapter flash toast — shown briefly after swipe navigation */}
-    <div className={`${styles.chapterFlash} ${flashChapter !== null ? styles.chapterFlashVisible : ''}`} aria-live="polite" aria-atomic="true">
-      {flashChapter !== null && (
-        <>Ch. {flashChapter + 1}{chapterTitles[flashChapter] ? `: ${chapterTitles[flashChapter]}` : ''}</>
-      )}
-    </div>
-    <div ref={listRef} className={`${styles.list} prose-outer`}>
-      {chapters.map((chapter, i) => (
-        <div key={i}>
-          <section
-            id={`chapter-${i}`}
-            ref={setRef(i)}
-            className={styles.chapter}
-            aria-label={chapter.title || `Chapter ${i + 1}`}
-          >
-            {/* In-flow "you left off here" banner — only for chapters after the first */}
-            {lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
-              <div className={styles.lastReadBanner} aria-hidden="true">
-                <span className={styles.lastReadLabel}>· you left off here ·</span>
+      {/* Chapter flash toast — shown briefly after swipe navigation */}
+      <div
+        className={`fixed left-1/2 top-[calc(16px+var(--safe-top))] z-[var(--z-panel)] -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-bubble px-4 py-1.5 font-sans text-[13px] text-secondary shadow-bubble transition-opacity duration-200 pointer-events-none ${flashChapter !== null ? 'opacity-100' : 'opacity-0'}`}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {flashChapter !== null && (
+          <>Ch. {flashChapter + 1}{chapterTitles[flashChapter] ? `: ${chapterTitles[flashChapter]}` : ''}</>
+        )}
+      </div>
+      <div
+        ref={listRef}
+        className="prose-outer relative motion-safe:animate-[fadeIn_800ms_var(--ease-out-expo)_300ms_both]"
+      >
+        {chapters.map((chapter, i) => (
+          <div key={i}>
+            <section
+              id={`chapter-${i}`}
+              ref={setRef(i)}
+              className={CHAPTER}
+              aria-label={chapter.title || `Chapter ${i + 1}`}
+            >
+              {/* In-flow "you left off here" banner — only for chapters after the first */}
+              {lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
+                <div className="pointer-events-none flex items-center gap-3 pb-6 pt-5" aria-hidden="true">
+                  <span className="h-px flex-1 bg-secondary opacity-20" />
+                  <span className="shrink-0 whitespace-nowrap font-mono text-[9px] tracking-[0.1em] text-secondary opacity-[0.45]">
+                    · you left off here ·
+                  </span>
+                  <span className="h-px flex-1 bg-secondary opacity-20" />
+                </div>
+              )}
+              <ChapterContent
+                chapter={chapter}
+                chapterHtml={chapterHtmls[i]}
+                totalChapters={chapters.length}
+                author={workMeta.author}
+                workTitle={workMeta.title}
+              />
+            </section>
+
+            {/* End of chapter label — above the comments zone for multi-chapter works */}
+            {chapters.length > 1 && (
+              <div
+                className="mx-auto mt-14 max-w-[var(--reader-line-width)] px-6 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-secondary opacity-[0.45] max-md:px-4"
+                aria-hidden="true"
+              >
+                END OF CHAPTER {i + 1}
               </div>
             )}
-            <ChapterContent
-              chapter={chapter}
-              chapterHtml={chapterHtmls[i]}
-              totalChapters={chapters.length}
-              author={workMeta.author}
-              workTitle={workMeta.title}
-            />
-          </section>
 
-          {/* End of chapter label — appears above the comments zone for multi-chapter works */}
-          {chapters.length > 1 && (
-            <div className={styles.chapterEndLabel} aria-hidden="true">
-              END OF CHAPTER {i + 1}
-            </div>
-          )}
+            {/* Comments after each chapter */}
+            <ChapterComments slug={slug} chapterIndex={i} />
 
-          {/* Comments after each chapter */}
-          <ChapterComments
-            slug={slug}
-            chapterIndex={i}
-          />
+            {/* Kudos section after the last chapter's comments */}
+            {i === chapters.length - 1 && (
+              <KudosSection slug={slug} totalKudos={workMeta.kudos} />
+            )}
 
-          {/* Kudos section after the last chapter's comments */}
-          {i === chapters.length - 1 && (
-            <KudosSection slug={slug} totalKudos={workMeta.kudos} />
-          )}
+            {/* Chapter break before next chapter */}
+            {i < chapters.length - 1 && <ChapterBreak chapterNumber={i + 1} />}
+          </div>
+        ))}
 
-          {/* Chapter break before next chapter */}
-          {i < chapters.length - 1 && <ChapterBreak chapterNumber={i + 1} />}
-        </div>
-      ))}
-
-      <EndOfStory slug={slug} recommendations={recommendations} />
-    </div>
+        <EndOfStory slug={slug} recommendations={recommendations} />
+      </div>
     </>
   );
 }

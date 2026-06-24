@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Chapter } from '@/types';
 import { Avatar } from './WorkCardCover';
-import styles from '@/styles/components/ChapterContent.module.css';
 
 interface Props {
   chapter: Chapter;
@@ -13,26 +12,39 @@ interface Props {
   workTitle?: string;
 }
 
+const NOTE_LABEL = 'mb-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary';
+const NOTE_TEXT = 'font-sans text-[13px] leading-[1.6] text-secondary';
+const AUTHOR_NOTE = 'border-l-2 border-border-strong px-5 py-4';
+
 export function ChapterContent({ chapter, chapterHtml, totalChapters, author, workTitle }: Props) {
   return (
-    <div className={styles.container}>
+    <div className="max-w-[var(--reader-max-width)]">
       {/* Chapter title + author byline */}
       {totalChapters > 1 && (
-        <header className={styles.chapterHeader}>
-          <p className={styles.chapterNumber}>Chapter {chapter.index + 1}</p>
-          <h2 className={styles.chapterTitle}>{chapter.title}</h2>
+        <header className="mb-16 text-center">
+          <p className="mb-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary">
+            Chapter {chapter.index + 1}
+          </p>
+          <h2 className="text-center font-sans text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-text">
+            {chapter.title}
+          </h2>
           {author && (
-            <p className={styles.chapterByline}>
+            <p className="mt-3 flex flex-nowrap items-center justify-center font-serif text-[14px] text-secondary opacity-[0.65] max-md:flex-col max-md:gap-1">
               {workTitle && (
                 <>
-                  <span className={styles.bylineWork}>{workTitle}</span>
-                  <span className={styles.bylineSep} aria-hidden="true">|</span>
+                  <span className="min-w-0 max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-text max-md:max-w-full">
+                    {workTitle}
+                  </span>
+                  <span className="mx-2 shrink-0 text-secondary opacity-[0.45] max-md:hidden" aria-hidden="true">|</span>
                 </>
               )}
-              <span className={styles.bylineAuthorGroup}>
-                <span className={styles.bylineBy}>by</span>
+              <span className="inline-flex shrink-0 items-center">
+                <span className="mr-1.5 shrink-0">by</span>
                 <Avatar />
-                <Link href={`/?q=${encodeURIComponent(author)}`} className={styles.bylineAuthor}>
+                <Link
+                  href={`/?q=${encodeURIComponent(author)}`}
+                  className="shrink-0 text-inherit hover:text-text hover:underline hover:underline-offset-2"
+                >
                   {author}
                 </Link>
               </span>
@@ -43,31 +55,28 @@ export function ChapterContent({ chapter, chapterHtml, totalChapters, author, wo
 
       {/* Author's beginning notes */}
       {chapter.notesBegin && (
-        <aside className={styles.authorNote}>
-          <p className={styles.noteLabel}>Author&rsquo;s note</p>
-          <p className={styles.noteText}>{chapter.notesBegin}</p>
+        <aside className={`${AUTHOR_NOTE} mb-8`}>
+          <p className={NOTE_LABEL}>Author&rsquo;s note</p>
+          <p className={NOTE_TEXT}>{chapter.notesBegin}</p>
         </aside>
       )}
 
       {/* Chapter summary */}
       {chapter.summary && (
-        <aside className={styles.chapterSummary}>
-          <p className={styles.noteLabel}>Summary</p>
-          <p className={styles.noteText}>{chapter.summary}</p>
+        <aside className="mb-8 rounded-[3px] border border-border-chip bg-transparent px-5 py-4">
+          <p className={NOTE_LABEL}>Summary</p>
+          <p className={NOTE_TEXT}>{chapter.summary}</p>
         </aside>
       )}
 
-      {/* Story text */}
-      <article
-        className="prose"
-        dangerouslySetInnerHTML={{ __html: chapterHtml }}
-      />
+      {/* Story text — data-chapter-prose scopes the selection toolbar to story text */}
+      <article data-chapter-prose className="prose" dangerouslySetInnerHTML={{ __html: chapterHtml }} />
 
       {/* Author's ending notes */}
       {chapter.notesEnd && (
-        <aside className={`${styles.authorNote} ${styles.authorNoteEnd}`}>
-          <p className={styles.noteLabel}>Author&rsquo;s note</p>
-          <p className={styles.noteText}>{chapter.notesEnd}</p>
+        <aside className={`${AUTHOR_NOTE} mt-8`}>
+          <p className={NOTE_LABEL}>Author&rsquo;s note</p>
+          <p className={NOTE_TEXT}>{chapter.notesEnd}</p>
         </aside>
       )}
     </div>

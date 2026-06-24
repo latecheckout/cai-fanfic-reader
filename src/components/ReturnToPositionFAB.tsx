@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
-import styles from '@/styles/components/ReturnToPositionFAB.module.css';
+import { BOOKMARKS_KEY } from '@/lib/constants';
+import { EASE_OUT_EXPO } from '@/lib/motion';
 
 interface BookmarkEntry {
   furthestScrollPercent?: number;
@@ -15,11 +17,11 @@ export function ReturnToPositionFAB() {
   const { slug } = useReading();
   const [visible, setVisible] = useState(false);
   const targetYRef = useRef<number | null>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
-    // Read the furthest scroll position for this work
     try {
-      const raw = localStorage.getItem('fanfic-bookmarks');
+      const raw = localStorage.getItem(BOOKMARKS_KEY);
       if (!raw) return;
       const bookmarks: Record<string, BookmarkEntry> = JSON.parse(raw);
       const entry = bookmarks[slug];
@@ -29,21 +31,16 @@ export function ReturnToPositionFAB() {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         return entry.furthestScrollPercent! * maxScroll;
       };
-
       targetYRef.current = compute();
 
       function onScroll() {
         if (targetYRef.current === null) return;
-        // Recompute on each scroll in case layout has shifted
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
         targetYRef.current = entry.furthestScrollPercent! * maxScroll;
-        const shouldShow = window.scrollY < targetYRef.current - THRESHOLD;
-        setVisible(shouldShow);
+        setVisible(window.scrollY < targetYRef.current - THRESHOLD);
       }
 
-      // Initial check
       onScroll();
-
       window.addEventListener('scroll', onScroll, { passive: true });
       return () => window.removeEventListener('scroll', onScroll);
     } catch {
@@ -57,28 +54,27 @@ export function ReturnToPositionFAB() {
     }
   }
 
-  if (!visible) return null;
-
   return (
-    <button
-      className={styles.fab}
-      onClick={handleClick}
-      aria-label="Return to your last reading position"
-    >
-      <svg
-        width="11"
-        height="11"
-        viewBox="0 0 11 11"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M5.5 1.5v8M2 6l3.5 3.5L9 6" />
-      </svg>
-      <span>Your place</span>
-    </button>
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          onClick={handleClick}
+          aria-label="Return to your last reading position"
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
+          className="fixed bottom-7 right-6 z-[var(--z-dropdown)] inline-flex items-center gap-2 rounded-full bg-bubble py-2 pl-[11px] pr-[14px] font-mono text-[11px] tracking-[0.03em] text-text shadow-bubble transition-shadow duration-[120ms] ease-out-expo hover:shadow-bubble-hover max-md:bottom-[calc(20px+var(--safe-bottom)+44px+12px)] max-md:left-0 max-md:right-0 max-md:mx-auto max-md:w-fit"
+        >
+          <svg
+            width="11" height="11" viewBox="0 0 11 11" fill="none"
+            stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+          >
+            <path d="M5.5 1.5v8M2 6l3.5 3.5L9 6" />
+          </svg>
+          <span>Your place</span>
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 }

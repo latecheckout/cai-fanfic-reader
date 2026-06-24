@@ -4,6 +4,10 @@
 export const PRESETS_KEY = 'cai_fanfic_presets';
 export const HISTORY_KEY = 'cai_search_history';
 
+// Reading-page (per-work) state keys.
+export const SAVED_KEY = 'fanfic-saved-works'; // reading-list (bookmarked work slugs)
+export const BOOKMARKS_KEY = 'fanfic-bookmarks'; // scroll position + furthest + last chapter
+
 // ── Filter taxonomy ────────────────────────────────────────────────────────
 // These are the canonical AO3-style filter values used in both FilterPanel
 // and BrowseSearchBar autocomplete. Keep them here as the single source of truth.

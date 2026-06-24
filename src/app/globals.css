@@ -1,81 +1,233 @@
 /* ============================================================
    GLOBALS
-   Import tokens and typography, then base resets.
+   Tokens + typography, Tailwind v4, then base/component layers.
    ============================================================ */
 
 @import '../styles/tokens.css';
 @import '../styles/typography.css';
+@import 'tailwindcss';
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Dark-theme variant — data-theme lives on <html>, so match descendants. */
+@custom-variant theme-dark (&:where([data-theme="dark"] *));
+
+/* ------------------------------------------------------------
+   @theme inline — map Tailwind utility namespaces onto the
+   runtime CSS variables defined in tokens.css. Because these
+   are `inline` var() references (not frozen values), flipping
+   data-theme / data-font on <html> re-resolves every utility
+   live. Spacing is intentionally NOT mapped — Tailwind v4's
+   default scale already equals --space-1..12 (4/8/.../48px).
+   ------------------------------------------------------------ */
+@theme inline {
+  /* Colors → bg / text / border / ring utilities */
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-secondary: var(--secondary);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-chip: var(--border-chip);
+  --color-border-active: var(--border-active);
+  --color-accent: var(--accent);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-bubble: var(--bubble-bg);
+  --color-overlay-soft: var(--overlay-soft);
+  --color-overlay-medium: var(--overlay-medium);
+
+  /* Brand (Character.ai) */
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+
+  /* Rating colors */
+  --color-rating-g: var(--rating-g);
+  --color-rating-t: var(--rating-t);
+  --color-rating-m: var(--rating-m);
+  --color-rating-e: var(--rating-e);
+  --color-rating-nr: var(--rating-nr);
+
+  /* Fonts → font-serif / font-sans / font-mono / font-body / font-dyslexic */
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-body: var(--font-body);
+  --font-dyslexic: var(--font-dyslexic);
+
+  /* Easing → ease-out-expo / ease-spring / ease-collapse */
+  --ease-out-expo: var(--ease-out-expo);
+  --ease-spring: var(--spring);
+  --ease-collapse: var(--collapse);
+
+  /* Shadows → shadow-bubble / shadow-bubble-hover / shadow-float */
+  --shadow-bubble: var(--bubble-shadow);
+  --shadow-bubble-hover: var(--bubble-shadow-hover);
+  --shadow-float: var(--shadow-float);
 }
 
-html {
-  /* Theme set by ThemeScript inline script to avoid FOUC */
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-  max-width: 100vw;
-  overflow-x: hidden;
-  /* Hide the scrollbar entirely — scrolling still works, but no bar takes layout
-     space, so the viewport width is constant (no FAB shift, full-width nav stroke). */
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* old Edge/IE */
+/* ============================================================
+   BASE — preserved resets (override Tailwind Preflight).
+   Kept here so the borderless-button + hidden-scrollbar
+   conventions the whole app relies on survive Preflight.
+   ============================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    /* Theme set by ThemeScript inline script to avoid FOUC */
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    max-width: 100vw;
+    overflow-x: hidden;
+    /* Hide the scrollbar entirely — scrolling still works, but no bar takes layout
+       space, so the viewport width is constant (no FAB shift, full-width nav stroke). */
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* old Edge/IE */
+  }
+
+  /* Chrome / Safari / other WebKit + Chromium */
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background-color var(--transition-chrome), color var(--transition-chrome),
+                padding-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  select {
+    font-family: var(--font-sans);
+    color: var(--text);
+    background: transparent;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
-/* Chrome / Safari / other WebKit + Chromium */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
+/* ============================================================
+   COMPONENTS — global reading-content (.prose) + small utils.
+   In @layer components so on-element Tailwind utilities win.
+   ============================================================ */
+
+@layer components {
+  .prose {
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    line-height: 1.75;
+    color: var(--text);
+    max-width: var(--reader-max-width);
+  }
+
+  .prose p {
+    margin-bottom: 1.4em;
+  }
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 2em 0 0.75em;
+    color: var(--text);
+    text-wrap: balance;
+  }
+
+  .prose h1 { font-size: 1.4em; }
+  .prose h2 { font-size: 1.2em; }
+  .prose h3 { font-size: 1.05em; }
+
+  .prose em { font-style: italic; }
+  .prose strong { font-weight: 600; }
+
+  .prose hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5em 0;
+  }
+
+  .prose blockquote {
+    border-left: 2px solid var(--border-strong);
+    padding-left: 1.2em;
+    margin: 1.5em 0;
+    color: var(--secondary);
+    font-style: italic;
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-left: 1.5em;
+    margin-bottom: 1.4em;
+  }
+  .prose li {
+    margin-bottom: 0.4em;
+  }
+
+  .hairline {
+    border-top: 1px solid var(--border);
+  }
+  .hairline-bottom {
+    border-bottom: 1px solid var(--border);
+  }
+  .text-secondary {
+    color: var(--secondary);
+  }
+  .text-accent {
+    color: var(--accent);
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  transition: background-color var(--transition-chrome), color var(--transition-chrome),
-              padding-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-body.filter-open {
-  padding-right: 380px;
-  box-sizing: border-box;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-}
-
-select {
-  font-family: var(--font-sans);
-  color: var(--text);
-  background: transparent;
-}
-
-:focus-visible {
-  outline: 1.5px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
+/* App scrollbar (non-hidden surfaces, e.g. panel lists keep this look) */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -87,64 +239,9 @@ select {
   border-radius: 3px;
 }
 
-/* ============================================================
-   PROSE / READING CONTENT
-   ============================================================ */
-
-.prose {
-  font-family: var(--font-body);
-  font-size: var(--font-size-body);
-  line-height: 1.75;
-  color: var(--text);
-  max-width: var(--reader-max-width);
-}
-
-.prose p {
-  margin-bottom: 1.4em;
-}
-.prose p:last-child {
-  margin-bottom: 0;
-}
-
-.prose h1,
-.prose h2,
-.prose h3 {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  line-height: 1.3;
-  margin: 2em 0 0.75em;
-  color: var(--text);
-  text-wrap: balance;
-}
-
-.prose h1 { font-size: 1.4em; }
-.prose h2 { font-size: 1.2em; }
-.prose h3 { font-size: 1.05em; }
-
-.prose em { font-style: italic; }
-.prose strong { font-weight: 600; }
-
-.prose hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5em 0;
-}
-
-.prose blockquote {
-  border-left: 2px solid var(--border-strong);
-  padding-left: 1.2em;
-  margin: 1.5em 0;
-  color: var(--secondary);
-  font-style: italic;
-}
-
-.prose ul,
-.prose ol {
-  padding-left: 1.5em;
-  margin-bottom: 1.4em;
-}
-.prose li {
-  margin-bottom: 0.4em;
+body.filter-open {
+  padding-right: 380px;
+  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -182,23 +279,10 @@ html.focus-active .prose-outer::after {
 }
 
 /* ============================================================
-   PAGE LOAD ANIMATION — stagger on browse page
-   Referenced by name in module CSS files.
-   Keyframes here so the name is global (not hashed).
+   GLOBAL KEYFRAMES — referenced by name in components.
+   Kept top-level so names are not layer-scoped.
    ============================================================ */
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Shared skeleton pulse (home rails reference this global keyframe by name). */
 @keyframes caiSkeletonPulse {
   0%, 100% { opacity: 0.5; }
   50%      { opacity: 0.85; }
@@ -210,60 +294,59 @@ html.focus-active .prose-outer::after {
 }
 
 /* ============================================================
-   READING PANELS — content dim when HUD panel is open
+   KUDOS — spring pop + count pop + 12 heart particles
+   (migrated from KudosSection.module.css)
    ============================================================ */
-
-main {
-  transition: opacity 400ms ease;
+@keyframes kudobounce {
+  0%   { transform: scale(1); }
+  18%  { transform: scale(0.92); }
+  45%  { transform: scale(1.32); }
+  65%  { transform: scale(0.95); }
+  80%  { transform: scale(1.08); }
+  92%  { transform: scale(0.98); }
+  100% { transform: scale(1); }
 }
 
-body.panel-open main {
-  opacity: 0.2;
+@keyframes countpop {
+  0%, 100% { transform: scale(1); }
+  40%       { transform: scale(1.22); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  main,
-  body.panel-open main {
-    transition: none;
-    opacity: 1;
-  }
-}
+@keyframes h1  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% +  0px), calc(-50% - 62px)) scale(.5) rotate( 20deg); } }
+@keyframes h2  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + 31px), calc(-50% - 53px)) scale(.4) rotate(-15deg); } }
+@keyframes h3  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + 56px), calc(-50% - 26px)) scale(.6) rotate( 30deg); } }
+@keyframes h4  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + 66px), calc(-50% +  6px)) scale(.4) rotate(-25deg); } }
+@keyframes h5  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + 53px), calc(-50% + 39px)) scale(.5) rotate( 40deg); } }
+@keyframes h6  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% + 26px), calc(-50% + 59px)) scale(.3) rotate(-10deg); } }
+@keyframes h7  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% -  4px), calc(-50% + 63px)) scale(.5) rotate( 15deg); } }
+@keyframes h8  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 33px), calc(-50% + 51px)) scale(.4) rotate(-35deg); } }
+@keyframes h9  { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 59px), calc(-50% + 23px)) scale(.6) rotate( 25deg); } }
+@keyframes h10 { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 66px), calc(-50% -  7px)) scale(.4) rotate(-20deg); } }
+@keyframes h11 { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 51px), calc(-50% - 36px)) scale(.5) rotate( 45deg); } }
+@keyframes h12 { 0% { opacity: .85; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(calc(-50% - 23px), calc(-50% - 56px)) scale(.3) rotate(-30deg); } }
 
-/* ============================================================
-   UTILITIES
-   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .kudos-pop { animation: kudobounce 580ms var(--spring) forwards; }
+  .kudos-count-pop { animation: countpop 380ms ease-out; }
 
-.hairline {
-  border-top: 1px solid var(--border);
-}
-.hairline-bottom {
-  border-bottom: 1px solid var(--border);
-}
-.text-secondary {
-  color: var(--secondary);
-}
-.text-accent {
-  color: var(--accent);
-}
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
+  .kudos-pop .kudos-heart:nth-child(1)  { animation: h1  520ms ease-out forwards   0ms; font-size: 12px; }
+  .kudos-pop .kudos-heart:nth-child(2)  { animation: h2  480ms ease-out forwards  20ms; font-size:  9px; }
+  .kudos-pop .kudos-heart:nth-child(3)  { animation: h3  550ms ease-out forwards  10ms; font-size: 14px; }
+  .kudos-pop .kudos-heart:nth-child(4)  { animation: h4  500ms ease-out forwards  40ms; font-size:  8px; }
+  .kudos-pop .kudos-heart:nth-child(5)  { animation: h5  530ms ease-out forwards  15ms; font-size: 11px; }
+  .kudos-pop .kudos-heart:nth-child(6)  { animation: h6  490ms ease-out forwards  55ms; font-size: 10px; }
+  .kudos-pop .kudos-heart:nth-child(7)  { animation: h7  560ms ease-out forwards   5ms; font-size: 13px; }
+  .kudos-pop .kudos-heart:nth-child(8)  { animation: h8  510ms ease-out forwards  35ms; font-size:  9px; }
+  .kudos-pop .kudos-heart:nth-child(9)  { animation: h9  540ms ease-out forwards  25ms; font-size: 12px; }
+  .kudos-pop .kudos-heart:nth-child(10) { animation: h10 480ms ease-out forwards  60ms; font-size:  8px; }
+  .kudos-pop .kudos-heart:nth-child(11) { animation: h11 520ms ease-out forwards  45ms; font-size: 11px; }
+  .kudos-pop .kudos-heart:nth-child(12) { animation: h12 500ms ease-out forwards  30ms; font-size: 10px; }
 }
 
 /* ============================================================
    REDUCED MOTION — global safety net
-   Per-component guards are preferred; this catches anything missed.
+   Per-component guards (motion useReducedMotion / motion-reduce:)
+   are preferred; this catches anything missed.
    ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {

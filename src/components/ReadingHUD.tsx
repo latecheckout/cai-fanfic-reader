@@ -1,25 +1,19 @@
 'use client';
 
-import styles from '@/styles/components/ReadingHUD.module.css';
+import { HUD_BUBBLE } from './readingChrome';
+import { ChevronLeftIcon } from './icons';
+import { Tooltip } from './Tooltip';
 
 export function ReadingHUD() {
   return (
-    <a href="/" className={styles.backBubble} aria-label="Back to works">
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        aria-hidden="true"
+    <Tooltip label="Back to works" align="left">
+      <a
+        href="/"
+        aria-label="Back to works"
+        className={`${HUD_BUBBLE} pointer-events-auto no-underline`}
       >
-        <path
-          d="M9 2L4 7L9 12"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </a>
+        <ChevronLeftIcon width={20} height={20} />
+      </a>
+    </Tooltip>
   );
 }

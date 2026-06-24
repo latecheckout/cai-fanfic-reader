@@ -1,13 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import styles from '@/styles/components/PrefsPanel.module.css';
+import { Segmented } from './Segmented';
+import { SizeSlider } from './SizeSlider';
 
-interface Props {
-  onClose: () => void;
-  /** When true, overrides the morph-animation defaults for use inside a bottom sheet */
-  inSheet?: boolean;
-}
+// The popover (desktop) and bottom sheet (mobile) own their own close affordances
+// (click-outside / Escape / overlay tap), so this panel is just the controls.
 
 type FontFamily = 'serif' | 'sans' | 'dyslexic';
 type Theme = 'default' | 'light' | 'paper' | 'dark';
@@ -20,257 +18,213 @@ const LINE_WIDTH_VALUES: Record<LineWidth, string> = {
 };
 
 const FONT_OPTIONS: { value: FontFamily; label: string; fontFamily: string }[] = [
-  { value: 'serif',    label: 'Serif',    fontFamily: '"Lora", Georgia, serif' },
-  { value: 'sans',     label: 'Sans',     fontFamily: '"Character Sans", system-ui, sans-serif' },
+  { value: 'serif', label: 'Serif', fontFamily: '"Lora", Georgia, serif' },
+  { value: 'sans', label: 'Sans', fontFamily: '"Character Sans", system-ui, sans-serif' },
   { value: 'dyslexic', label: 'Dyslexic', fontFamily: '"OpenDyslexic", cursive' },
 ];
 
 const THEME_SWATCHES: { value: Theme; color: string | null; label: string }[] = [
-  { value: 'default', color: null,      label: 'System' },
-  { value: 'light',   color: '#FFFFFF',  label: 'Light'  },
-  { value: 'paper',   color: '#EDE8DE',  label: 'Paper'  },
-  { value: 'dark',    color: '#141210',  label: 'Dark'   },
+  { value: 'default', color: null, label: 'System' },
+  { value: 'light', color: '#FFFFFF', label: 'Light' },
+  { value: 'paper', color: '#EDE8DE', label: 'Paper' },
+  { value: 'dark', color: '#141210', label: 'Dark' },
 ];
 
-// Column-width indicator icons for the line width control
 const WIDTH_ICONS: Record<LineWidth, React.ReactNode> = {
   narrow: (
     <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2"   x2="11" y2="2"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="5.5" x2="9"  y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="9"   x2="11" y2="9"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="2" y1="2" x2="11" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="5.5" x2="9" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="9" x2="11" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
   default: (
     <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2"   x2="15" y2="2"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="9"   x2="15" y2="9"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="2" y1="2" x2="15" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="9" x2="15" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
   wide: (
     <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2"   x2="18" y2="2"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="5.5" x2="16" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="2" y1="9"   x2="18" y2="9"   stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="2" y1="2" x2="18" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="5.5" x2="16" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
 };
 
-export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
-  function PrefsPanel({ onClose, inSheet }, ref) {
-    const [fontFamily, setFontFamily] = useState<FontFamily>('serif');
-    const [fontSize, setFontSize] = useState(19);
-    const [lineWidth, setLineWidth] = useState<LineWidth>('default');
-    const [theme, setTheme] = useState<Theme>(() => {
-      try { return (localStorage.getItem('fanfic-reader-theme') as Theme) || 'default'; }
-      catch { return 'default'; }
-    });
-    const [isDragging, setIsDragging] = useState(false);
+// Popover chrome uses only Character Mono (labels/values) + Lora (heading).
+const SECTION_LABEL = 'font-mono text-[11px] uppercase tracking-[0.1em] text-secondary';
 
-    // Load saved prefs from localStorage
-    useEffect(() => {
-      try {
-        const savedSize = localStorage.getItem('fanfic-font-size');
-        if (savedSize) setFontSize(Number(savedSize));
-        const savedWidth = localStorage.getItem('fanfic-line-width') as LineWidth | null;
-        if (savedWidth) setLineWidth(savedWidth);
-        const savedFamily = localStorage.getItem('fanfic-font') as FontFamily | null;
-        if (savedFamily) setFontFamily(savedFamily);
-      } catch {
-        // Fail silently
-      }
-    }, []);
+export function PrefsPanel() {
+  // Seed every control from localStorage on the FIRST render (lazy init) — not
+  // a post-mount effect — so the segmented indicator and slider thumb are at
+  // their saved positions immediately. No value change after mount = no slide.
+  // (Safe: this panel only renders client-side, gated behind the open popover.)
+  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
+    try { return (localStorage.getItem('fanfic-font') as FontFamily) || 'serif'; }
+    catch { return 'serif'; }
+  });
+  const [fontSize, setFontSize] = useState<number>(() => {
+    try { const s = localStorage.getItem('fanfic-font-size'); return s ? Number(s) : 19; }
+    catch { return 19; }
+  });
+  const [lineWidth, setLineWidth] = useState<LineWidth>(() => {
+    try { return (localStorage.getItem('fanfic-line-width') as LineWidth) || 'default'; }
+    catch { return 'default'; }
+  });
+  const [theme, setTheme] = useState<Theme>(() => {
+    try { return (localStorage.getItem('fanfic-reader-theme') as Theme) || 'default'; }
+    catch { return 'default'; }
+  });
+  // Track the OS scheme so the "System" swatch shows the bg it actually resolves to.
+  const [systemDark, setSystemDark] = useState<boolean>(() => {
+    try { return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false; }
+    catch { return false; }
+  });
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
 
-    function setBackdropAdjusting(active: boolean) {
-      const el = document.querySelector('[data-panel-backdrop]');
-      if (active) {
-        el?.setAttribute('data-adjusting', 'true');
-      } else {
-        el?.removeAttribute('data-adjusting');
-      }
+  function applyFontFamily(f: FontFamily) {
+    setFontFamily(f);
+    document.documentElement.setAttribute('data-font', f);
+    try { localStorage.setItem('fanfic-font', f); } catch { /**/ }
+  }
+
+  function applyFontSize(size: number) {
+    setFontSize(size);
+    document.documentElement.style.setProperty('--font-size-body', `${size}px`);
+    try { localStorage.setItem('fanfic-font-size', String(size)); } catch { /**/ }
+  }
+
+  function applyLineWidth(w: LineWidth) {
+    setLineWidth(w);
+    document.documentElement.style.setProperty('--reader-line-width', LINE_WIDTH_VALUES[w]);
+    try { localStorage.setItem('fanfic-line-width', w); } catch { /**/ }
+  }
+
+  function applyThemeVisual(t: Theme) {
+    if (t === 'default') {
+      const dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', t);
     }
+  }
 
-    function handleAdjustStart() {
-      setIsDragging(true);
-      setBackdropAdjusting(true);
+  function applyTheme(t: Theme) {
+    setTheme(t);
+    applyThemeVisual(t);
+    if (t === 'default') {
+      try { localStorage.removeItem('fanfic-reader-theme'); } catch {}
+    } else {
+      try { localStorage.setItem('fanfic-reader-theme', t); } catch {}
     }
+  }
 
-    function handleAdjustEnd() {
-      setIsDragging(false);
-      setBackdropAdjusting(false);
-    }
+  return (
+    <>
+      {/* Header — Lora heading */}
+      <div className="flex shrink-0 items-center px-1 pb-4">
+        <span className="font-serif text-[16px] font-medium text-text">Reading preferences</span>
+      </div>
 
-    function applyFontFamily(f: FontFamily) {
-      setFontFamily(f);
-      document.documentElement.setAttribute('data-font', f);
-      try { localStorage.setItem('fanfic-font', f); } catch { /**/ }
-    }
+      <div className="flex flex-col gap-5">
+        {/* Font family */}
+        <div className="flex flex-col gap-2.5">
+          <span className={SECTION_LABEL}>Font</span>
+          <Segmented
+            id="font"
+            ariaLabel="Font family"
+            value={fontFamily}
+            onChange={(v) => applyFontFamily(v as FontFamily)}
+            options={FONT_OPTIONS.map((f) => ({
+              value: f.value,
+              label: f.label,
+              content: (
+                <span className="flex flex-col items-center gap-1">
+                  <span className="text-[22px] leading-none" style={{ fontFamily: f.fontFamily }}>Aa</span>
+                  <span className="font-mono text-[11px] tracking-[0.04em]">{f.label}</span>
+                </span>
+              ),
+            }))}
+          />
+        </div>
 
-    function applyFontSize(size: number) {
-      setFontSize(size);
-      document.documentElement.style.setProperty('--font-size-body', `${size}px`);
-      try { localStorage.setItem('fanfic-font-size', String(size)); } catch { /**/ }
-    }
-
-    function applyLineWidth(w: LineWidth) {
-      setLineWidth(w);
-      document.documentElement.style.setProperty('--reader-line-width', LINE_WIDTH_VALUES[w]);
-      try { localStorage.setItem('fanfic-line-width', w); } catch { /**/ }
-    }
-
-    // Apply theme visually only (no save) — used for hover preview
-    function applyThemeVisual(t: Theme) {
-      if (t === 'default') {
-        const dark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-      } else {
-        document.documentElement.setAttribute('data-theme', t);
-      }
-    }
-
-    function applyTheme(t: Theme) {
-      setTheme(t);
-      applyThemeVisual(t);
-      if (t === 'default') {
-        try { localStorage.removeItem('fanfic-reader-theme'); } catch {}
-      } else {
-        try { localStorage.setItem('fanfic-reader-theme', t); } catch {}
-      }
-    }
-
-    // Thumb ratio 0–1 for tooltip CSS positioning
-    const thumbRatio = (fontSize - 16) / 8;
-
-    return (
-      <div
-        ref={ref}
-        className={`${styles.panel} ${inSheet ? styles.panelInSheet : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Reading preferences"
-      >
-        <div className={styles.panelContent}>
-          {/* Header — no dividing line */}
-          <div className={styles.header}>
-            <span className={styles.heading}>Reading preferences</span>
-            <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-              </svg>
-            </button>
+        {/* Text size */}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-baseline justify-between">
+            <span className={SECTION_LABEL}>Text size</span>
+            <span className="font-mono text-[12px] tabular-nums text-secondary">{fontSize}px</span>
           </div>
+          <div className="flex items-center gap-3">
+            <span className="shrink-0 font-serif text-[14px] text-secondary/60">A</span>
+            <SizeSlider value={fontSize} min={16} max={24} step={1} onChange={applyFontSize} ariaLabel="Text size" />
+            <span className="shrink-0 font-serif text-[22px] text-secondary/60">A</span>
+          </div>
+        </div>
 
-          <div
-            className={styles.sections}
-            onPointerDown={handleAdjustStart}
-            onPointerUp={handleAdjustEnd}
-          >
-            {/* Font family */}
-            <div className={styles.section}>
-              <span className={styles.sectionLabel}>Font</span>
-              <div className={styles.fontPicker}>
-                {FONT_OPTIONS.map((f) => (
-                  <button
-                    key={f.value}
-                    className={`${styles.fontBlock} ${fontFamily === f.value ? styles.fontBlockActive : ''}`}
-                    onClick={() => applyFontFamily(f.value)}
-                    aria-pressed={fontFamily === f.value}
-                  >
-                    <span
-                      className={styles.fontPreview}
-                      style={{ fontFamily: f.fontFamily }}
-                      aria-hidden="true"
-                    >
-                      Aa
-                    </span>
-                    <span className={styles.fontLabel}>{f.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Line width */}
+        <div className="flex flex-col gap-2.5">
+          <span className={SECTION_LABEL}>Line width</span>
+          <Segmented
+            id="line-width"
+            ariaLabel="Line width"
+            value={lineWidth}
+            onChange={(v) => applyLineWidth(v as LineWidth)}
+            options={(['narrow', 'default', 'wide'] as LineWidth[]).map((w) => ({
+              value: w,
+              label: w === 'narrow' ? 'Narrow' : w === 'default' ? 'Default' : 'Wide',
+              content: (
+                <span className="flex flex-col items-center gap-1.5">
+                  {WIDTH_ICONS[w]}
+                  <span className="font-mono text-[11px] tracking-[0.02em]">
+                    {w === 'narrow' ? 'Narrow' : w === 'default' ? 'Default' : 'Wide'}
+                  </span>
+                </span>
+              ),
+            }))}
+          />
+        </div>
 
-            {/* Font size */}
-            <div className={styles.section}>
-              <label className={styles.sectionLabel} htmlFor="prefs-font-size">
-                Text size
-              </label>
-              <div className={styles.rangeRow}>
-                <span className={styles.rangeSmall}>A</span>
-                <div className={styles.rangeTrack}>
-                  {/* Floating value tooltip — visible while dragging */}
-                  <div
-                    className={`${styles.thumbTooltip} ${isDragging ? styles.thumbTooltipVisible : ''}`}
-                    style={{ '--thumb-ratio': thumbRatio } as React.CSSProperties}
+        {/* Theme — each option in its own card */}
+        <div className="flex flex-col gap-2.5">
+          <span className={SECTION_LABEL}>Theme</span>
+          <div className="grid grid-cols-4 gap-1">
+            {THEME_SWATCHES.map((s) => {
+              const active = theme === s.value;
+              return (
+                <button
+                  key={s.value}
+                  onClick={() => applyTheme(s.value)}
+                  onMouseEnter={() => applyThemeVisual(s.value)}
+                  onMouseLeave={() => applyThemeVisual(theme)}
+                  aria-label={s.label}
+                  aria-pressed={active}
+                  className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl p-2 transition-colors ${active ? 'bg-[color-mix(in_srgb,var(--text)_12%,transparent)]' : 'bg-[color-mix(in_srgb,var(--text)_6%,transparent)] hover:bg-[color-mix(in_srgb,var(--text)_10%,transparent)]'}`}
+                >
+                  <span
+                    className="h-7 w-7 rounded-full border-[1.5px] border-border-chip"
+                    style={s.color === null
+                      ? { background: systemDark ? '#141210' : '#FFFFFF' }
+                      : { background: s.color }
+                    }
                     aria-hidden="true"
-                  >
-                    {fontSize}
-                  </div>
-                  <input
-                    id="prefs-font-size"
-                    type="range"
-                    min={16}
-                    max={24}
-                    step={1}
-                    value={fontSize}
-                    onChange={(e) => applyFontSize(Number(e.target.value))}
-                    className={styles.range}
                   />
-                </div>
-                <span className={styles.rangeLarge}>A</span>
-              </div>
-            </div>
-
-            {/* Line width */}
-            <div className={styles.section}>
-              <span className={styles.sectionLabel}>Line width</span>
-              <div className={styles.segmented}>
-                {(['narrow', 'default', 'wide'] as LineWidth[]).map((w) => (
-                  <button
-                    key={w}
-                    className={`${styles.segBtn} ${lineWidth === w ? styles.segActive : ''}`}
-                    onClick={() => applyLineWidth(w)}
-                    aria-pressed={lineWidth === w}
-                  >
-                    {WIDTH_ICONS[w]}
-                    <span className={styles.segLabel}>
-                      {w === 'narrow' ? 'Narrow' : w === 'default' ? 'Default' : 'Wide'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Theme */}
-            <div className={styles.section}>
-              <span className={styles.sectionLabel}>Theme</span>
-              <div className={styles.swatches}>
-                {THEME_SWATCHES.map((s) => (
-                  <div key={s.value} className={styles.swatchItem}>
-                    <button
-                      className={`${styles.swatch} ${theme === s.value ? styles.swatchActive : ''} ${s.value === 'default' ? styles.swatchDefault : ''}`}
-                      style={s.color === null
-                        ? { background: 'conic-gradient(from -90deg, #F0EFED 50%, #1A1814 50%)' }
-                        : { background: s.color }
-                      }
-                      onClick={() => applyTheme(s.value)}
-                      onMouseEnter={() => applyThemeVisual(s.value)}
-                      onMouseLeave={() => applyThemeVisual(theme)}
-                      aria-label={s.label}
-                      aria-pressed={theme === s.value}
-                    />
-                    <span className={`${styles.swatchLabel} ${theme === s.value ? styles.swatchLabelActive : ''}`}>
-                      {s.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  <span className={`font-mono text-[10px] tracking-[0.04em] ${active ? 'text-text' : 'text-secondary/60'}`}>
+                    {s.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
-    );
-  }
-);
-
-PrefsPanel.displayName = 'PrefsPanel';
+    </>
+  );
+}

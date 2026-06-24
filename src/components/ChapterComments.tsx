@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { getComments, Comment } from '@/data/comments';
-import styles from '@/styles/components/ChapterComments.module.css';
 
 const PREVIEW_COUNT = 2;
 
@@ -11,26 +10,31 @@ interface Props {
   chapterIndex: number;
 }
 
-function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number }) {
+function CommentItem({ comment }: { comment: Comment }) {
   const [repliesOpen, setRepliesOpen] = useState(false);
   const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
-    <div className={styles.comment}>
-      <div className={styles.avatar} aria-hidden="true">
+    <div className="flex gap-3 py-3 [&_+_&]:border-t [&_+_&]:border-border">
+      <div
+        className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--text)_10%,transparent)] font-mono text-[10px] text-secondary"
+        aria-hidden="true"
+      >
         {comment.author[0].toUpperCase()}
       </div>
-      <div className={styles.commentBody}>
-        <div className={styles.commentMeta}>
-          <span className={styles.author}>{comment.author}</span>
-          <span className={styles.date}>{comment.timestamp}</span>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 flex items-baseline gap-2">
+          <span className="font-sans text-xs font-semibold text-text">{comment.author}</span>
+          <span className="font-mono text-[10px] text-secondary opacity-60">{comment.timestamp}</span>
         </div>
-        <p className={styles.text}>{comment.text}</p>
-        <div className={styles.commentActions}>
-          <span className={styles.likeBtn}>♥ {comment.likes.toLocaleString()}</span>
+        <p className="font-sans text-[13px] leading-[1.55] text-text opacity-85">{comment.text}</p>
+        <div className="mt-2 flex items-center gap-3">
+          <span className="flex cursor-pointer items-center gap-1 border-none bg-none p-0 font-mono text-[11px] text-secondary opacity-60 transition-opacity duration-[120ms] [transition-timing-function:ease] hover:opacity-100">
+            ♥ {comment.likes.toLocaleString()}
+          </span>
           {hasReplies && (
             <button
-              className={styles.replyToggle}
+              className="cursor-pointer border-none bg-none p-0 font-mono text-[11px] text-secondary underline opacity-50 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-80"
               onClick={() => setRepliesOpen((o) => !o)}
               aria-expanded={repliesOpen}
             >
@@ -41,9 +45,9 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
           )}
         </div>
         {hasReplies && repliesOpen && (
-          <div className={styles.replies}>
+          <div className="mt-2 ml-[calc(28px+var(--space-3))] border-l-2 border-border pl-3">
             {comment.replies!.map((reply) => (
-              <CommentItem key={reply.id} comment={reply} depth={depth + 1} />
+              <CommentItem key={reply.id} comment={reply} />
             ))}
           </div>
         )}
@@ -87,9 +91,9 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   }
 
   return (
-    <div className={styles.zone}>
-      <div className={styles.inner}>
-        <div className={styles.header}>
+    <div className="mt-6 w-screen bg-[color-mix(in_srgb,var(--text)_3.5%,var(--bg))] pt-10 pb-16 [margin-inline:calc(50%-50vw)]">
+      <div className="mx-auto max-w-[var(--reader-line-width)] px-6">
+        <div className="mb-5 font-mono text-[9px] uppercase tracking-[0.12em] text-secondary opacity-60">
           <span>
             {allComments.length === 0
               ? 'comments'
@@ -98,7 +102,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
         </div>
 
         {allComments.length === 0 ? (
-          <p className={styles.emptyState}>· be the first to comment ·</p>
+          <p className="pt-7 pb-3 text-center font-mono text-[11px] tracking-[0.08em] text-secondary opacity-40">· be the first to comment ·</p>
         ) : (
           <div>
             {visibleComments.map((comment) => (
@@ -109,7 +113,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
 
         {!expanded && hiddenCount > 0 && (
           <button
-            className={styles.showMore}
+            className="cursor-pointer border-none bg-none px-0 pt-3 pb-0 font-mono text-[11px] text-secondary underline opacity-55 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-85"
             onClick={() => setExpanded(true)}
           >
             Show {hiddenCount} more {hiddenCount === 1 ? 'comment' : 'comments'}
@@ -118,7 +122,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
 
         {expanded && allComments.length > PREVIEW_COUNT && (
           <button
-            className={styles.showMore}
+            className="cursor-pointer border-none bg-none px-0 pt-3 pb-0 font-mono text-[11px] text-secondary underline opacity-55 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-85"
             onClick={() => setExpanded(false)}
           >
             Show less
@@ -128,10 +132,10 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
         {/* Add comment form — always visible */}
         {/* @TODO-DEV — When wiring to a real API, add a submission error state and
             announce it via role="alert" so screen readers pick it up:
-            {error && <p role="alert" className={styles.formError}>{error}</p>} */}
-        <form className={styles.commentForm} onSubmit={handleSubmit}>
+            {error && <p role="alert">{error}</p>} */}
+        <form className="mt-10 flex flex-col gap-3" onSubmit={handleSubmit}>
           <textarea
-            className={styles.commentInput}
+            className="box-border min-h-[80px] w-full resize-none rounded-2xl border border-border bg-bg px-4 py-[14px] font-sans text-[13px] leading-[1.6] text-text transition-[border-color] duration-150 [transition-timing-function:ease] placeholder:text-secondary placeholder:opacity-50 focus:border-border-strong focus:outline-none"
             placeholder="Leave a comment..."
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
@@ -140,7 +144,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
           />
           <button
             type="submit"
-            className={styles.commentSubmit}
+            className="cursor-pointer self-end rounded-full border border-border-strong bg-none px-5 py-2 font-mono text-[11px] tracking-[0.06em] text-text opacity-70 transition-[opacity,background] duration-[120ms] [transition-timing-function:ease] hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)] hover:opacity-100 disabled:cursor-default disabled:opacity-30"
             disabled={!commentText.trim()}
           >
             Post
