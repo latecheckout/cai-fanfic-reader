@@ -4,7 +4,7 @@ import { BrowseHeader } from '@/components/BrowseHeader';
 import styles from './fandoms.module.css';
 
 export const metadata = {
-  title: 'Fandoms — Archive of Our Stories',
+  title: 'Fandoms — c.ai Fanfic',
 };
 
 export default function FandomsPage() {
@@ -27,9 +27,9 @@ export default function FandomsPage() {
   return (
     <div>
       <BrowseHeader />
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <div className={styles.titleRow}>
-          <h2 className={styles.heading}>Fandoms</h2>
+          <h1 className={styles.heading}>Fandoms</h1>
           <span className={styles.count}>{fandoms.length} fandoms</span>
         </div>
 

@@ -165,18 +165,34 @@ export function LibraryShell({
     <>
       {/* ── Page heading ── */}
       <div className={styles.pageHeader}>
-        <h2 className={styles.heading}>Library</h2>
+        <h1 className={styles.heading}>Library</h1>
       </div>
 
       {/* ── Tab bar ── */}
-      <div className={styles.tabs} role="tablist">
+      <div className={styles.tabs} role="tablist" aria-label="Library sections">
         {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
           <button
             key={tab}
             role="tab"
+            id={`library-tab-${tab}`}
             aria-selected={activeTab === tab}
+            aria-controls="library-tabpanel"
+            tabIndex={activeTab === tab ? 0 : -1}
             className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
             onClick={() => handleTabChange(tab)}
+            onKeyDown={(e) => {
+              // Manual activation: arrows move focus between tabs; Enter/Space (native button) activates.
+              const tabs = Array.from(
+                e.currentTarget.parentElement!.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+              );
+              const i = tabs.indexOf(e.currentTarget);
+              let next = -1;
+              if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
+              else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
+              else if (e.key === 'Home') next = 0;
+              else if (e.key === 'End') next = tabs.length - 1;
+              if (next >= 0) { e.preventDefault(); tabs[next].focus(); }
+            }}
           >
             {TAB_LABELS[tab]}
             <span className={styles.tabCount}>{displayedTabCounts[tab]}</span>
@@ -194,8 +210,14 @@ export function LibraryShell({
         basePath="/reading"
       />
 
-      {/* ── Work list ── */}
-      <div className={`${styles.workList} ${styles[view]}`}>
+      {/* ── Work list (tab panel) ── */}
+      <div
+        className={`${styles.workList} ${styles[view]}`}
+        role="tabpanel"
+        id="library-tabpanel"
+        aria-labelledby={`library-tab-${activeTab}`}
+        tabIndex={0}
+      >
         {isFiltering || viewSwitching ? (
           // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
           Array.from(

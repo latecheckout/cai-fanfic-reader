@@ -53,12 +53,12 @@
 
 .headerLabel {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--secondary);
-  opacity: 0.7;
+  opacity: 0.95;
 }
 
 .closeBtn {
@@ -156,7 +156,7 @@
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--secondary);
-  opacity: 0.5;
+  opacity: 0.95;
   margin-left: auto;
   flex-shrink: 0;
   line-height: 1;

@@ -34,8 +34,10 @@ export const ChapterPanel = React.forwardRef<HTMLDivElement, Props>(
           </div>
           <ul className={styles.list} role="listbox" aria-label="Chapters">
             {chapters.map((title, i) => (
-              <li key={i} role="option" aria-selected={i === activeIndex}>
+              <li key={i} role="presentation">
                 <button
+                  role="option"
+                  aria-selected={i === activeIndex}
                   className={`${styles.chapterRow} ${i === activeIndex ? styles.active : ''}`}
                   onClick={() => onSelect(i)}
                 >

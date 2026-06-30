@@ -94,7 +94,7 @@ export default async function ReaderPage({ params }: PageProps) {
         <MobileReadingBar />
 
         {/* Main reading content */}
-        <main className={styles.main}>
+        <main id="main-content" className={styles.main}>
           {/* Work header — three-zone scroll animation */}
           <WorkHeader
             meta={meta}

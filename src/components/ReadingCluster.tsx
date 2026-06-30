@@ -190,6 +190,13 @@ export function ReadingCluster() {
     // 7. Reveal content after morph is well underway
     setTimeout(() => {
       panelEl.setAttribute('data-content', 'visible');
+      // a11y: move keyboard focus into the opened panel
+      if (activePanelRef.current === name) {
+        const f = panelEl.querySelector<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        );
+        f?.focus();
+      }
     }, prefersReducedMotion ? 80 : 200);
 
     // For chapter panel: snap height to actual content after morph (handles title wrapping)
@@ -226,6 +233,9 @@ export function ReadingCluster() {
     const pillEl  = getPillEl(name);
     const panelEl = getPanelEl(name);
     if (!pillEl || !panelEl) return;
+
+    // a11y: return keyboard focus to the trigger when the panel closes
+    pillEl.focus?.();
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -328,6 +338,24 @@ export function ReadingCluster() {
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
+      // a11y: trap Tab within an open panel (focus cannot leave the dialog)
+      if (e.key === 'Tab' && activePanelRef.current) {
+        const panelEl = getPanelEl(activePanelRef.current);
+        if (panelEl) {
+          const f = Array.from(
+            panelEl.querySelectorAll<HTMLElement>(
+              'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((el) => el.offsetParent !== null);
+          if (f.length) {
+            const first = f[0];
+            const last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          }
+        }
+        return;
+      }
       const tag = (e.target as HTMLElement).tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (e.key === 'ArrowLeft' || e.key === 'j') {

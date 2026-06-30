@@ -1048,7 +1048,7 @@ export function FilterPanel({
               {/* Rating — cards with per-tier color fill */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('rating')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('rating')} aria-expanded={isSectionOpen('rating')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('rating') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Rating</span>
                   </button>
@@ -1089,7 +1089,7 @@ export function FilterPanel({
               {/* Warnings */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('warnings')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('warnings')} aria-expanded={isSectionOpen('warnings')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('warnings') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Warnings</span>
                   </button>
@@ -1134,7 +1134,7 @@ export function FilterPanel({
               {/* Category */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('category')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('category')} aria-expanded={isSectionOpen('category')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('category') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Category</span>
                   </button>
@@ -1174,7 +1174,7 @@ export function FilterPanel({
               {/* Status — cards */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('status')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('status')} aria-expanded={isSectionOpen('status')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('status') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Status</span>
                   </button>
@@ -1215,7 +1215,7 @@ export function FilterPanel({
               {/* Words — preset pills + custom expander */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('words')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('words')} aria-expanded={isSectionOpen('words')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('words') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Words</span>
                   </button>
@@ -1264,6 +1264,7 @@ export function FilterPanel({
                             type="number"
                             className={styles.wcInput}
                             placeholder="min"
+                            aria-label="Minimum word count"
                             value={wordMin}
                             onChange={(e) => handleWordInput(e.target.value, wordMax)}
                           />
@@ -1272,6 +1273,7 @@ export function FilterPanel({
                             type="number"
                             className={styles.wcInput}
                             placeholder="max"
+                            aria-label="Maximum word count"
                             value={wordMax}
                             onChange={(e) => handleWordInput(wordMin, e.target.value)}
                           />
@@ -1285,7 +1287,7 @@ export function FilterPanel({
               {/* Updated — preset pills + custom date expander */}
               <div className={styles.drawerSection}>
                 <div className={styles.drawerSectionHeader}>
-                  <button className={styles.sectionToggle} onClick={() => toggleSection('updated')}>
+                  <button className={styles.sectionToggle} onClick={() => toggleSection('updated')} aria-expanded={isSectionOpen('updated')}>
                     <span className={`${styles.sectionChevron} ${isSectionOpen('updated') ? styles.sectionChevronOpen : ''}`}>›</span>
                     <span className={styles.drawerLabel}>Updated</span>
                   </button>
@@ -1329,6 +1331,7 @@ export function FilterPanel({
                           <input
                             type="date"
                             className={styles.dateInput}
+                            aria-label="Updated after"
                             value={dateFrom}
                             onChange={(e) => {
                               setDateFrom(e.target.value);
@@ -1339,6 +1342,7 @@ export function FilterPanel({
                           <input
                             type="date"
                             className={styles.dateInput}
+                            aria-label="Updated before"
                             value={dateTo}
                             onChange={(e) => {
                               setDateTo(e.target.value);
@@ -1417,6 +1421,7 @@ export function FilterPanel({
                 type="text"
                 className={styles.savePopoverInput}
                 placeholder="Name this filter set…"
+                aria-label="Filter set name"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
               />

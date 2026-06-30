@@ -144,6 +144,13 @@ export function BrowseShell({
         </Link>
       )}
 
+      {/* a11y: announce result count to screen readers when filtering settles (WCAG 4.1.3) */}
+      <div className="visually-hidden" role="status" aria-live="polite">
+        {!isFiltering && !viewSwitching
+          ? `${works.length} ${works.length === 1 ? 'work' : 'works'} found`
+          : ''}
+      </div>
+
       <div className={`${styles.workList} ${isFiltering ? styles.list : styles[view]}`}>
         {isFiltering || viewSwitching ? (
           // On a view switch keep the page the same height (one skeleton per work)

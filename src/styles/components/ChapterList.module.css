@@ -45,10 +45,10 @@
 
 .lastReadLabel {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--secondary);
-  opacity: 0.45;
+  opacity: 0.95;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -56,11 +56,11 @@
 /* ── End-of-chapter label — sits above the comments zone ── */
 .chapterEndLabel {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--secondary);
-  opacity: 0.45;
+  opacity: 0.95;
   text-align: center;
   max-width: var(--reader-line-width);
   margin: 56px auto 0;

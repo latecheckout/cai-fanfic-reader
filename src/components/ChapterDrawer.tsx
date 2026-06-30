@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useReading } from '@/context/ReadingContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import styles from '@/styles/components/ChapterDrawer.module.css';
 
 interface Props {
@@ -20,19 +21,13 @@ export function ChapterDrawer({ onClose, onSelect }: Props) {
     requestAnimationFrame(() => setVisible(true));
   }, []);
 
-  // Escape key
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') handleClose();
-    }
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   function handleClose() {
     setVisible(false);
     setTimeout(onClose, 220);
   }
+
+  // a11y: focus-in, Tab-trap, Escape, and focus-return to the trigger
+  useFocusTrap(drawerRef, visible, handleClose);
 
   // Touch drag-to-dismiss
   function handleTouchStart(e: React.TouchEvent) {
@@ -73,8 +68,10 @@ export function ChapterDrawer({ onClose, onSelect }: Props) {
         {/* Chapter list */}
         <ul className={styles.list} role="listbox" aria-label="Chapters">
           {Array.from({ length: totalChapters }, (_, i) => (
-            <li key={i} role="option" aria-selected={i === activeChapterIndex}>
+            <li key={i} role="presentation">
               <button
+                role="option"
+                aria-selected={i === activeChapterIndex}
                 className={`${styles.chapterRow} ${i === activeChapterIndex ? styles.active : ''}`}
                 onClick={() => onSelect(i)}
               >

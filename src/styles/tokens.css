@@ -8,11 +8,15 @@
   /* Default to light theme */
   --bg: #F7F4EF;
   --text: #1A1816;
-  --secondary: #8A857D;
+  --secondary: #6B675F;
   --border: rgba(26, 24, 22, 0.12);
   --border-strong: rgba(26, 24, 22, 0.22);
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.40);
+  /* Interactive-control outline. Kept as a faint hairline by design: these
+     controls are identified by their label/icon/placeholder (not the border),
+     so 1.4.11 is met via that exemption + the visible :focus-visible ring. */
+  --border-control: rgba(26, 24, 22, 0.22);
   --accent: #8B4040;
   --accent-subtle: rgba(139, 64, 64, 0.12);
 
@@ -30,9 +34,9 @@
   /* Rating dot colors — per brief spec */
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
+  --rating-m:  #b5591a;
   --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-nr: #757067;
 
   /* Typography */
   --font-serif: "Lora", Georgia, 'Times New Roman', serif;
@@ -116,20 +120,24 @@
 [data-theme="light"] {
   --bg: #FFFFFF;
   --text: #1A1816;
-  --secondary: #8A857D;
+  --secondary: #6B675F;
   --border: rgba(26, 24, 22, 0.12);
   --border-strong: rgba(26, 24, 22, 0.22);
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.40);
+  /* Interactive-control outline. Kept as a faint hairline by design: these
+     controls are identified by their label/icon/placeholder (not the border),
+     so 1.4.11 is met via that exemption + the visible :focus-visible ring. */
+  --border-control: rgba(26, 24, 22, 0.22);
   --accent: #8B4040;
   --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
+  --rating-m:  #b5591a;
   --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-nr: #757067;
   --bubble-bg: #ffffff;
   --grid-line: rgba(26, 24, 22, 0.055);
 }
@@ -137,20 +145,21 @@
 [data-theme="paper"] {
   --bg: #EDE8DE;
   --text: #1A1816;
-  --secondary: #7A756D;
+  --secondary: #615C54;
   --border: rgba(26, 24, 22, 0.14);
   --border-strong: rgba(26, 24, 22, 0.24);
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.42);
+  --border-control: rgba(26, 24, 22, 0.22);
   --accent: #8B4040;
   --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F4F1EB;
   --card-border: rgba(26, 24, 22, 0.09);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
+  --rating-m:  #b5591a;
   --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-nr: #757067;
   --bubble-bg: #f5f0e8;
   --grid-line: rgba(26, 24, 22, 0.055);
 }
@@ -158,18 +167,19 @@
 [data-theme="dark"] {
   --bg: #141210;
   --text: #E5E1D8;
-  --secondary: #5C5852;
+  --secondary: #9E998F;
   --border: rgba(229, 225, 216, 0.10);
   --border-strong: rgba(229, 225, 216, 0.20);
   --border-chip: rgba(229, 225, 216, 0.15);
   --border-active: rgba(229, 225, 216, 0.38);
+  --border-control: rgba(229, 225, 216, 0.20);
   --accent: #C4785A;
   --accent-subtle: rgba(196, 120, 90, 0.14);
   --card-bg: #1D1B1A;
   --card-border: rgba(229, 225, 216, 0.12);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
+  --rating-m:  #b5591a;
   --rating-e:  #b02828;
   --rating-nr: #666666;
   --bubble-bg: #272523;

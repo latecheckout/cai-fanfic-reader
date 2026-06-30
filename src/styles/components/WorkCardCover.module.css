@@ -104,6 +104,10 @@
 .fandomLink {
   text-decoration: none;
   color: inherit;
+  /* a11y (2.5.8): expand the inline link's tap area to 24px without shifting layout. */
+  display: inline-block;
+  padding-block: 6px;
+  margin-block: -6px;
 }
 
 .fandomLink:hover {
@@ -216,6 +220,9 @@
   pointer-events: auto;
   color: inherit;
   text-decoration: none;
+  /* a11y (2.5.8): expand inline tap area to 24px without shifting layout. */
+  padding-block: 4px;
+  margin-block: -4px;
 }
 
 .authorLink:hover {
@@ -272,10 +279,15 @@
 }
 
 .tagChip {
-  display: inline-block;
+  /* a11y (2.5.8): 24px tap target; padding-only so the chip looks unchanged. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
   font-family: var(--font-sans);
   font-size: 13px;
-  color: var(--secondary);
+  /* a11y (1.4.3): secondary-on-chip-tint is only 4.18:1 (grey on grey) — darken
+     toward --text so it clears 4.5:1. Theme-safe mix (stays light in dark mode). */
+  color: color-mix(in srgb, var(--secondary) 70%, var(--text));
   background: var(--border);
   border-radius: 3px;
   padding: 2px 7px;
@@ -384,6 +396,12 @@
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
 
+/* a11y: light fills (green/yellow) need dark glyph to reach WCAG AA 4.5:1
+   with white text. Fills are theme-constant, so the dark value is literal
+   (not var(--text), which inverts to light in dark theme). */
+.ratingG,
+.ratingT { color: #1A1816; }
+
 /* Category is a filled chip — solid like the rating, but a neutral tone
    so it never shares a color with the rating hue. Grows wider than the
    square to fit "M/M", "Multi", etc. */
@@ -439,11 +457,6 @@
 
 /* Dark mode: --secondary is near the card colour, so the category pill and the
    status glyph almost vanish. Lighten the category fill and the glyph. */
-[data-theme="dark"] .catLabel {
-  background: color-mix(in srgb, var(--secondary) 80%, var(--bg));
-  color: #fff;
-}
-
 [data-theme="dark"] .statusPill:not(.statusPillOnImage) {
   color: color-mix(in srgb, var(--text) 70%, transparent);
 }

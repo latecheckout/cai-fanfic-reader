@@ -164,6 +164,13 @@
   background: var(--secondary);
 }
 
+/* a11y: in dark theme --secondary is a light grey, so the white label fails
+   contrast on it. Use a darker track so white text clears WCAG AA 4.5:1
+   while the control stays visible against the dark page (1.4.11). */
+[data-theme="dark"] .off {
+  background: #6B675F;
+}
+
 .icon {
   position: relative;
   z-index: 1;

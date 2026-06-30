@@ -69,12 +69,17 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  /* a11y (1.4.3): the overlaid text must stay legible over ANY cover image,
+     including a near-white one. The dark floor is held >=0.55 opacity through
+     the bottom ~62% where the metadata cluster sits, so white text clears
+     4.5:1 even worst-case, then fades out toward the top of the art. */
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.92) 28%,
-    rgba(0, 0, 0, 0.62) 52%,
-    rgba(0, 0, 0, 0) 78%
+    rgba(0, 0, 0, 0.98) 0%,
+    rgba(0, 0, 0, 0.93) 42%,
+    rgba(0, 0, 0, 0.72) 60%,
+    rgba(0, 0, 0, 0.30) 78%,
+    rgba(0, 0, 0, 0) 92%
   );
 }
 
@@ -125,7 +130,7 @@
   align-items: center;
   font-family: var(--font-sans);
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .by {
@@ -138,6 +143,10 @@
   pointer-events: auto;
   color: inherit;
   text-decoration: none;
+  /* a11y (2.5.8): expand the inline link's tap area to 24px without shifting
+     the byline layout. */
+  padding-block: 4px;
+  margin-block: -4px;
 }
 
 .authorLink:hover {
@@ -165,6 +174,10 @@
   color: #fff;
   text-decoration: none;
   transition: background var(--transition-micro);
+  /* a11y (2.5.8): 24px tap target; padding-only so the chip looks unchanged. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .tag:hover {
@@ -175,5 +188,5 @@
 .metrics {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.94);
 }

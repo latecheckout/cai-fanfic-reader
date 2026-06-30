@@ -55,11 +55,12 @@ export function BrowseHeader({ search }: Props = {}) {
         </div>
 
         {/* ── Center zone: nav links ── */}
-        <nav className={styles.zoneCenter} aria-label="Site navigation">
+        <nav className={styles.zoneCenter} aria-label="Main">
           {NAV_LINKS.map(({ href, label }) => (
             <a
               key={href}
               href={href}
+              aria-current={pathname === href ? 'page' : undefined}
               className={`${styles.navLink} ${pathname === href ? styles.navActive : ''}`}
             >
               {label}

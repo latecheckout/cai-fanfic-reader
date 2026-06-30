@@ -56,6 +56,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [localComments, setLocalComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
+  const [error, setError] = useState('');
 
   // @WIRE — Replace getComments() with: GET /works/:slug/comments?chapter=:chapterIndex
   //         Add useEffect + fetch, loading skeleton, and error state.
@@ -71,7 +72,11 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const text = commentText.trim();
-    if (!text) return;
+    if (!text) {
+      setError('Please write a comment before posting.');
+      return;
+    }
+    setError('');
     const newComment: Comment = {
       id: `local-${Date.now()}`,
       author: 'you',
@@ -126,17 +131,17 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
         )}
 
         {/* Add comment form — always visible */}
-        {/* @TODO-DEV — When wiring to a real API, add a submission error state and
-            announce it via role="alert" so screen readers pick it up:
-            {error && <p role="alert" className={styles.formError}>{error}</p>} */}
         <form className={styles.commentForm} onSubmit={handleSubmit}>
+          {error && <p id="comment-error" role="alert" className={styles.formError}>{error}</p>}
           <textarea
             className={styles.commentInput}
             placeholder="Leave a comment..."
             value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
+            onChange={(e) => { setCommentText(e.target.value); if (error) setError(''); }}
             rows={3}
             aria-label="Write a comment"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? 'comment-error' : undefined}
           />
           <button
             type="submit"

@@ -40,7 +40,7 @@
   font-size: 15px;
   color: var(--text);
   background: transparent;
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-control);
   border-radius: 999px;
   padding: 0 36px 0 34px;
   outline: none;
@@ -69,15 +69,23 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--secondary);
-  opacity: 0.35;
+  /* a11y: full-strength secondary needed for WCAG AA 4.5:1; the hint still
+     fades to 0 on focus via the rule below. */
+  opacity: 1;
   pointer-events: none;
   background: none;
   border: none;
-  transition: opacity 150ms ease;
+  transition: opacity 150ms ease, color 150ms ease;
 }
 
 .wrap:focus-within .kbdHint {
   opacity: 0;
+}
+
+/* Match the sort/filter buttons: the shortcut hint darkens on hover.
+   :not(:focus-within) so it stays hidden (not darkened) once the field is active. */
+.wrap:hover:not(:focus-within) .kbdHint {
+  color: var(--text);
 }
 
 /* When query has input — wider right padding for X + submit */
@@ -88,11 +96,12 @@
 /* Clear × button — sits left of submit */
 .clearBtn {
   position: absolute;
-  right: 38px;
+  right: 34px;
   top: 50%;
   transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
+  /* a11y (2.5.8): 24px min hit target; the glyph stays visually small. */
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +110,8 @@
   color: var(--secondary);
   font-size: 17px;
   cursor: pointer;
-  opacity: 0.45;
+  /* a11y (1.4.11): resting glyph must clear 3:1 — secondary needs ~full strength. */
+  opacity: 0.85;
   padding: 0;
   line-height: 1;
   transition: opacity var(--transition-micro), color var(--transition-micro);
@@ -149,7 +159,7 @@
   right: 0;
   z-index: var(--z-dropdown);
   background: var(--card-bg);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border-control);
   border-radius: 14px;
   box-shadow: 0 4px 20px rgba(26, 24, 22, 0.10);
   padding: 6px 0;
@@ -460,7 +470,8 @@
   cursor: pointer;
   padding: 7px 12px 7px 6px;
   line-height: 1;
-  opacity: 0.35;
+  /* a11y (1.4.11): resting glyph must clear 3:1. */
+  opacity: 0.8;
   transition: opacity 80ms ease;
 }
 

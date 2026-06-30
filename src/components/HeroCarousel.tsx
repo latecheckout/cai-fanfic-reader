@@ -116,9 +116,12 @@ export function HeroCarousel() {
     setIndex(Math.round(vp.scrollLeft / vp.clientWidth) % realCount);
   };
 
-  // Auto-advance on a seamless loop (pause while hovered).
+  // Auto-advance on a seamless loop. Pauses while hovered or keyboard-focused,
+  // and never starts when the user prefers reduced motion (WCAG 2.2.2).
   useEffect(() => {
     if (paused) return;
+    if (typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = setInterval(advance, AUTOPLAY_MS);
     return () => clearInterval(id);
   }, [paused]);
@@ -129,6 +132,8 @@ export function HeroCarousel() {
       aria-label="Featured"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
     >
       <div className={styles.viewport} ref={viewportRef} onScroll={onScroll}>
         {[...SLIDES, SLIDES[0]].map((s, i) => (
@@ -197,7 +202,7 @@ export function HeroCarousel() {
             className={`${styles.dot} ${i === index ? styles.dotActive : ''}`}
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
-            aria-current={i === index}
+            aria-current={i === index ? 'true' : undefined}
           />
         ))}
       </div>

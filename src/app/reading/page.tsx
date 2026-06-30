@@ -7,6 +7,10 @@ import { BrowseHeader } from '@/components/BrowseHeader';
 import { LibraryShell } from '@/components/LibraryShell';
 import styles from '../browse.module.css';
 
+export const metadata = {
+  title: 'Library — c.ai Fanfic',
+};
+
 interface PageProps {
   searchParams: Promise<{
     tab?: string;
@@ -96,7 +100,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   return (
     <div className={styles.page}>
       <BrowseHeader />
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <Suspense>
           <LibraryShell
             works={filteredWorks}

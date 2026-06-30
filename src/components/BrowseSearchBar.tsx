@@ -402,9 +402,11 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
               if (window.matchMedia('(max-width: 480px)').matches) setIsMobileFS(true);
             }}
             onKeyDown={handleKeyDown}
+            role="combobox"
             aria-label="Search"
             aria-autocomplete="list"
             aria-expanded={focused}
+            aria-controls="search-listbox"
           />
 
           {/* ⌘K hint — hidden when query is present */}
@@ -455,7 +457,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
       </div>
 
       {focused && (
-        <div className={styles.dropdown} role="listbox">
+        <div className={styles.dropdown} role="listbox" id="search-listbox">
 
           {/* Vibe section — loading or result */}
           {!isDefaultState && (vibeLoading || vibeResult) && (

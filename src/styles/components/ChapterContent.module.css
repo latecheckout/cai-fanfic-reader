@@ -38,7 +38,7 @@
   font-family: var(--font-serif);
   font-size: 14px;
   color: var(--secondary);
-  opacity: 0.65;
+  opacity: 0.95;
 }
 
 /* Work title — truncates so the byline stays on one line */
@@ -56,7 +56,7 @@
   flex-shrink: 0;
   margin: 0 8px;
   color: var(--secondary);
-  opacity: 0.45;
+  opacity: 0.95;
 }
 
 /* Keeps "by · avatar · author" together as one unit (so it stacks as a row

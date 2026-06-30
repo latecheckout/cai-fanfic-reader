@@ -100,7 +100,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     <div className={styles.page}>
       <BrowseHeader />
 
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 

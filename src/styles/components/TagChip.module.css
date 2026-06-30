@@ -59,6 +59,11 @@
 /* Clickable state */
 .clickable {
   cursor: pointer;
+  /* a11y (2.5.8): clickable chips are tap targets — guarantee 24px height
+     without changing the visible text size. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .clickable:hover {

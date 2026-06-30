@@ -126,23 +126,28 @@
   transform: rotate(180deg);
 }
 
-/* Embedded progress bar — clipped by pill's overflow: hidden */
+/* Embedded progress bar — clipped by pill's overflow: hidden.
+   Matches the continue-reading ("reading list") bar: full-opacity --rating-t
+   fill over a dark track, so the fill clears 3:1 (1.4.11). The 38% rating tint
+   was only ~1.6:1. */
 .progressBar {
   position: absolute;
   bottom: 0;
   left: 0;
   height: 3px;
-  background: var(--secondary);
-  opacity: 0.38;
+  /* Trackless: darker amber that clears 3:1 against both the white pill (light)
+     and the dark pill #272523 — no track needed. */
+  background: #9a780e;
+  z-index: 1;
   border-radius: 0;
   transition: width 120ms linear;
 }
 
-.progress_ratingG  { background: var(--rating-g); }
-.progress_ratingT  { background: var(--rating-t); }
-.progress_ratingM  { background: var(--rating-m); }
-.progress_ratingE  { background: var(--rating-e); }
-.progress_ratingNR { background: var(--rating-nr); }
+.progress_ratingG,
+.progress_ratingT,
+.progress_ratingM,
+.progress_ratingE,
+.progress_ratingNR { background: #9a780e; }
 
 /* ── Prefs bubble — 32px circle ── */
 .prefsBubble {

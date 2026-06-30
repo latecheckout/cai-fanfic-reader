@@ -10,6 +10,7 @@ export function ReadingActions() {
   const { slug, externalPrefsRef, prefsToggleFnRef } = useReading();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [announce, setAnnounce] = useState('');
   const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load bookmark state on mount
@@ -31,10 +32,12 @@ export function ReadingActions() {
       if (saved.includes(slug)) {
         updated = saved.filter((s) => s !== slug);
         setIsBookmarked(false);
+        setAnnounce('Bookmark removed');
         // No animation on remove
       } else {
         updated = [...saved, slug];
         setIsBookmarked(true);
+        setAnnounce('Bookmarked');
         // Trigger pop + sparkle animation
         if (animTimerRef.current) clearTimeout(animTimerRef.current);
         setIsAnimating(true);
@@ -99,6 +102,8 @@ export function ReadingActions() {
           <path d="M2 1.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5V14l-4.5-3-4.5 3V1.5z" />
         </svg>
       </button>
+      {/* a11y (4.1.3): announce bookmark changes to screen readers */}
+      <span className="visually-hidden" role="status" aria-live="polite">{announce}</span>
     </div>
   );
 }

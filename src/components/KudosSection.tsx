@@ -62,6 +62,10 @@ export function KudosSection({ slug, totalKudos }: Props) {
       <p className={[styles.count, animating ? styles.countPop : ''].filter(Boolean).join(' ')}>
         {displayCount.toLocaleString()} kudos
       </p>
+      {/* a11y (4.1.3): announce the action to screen readers */}
+      <span className="visually-hidden" role="status" aria-live="polite">
+        {given ? 'Kudos left for this work' : ''}
+      </span>
     </div>
   );
 }

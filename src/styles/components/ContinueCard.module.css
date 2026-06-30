@@ -57,7 +57,9 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.55) 30%, rgba(0, 0, 0, 0.12) 52%, transparent 64%);
+  /* a11y (1.4.3): hold the dark floor >=0.6 through the top cluster so the
+     white title + chapter clear 4.5:1 over any cover, then fade. */
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.96) 0%, rgba(0, 0, 0, 0.88) 30%, rgba(0, 0, 0, 0.6) 46%, rgba(0, 0, 0, 0.15) 66%, transparent 80%);
 }
 
 /* Header cluster — title + chapter, pinned to the top in BOTH modes. */
@@ -89,7 +91,7 @@
 
 /* Colours per slot: white over the cover, dark on the solid text card. */
 .media .title { color: #fff; }
-.media .meta { color: rgba(255, 255, 255, 0.8); }
+.media .meta { color: rgba(255, 255, 255, 0.94); }
 .slotText .title { color: var(--text); }
 .slotText .meta { color: var(--secondary); }
 
@@ -100,13 +102,15 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: rgba(0, 0, 0, 0.45);
+  /* Trackless to match the chapter pill — the unfilled portion is transparent. */
+  background: transparent;
 }
 
 .progressFill {
   display: block;
   height: 100%;
-  background: var(--rating-t);
+  /* Darker amber so the fill clears 3:1 trackless (matches the chapter pill). */
+  background: #9a780e;
   border-radius: 0 2px 2px 0;
 }
 
@@ -140,9 +144,10 @@
   border-color: var(--border-strong);
 }
 
-/* Lighter track on the solid card (no dark cover to contrast against). */
+/* Trackless to match the chapter pill; the darker-amber fill (#9a780e) clears
+   3:1 on the solid card in both themes (light 4.14:1, dark 4.2:1). */
 .slotText .progressTrack {
-  background: var(--border);
+  background: transparent;
 }
 
 /* ── Skeleton (mode-switch flash) — same 2:3 box + placeholder UI elements. ── */

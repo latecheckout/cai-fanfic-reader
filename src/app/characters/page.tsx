@@ -38,9 +38,9 @@ export default function CharactersPage() {
   return (
     <div>
       <BrowseHeader />
-      <main className={styles.main}>
+      <main id="main-content" className={styles.main}>
         <div className={styles.titleRow}>
-          <h2 className={styles.heading}>Characters</h2>
+          <h1 className={styles.heading}>Characters</h1>
           <span className={styles.count}>{sorted.length} characters</span>
         </div>
         <CharactersList grouped={grouped} />

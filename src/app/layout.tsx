@@ -39,6 +39,7 @@ export default function RootLayout({
         {/* brightness/peakAlpha dim the vivid ribbon to a subtle wash on the
             paper bg. Provider defaults the AO4 toggle's sweep inherits.
             No <InterceptLinks /> — the sweep fires only on the toggle, not nav. */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <GlimmProvider palette={SWEEP_PALETTE} brightness={0.84} peakAlpha={0.8}>
           {children}
           {/* Dev-only UI annotation overlay; stripped from production builds. */}
