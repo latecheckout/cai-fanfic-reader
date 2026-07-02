@@ -189,11 +189,13 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
     <div ref={listRef} className={`${styles.list} prose-outer`}>
       {chapters.map((chapter, i) => (
         <div key={i}>
+          {/* Not a labelled <section>: naming it would make every chapter a
+              landmark region AND duplicate the chapter <h2> inside it (region +
+              heading announce the same title). The h2 gives heading-rotor nav. */}
           <section
             id={`chapter-${i}`}
             ref={setRef(i)}
             className={styles.chapter}
-            aria-label={chapter.title || `Chapter ${i + 1}`}
           >
             {/* In-flow "you left off here" banner — only for chapters after the first */}
             {lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (

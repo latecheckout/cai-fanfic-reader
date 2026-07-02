@@ -27,7 +27,11 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
         </div>
         <p className={styles.text}>{comment.text}</p>
         <div className={styles.commentActions}>
-          <span className={styles.likeBtn}>♥ {comment.likes.toLocaleString()}</span>
+          <span className={styles.likeBtn}>
+            <span aria-hidden="true">♥</span>
+            <span className="visually-hidden">likes </span>
+            {comment.likes.toLocaleString()}
+          </span>
           {hasReplies && (
             <button
               className={styles.replyToggle}

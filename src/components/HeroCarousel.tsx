@@ -44,115 +44,121 @@ const SLIDES: Slide[] = [
   },
 ];
 
+/**
+ * Hero carousel. Exactly one keyboard tab stop: only the CURRENT slide is
+ * reachable (the others are `inert`), and Left/Right arrow keys move between
+ * slides, shifting focus to the new slide. The prev/next arrows and dots are
+ * always-visible controls kept OUT of the tab order (tabindex -1) — mouse users
+ * click them, keyboard users use the slide's arrow keys.
+ *
+ * Autoplay: advances every 6s but PAUSES on hover and on keyboard focus, and
+ * never starts under prefers-reduced-motion. Per product decision there is no
+ * explicit play/pause button, so WCAG 2.2.2 (Pause/Stop/Hide) is met only via
+ * hover/focus-pause + reduced-motion — a DOCUMENTED accepted exception, not a
+ * clean pass. (Reinstating a pause control would fully satisfy 2.2.2.)
+ */
 export function HeroCarousel() {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<Array<HTMLAnchorElement | null>>([]);
+  const focusPending = useRef(false);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [motionOK, setMotionOK] = useState(false);
+  const count = SLIDES.length;
 
-  const realCount = SLIDES.length;
-
-  const scrollToPos = (pos: number, smooth = true) => {
+  const scrollToPos = (i: number) => {
     const vp = viewportRef.current;
     if (!vp) return;
-    vp.scrollTo({ left: pos * vp.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+    vp.scrollTo({ left: i * vp.clientWidth, behavior: 'smooth' });
   };
 
-  const goTo = (i: number) => {
-    const clamped = Math.max(0, Math.min(realCount - 1, i));
-    scrollToPos(clamped);
-    setIndex(clamped);
+  // Wrap around; when `focusSlide` is set (keyboard nav) move focus to the new
+  // slide after it commits (see the effect below — the slide is `inert` until
+  // then, so focusing earlier would be a no-op).
+  const goTo = (i: number, focusSlide = false) => {
+    const next = (i + count) % count;
+    scrollToPos(next);
+    if (focusSlide) focusPending.current = true;
+    setIndex(next);
   };
 
-  // Forward one slide; at the last, glide FORWARD into a clone of the first, then
-  // jump back to the real first slide so it loops without rewinding the list.
-  const advance = () => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-    const cur = Math.round(vp.scrollLeft / vp.clientWidth);
-    if (cur < realCount - 1) {
-      scrollToPos(cur + 1, true);
-      setIndex(cur + 1);
-      return;
+  useEffect(() => {
+    if (focusPending.current) {
+      focusPending.current = false;
+      slideRefs.current[index]?.focus();
     }
+  }, [index]);
 
-    // Glide into the clone, then — once the scroll has fully SETTLED (scrollend,
-    // not a guessed timer) — jump back to slide 0. Snap is disabled for the jump
-    // so `scroll-snap-type: mandatory` doesn't re-animate it (the visible glitch).
-    scrollToPos(realCount, true);
-    setIndex(0);
+  // Reduced-motion preference (react to runtime changes).
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const set = () => setMotionOK(!mq.matches);
+    set();
+    mq.addEventListener('change', set);
+    return () => mq.removeEventListener('change', set);
+  }, []);
 
-    let done = false;
-    let fallback: ReturnType<typeof setTimeout>;
-    const settle = () => {
-      if (done) return;
-      done = true;
-      vp.removeEventListener('scrollend', settle);
-      clearTimeout(fallback);
-      vp.style.scrollSnapType = 'none';
-      vp.scrollLeft = 0;
-      requestAnimationFrame(() => { vp.style.scrollSnapType = ''; });
-    };
-    vp.addEventListener('scrollend', settle);
-    fallback = setTimeout(settle, 900); // safety net if scrollend never fires
-  };
-
-  // Back one slide; from the first, wrap to the last.
-  const retreat = () => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-    const cur = Math.round(vp.scrollLeft / vp.clientWidth) % realCount;
-    if (cur <= 0) {
-      scrollToPos(realCount - 1, false);
-      setIndex(realCount - 1);
-    } else {
-      scrollToPos(cur - 1, true);
-      setIndex(cur - 1);
-    }
-  };
+  // Auto-advance. Pauses on hover / keyboard focus (so the focused slide never
+  // goes `inert` underneath the user), and never runs under reduced motion.
+  useEffect(() => {
+    if (paused || !motionOK) return;
+    const id = setInterval(() => {
+      const vp = viewportRef.current;
+      if (!vp) return;
+      const cur = Math.round(vp.scrollLeft / vp.clientWidth);
+      const next = (cur + 1) % count;
+      scrollToPos(next);
+      setIndex(next);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [paused, motionOK, count]);
 
   const onScroll = () => {
     const vp = viewportRef.current;
     if (!vp) return;
-    setIndex(Math.round(vp.scrollLeft / vp.clientWidth) % realCount);
+    setIndex(Math.round(vp.scrollLeft / vp.clientWidth));
   };
 
-  // Auto-advance on a seamless loop. Pauses while hovered or keyboard-focused,
-  // and never starts when the user prefers reduced motion (WCAG 2.2.2).
-  useEffect(() => {
-    if (paused) return;
-    if (typeof window !== 'undefined' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(advance, AUTOPLAY_MS);
-    return () => clearInterval(id);
-  }, [paused]);
+  const onSlideKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      goTo(index + 1, true);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      goTo(index - 1, true);
+    }
+  };
 
   return (
     <section
       className={styles.hero}
+      aria-roledescription="carousel"
       aria-label="Featured"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className={styles.viewport} ref={viewportRef} onScroll={onScroll}>
-        {[...SLIDES, SLIDES[0]].map((s, i) => (
+      <div className={styles.viewport} ref={viewportRef} id="hero-carousel-slides" onScroll={onScroll}>
+        {SLIDES.map((s, i) => (
           <Link
-            key={i}
+            key={s.href}
             href={s.href}
             className={styles.slide}
-            aria-label={s.headline}
-            aria-hidden={i >= realCount || undefined}
-            tabIndex={i >= realCount ? -1 : undefined}
+            ref={(el) => {
+              slideRefs.current[i] = el;
+            }}
+            // Accessible name carries the slide's position, e.g. "…, slide 1 of 3".
+            aria-label={`${s.headline}, slide ${i + 1} of ${count}`}
+            // Only the current slide is interactive / in the tab + AT tree.
+            inert={i !== index || undefined}
+            onKeyDown={onSlideKeyDown}
           >
             <Image
               src={s.image}
               alt=""
               fill
               sizes="(max-width: 980px) 100vw, 940px"
-              /* Only the first banner is the LCP image → priority. The others
-                 load eagerly (decoded before they animate in) but without a
-                 competing preload, so LCP isn't penalised. */
               {...(i === 0 ? { priority: true } : { loading: 'eager' as const })}
               className={styles.bg}
             />
@@ -173,11 +179,16 @@ export function HeroCarousel() {
         ))}
       </div>
 
+      {/* Always-visible controls, kept out of the tab order (one tab stop for the
+          whole carousel). Labeled so they still work via the screen-reader cursor;
+          keyboard users navigate with the slide's arrow keys. */}
       <button
         type="button"
         className={`${styles.arrow} ${styles.arrowPrev}`}
-        onClick={retreat}
-        aria-label="Previous"
+        onClick={() => goTo(index - 1)}
+        tabIndex={-1}
+        aria-label="Previous slide"
+        aria-controls="hero-carousel-slides"
       >
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
           <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -186,8 +197,10 @@ export function HeroCarousel() {
       <button
         type="button"
         className={`${styles.arrow} ${styles.arrowNext}`}
-        onClick={advance}
-        aria-label="Next"
+        onClick={() => goTo(index + 1)}
+        tabIndex={-1}
+        aria-label="Next slide"
+        aria-controls="hero-carousel-slides"
       >
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
           <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -201,6 +214,7 @@ export function HeroCarousel() {
             type="button"
             className={`${styles.dot} ${i === index ? styles.dotActive : ''}`}
             onClick={() => goTo(i)}
+            tabIndex={-1}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === index ? 'true' : undefined}
           />

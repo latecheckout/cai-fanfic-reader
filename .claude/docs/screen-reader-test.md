@@ -29,6 +29,9 @@ Final human sign-off for the WCAG 2.2 AA work. Automated tooling (axe) and the c
 | B6 | Apply a filter | Result count announced (e.g. "12 works found") without moving focus |
 | B7 | Toggle "AO4 turbo" switch | Announced as a **switch**, on/off state changes; flips with **Space** |
 | B8 | Carousel dots | Active dot announces "current"; arrows/dots reachable, ≥24px |
+| B8b | Carousel **pause/play** button (bottom-left) | Announced "Pause slideshow"; activating flips to "Play slideshow" (aria-pressed) and stops auto-advance. Absent under Reduce Motion (nothing auto-moves) |
+| B9 | Read a work card (both modes) | Title announced **once** (not twice); stats read as **"kudos 1,200 · bookmarks 300 · views …"** — never "heart"/"flag"/"eye". Author + tags are separate links |
+| B10 | A shelf region + its heading | Shelf name ("Trending", "Featured") announced **once** as the region/heading — not repeated 2–3× (emoji not spoken) |
 
 ## C. Reader (`/works/{slug}`)
 | # | Step | Expected |
@@ -50,12 +53,13 @@ Final human sign-off for the WCAG 2.2 AA work. Automated tooling (axe) and the c
 | D1 | Reach the tab bar | Announced as a **tablist** ("Library sections"); tabs say "selected" |
 | D2 | ←/→ on a tab | Focus moves between tabs (manual activation); Enter/Space activates and swaps the panel |
 | D3 | Tab to the content | Reached as a **tab panel** associated with the active tab |
+| D4 | Headings rotor | h1 "Library" → h2 for the active section (Continuing / Bookmarked / Completed) → card h3s — no skipped level |
 
 ## E. Characters / Fandoms
 | # | Step | Expected |
 |---|------|----------|
-| E1 | Headings rotor | Page has an h1 ("Characters" / "Fandoms") |
-| E2 | Character search (Characters) | Input has a name; clear button labeled |
+| E1 | Headings rotor | Page has an h1 ("Characters" / "Fandoms"). On Characters, each **A–Z letter is an h2** in its own region — jump between letters via the Headings rotor |
+| E2 | Character search (Characters) | Input has a name and a **visible focus ring**; clear button labeled |
 | E3 | Tag/chip links | Reachable; ≥24px targets |
 
 ## F. Keyboard-only sweep (no mouse)
@@ -66,7 +70,7 @@ Final human sign-off for the WCAG 2.2 AA work. Automated tooling (axe) and the c
 
 ## G. Other passes
 - **200% / 400% zoom** (⌘+): no clipping, no loss of content.
-- **Reduced motion** (System Settings → Accessibility → Display → Reduce Motion): the carousel doesn't auto-advance; panel/morph animation is minimized.
+- **Reduced motion** (System Settings → Accessibility → Display → Reduce Motion): the carousel doesn't auto-advance and the pause/play control is hidden (nothing to pause); panel/morph animation is minimized.
 - **Dark + Paper themes:** repeat a few spot checks.
 
 ---

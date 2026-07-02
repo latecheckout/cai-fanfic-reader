@@ -32,12 +32,15 @@ export function MobileNav({ open, onClose, pathname, navLinks }: Props) {
   if (!open) return null;
 
   return (
-    <div className={styles.overlay} onClick={onClose} aria-modal="true" role="dialog" aria-label="Navigation">
+    <div className={styles.overlay} onClick={onClose}>
       <div
         ref={panelRef}
         className={styles.panel}
         onClick={(e) => e.stopPropagation()}
         tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation"
       >
         {/* Close button */}
         <div className={styles.panelHeader}>

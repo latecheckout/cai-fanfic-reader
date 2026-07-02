@@ -88,7 +88,20 @@ export function Views({ hits }: { hits: number }) {
   return (
     <span className={styles.statViews}>
       <EyeIcon />
+      <span className="visually-hidden">views </span>
       {formatCount(hits)}
+    </span>
+  );
+}
+
+/** A single social stat: a decorative glyph (hidden from screen readers) plus a
+ *  visually-hidden word, so VoiceOver reads "kudos 1,200" — not "heart 1,200". */
+export function Stat({ glyph, label, value }: { glyph: string; label: string; value: string }) {
+  return (
+    <span>
+      <span aria-hidden="true">{glyph} </span>
+      <span className="visually-hidden">{label} </span>
+      {value}
     </span>
   );
 }
@@ -172,8 +185,8 @@ export function WorkCardCover({ work }: Props) {
     formatWords(meta.words),
     formatChapters(meta.chaptersPosted, meta.chapters),
     meta.updated || meta.published ? `updated ${meta.updated || meta.published}` : null,
-    meta.kudos > 0 ? `♥ ${formatCount(meta.kudos)}` : null,
-    meta.bookmarks > 0 ? `⚑ ${formatCount(meta.bookmarks)}` : null,
+    meta.kudos > 0 ? <Stat key="kudos" glyph="♥" label="kudos" value={formatCount(meta.kudos)} /> : null,
+    meta.bookmarks > 0 ? <Stat key="bookmarks" glyph="⚑" label="bookmarks" value={formatCount(meta.bookmarks)} /> : null,
     meta.hits > 0 ? <Views key="views" hits={meta.hits} /> : null,
   ].filter(Boolean);
   const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, MAX_TAGS_LIST);
@@ -196,10 +209,10 @@ export function WorkCardCover({ work }: Props) {
           </h3>
           {meta.author && (
             <span className={`${styles.author} ${styles.bylineAvatar}`}>
-              <span className={styles.bylineBy}>by</span>
+              <span className={styles.bylineBy} aria-hidden="true">by</span>
               <Avatar />
               <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
-                {meta.author}
+                <span className="visually-hidden">Author: </span>{meta.author}
               </Link>
             </span>
           )}
@@ -210,13 +223,18 @@ export function WorkCardCover({ work }: Props) {
         {(warnings.length > 0 || meta.tags.length > 0) && (
           <div className={`${styles.tags} ${styles.interactive}`}>
             {warnings.map((w) => (
-              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className={styles.warnChip}>{w}</Link>
+              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className={styles.warnChip}><span className="visually-hidden">Warning: </span>{w}</Link>
             ))}
             {visibleTags.map((t) => (
-              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>{t}</Link>
+              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}><span className="visually-hidden">Tag: </span>{t}</Link>
             ))}
             {hiddenTagCount > 0 && (
-              <button type="button" className={styles.tagsMore} onClick={() => setTagsExpanded(!tagsExpanded)}>
+              <button
+                type="button"
+                className={styles.tagsMore}
+                onClick={() => setTagsExpanded(!tagsExpanded)}
+                aria-label={tagsExpanded ? 'Show fewer tags' : `Show ${hiddenTagCount} more tags`}
+              >
                 {tagsExpanded ? 'show less' : `+${hiddenTagCount}`}
               </button>
             )}
@@ -234,7 +252,7 @@ export function WorkCardCover({ work }: Props) {
                 {meta.fandom.map((f, i) => (
                   <span key={f}>
                     {i > 0 && ', '}
-                    <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.fandomLink}>{f}</Link>
+                    <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.fandomLink}><span className="visually-hidden">Fandom: </span>{f}</Link>
                   </span>
                 ))}
               </div>
@@ -245,7 +263,7 @@ export function WorkCardCover({ work }: Props) {
                 {meta.relationships.map((r, i) => (
                   <span key={r}>
                     {i > 0 && <span className={styles.shipSeparator}> / </span>}
-                    <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.shipLink}>{r}</Link>
+                    <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.shipLink}><span className="visually-hidden">Relationship: </span>{r}</Link>
                   </span>
                 ))}
               </div>
@@ -256,7 +274,7 @@ export function WorkCardCover({ work }: Props) {
                 {meta.characters.map((c, i) => (
                   <span key={`char-${i}`}>
                     {i > 0 && <span className={styles.charSeparator}>, </span>}
-                    <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.charLink}>{c}</Link>
+                    <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.charLink}><span className="visually-hidden">Character: </span>{c}</Link>
                   </span>
                 ))}
               </div>

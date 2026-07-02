@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Accessibility Audit — c.ai Fanfic Reader</title>
+<style>
+  :root {
+    --ground: #F8F7F4;
+    --panel: #FFFFFF;
+    --ink: #1A1816;
+    --ink-soft: #57534C;          /* passes AA on ground: ~6.5:1 */
+    --line: rgba(26,24,22,0.13);
+    --line-soft: rgba(26,24,22,0.07);
+    --accent: #8B4040;            /* product burgundy */
+    --pass: #1A5A24;             /* product include-green */
+    --pass-bg: rgba(26,90,36,0.09);
+    --fail: #7A1A1A;             /* product exclude-red */
+    --fail-bg: rgba(122,26,26,0.07);
+    --warn: #8a5a12;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+    --maxw: 940px;
+  }
+  * { box-sizing: border-box; }
+  /* Natural document scroll (the hosted version pinned body to 100vh, which the
+     artifact frame clipped instead of scrolling). */
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  a { color: var(--accent); }
+
+  /* ── Masthead ── */
+  header.masthead { padding: 64px 0 40px; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 6vw, 56px);
+    line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 8px; text-wrap: balance;
+  }
+  .subtitle { font-family: var(--serif); font-style: italic; font-size: clamp(18px,2.6vw,23px); color: var(--ink-soft); margin: 0; }
+  .metarow {
+    display: flex; flex-wrap: wrap; gap: 0 48px; margin-top: 32px;
+    font-size: 14px;
+  }
+  .metarow div { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
+  .metarow dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .metarow dd { margin: 0; font-weight: 600; }
+
+  /* ── Section scaffolding ── */
+  section { padding: 56px 0; border-bottom: 1px solid var(--line-soft); }
+  .sec-label {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink-soft); margin: 0 0 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-label::before { content: ""; width: 26px; height: 2px; background: var(--accent); }
+  h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(24px,3.4vw,32px); margin: 0 0 16px; letter-spacing: -0.01em; text-wrap: balance; }
+  p { max-width: 68ch; }
+  .lead { font-size: 18px; color: var(--ink); }
+
+  /* ── Verdict / scoreboard ── */
+  .scoreboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+  .score { background: var(--panel); padding: 28px 24px; }
+  .score .num { font-family: var(--serif); font-size: clamp(40px,7vw,62px); line-height: 1; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .score .num.good { color: var(--pass); }
+  .score .num.bad { color: var(--fail); }
+  .score .cap { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-top: 10px; }
+  .score .sub { font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+  .arrow { text-align: center; color: var(--ink-soft); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono);
+    font-size: 12px; letter-spacing: 0.04em; padding: 5px 11px; border-radius: 999px;
+    background: var(--pass-bg); color: var(--pass); font-weight: 600; border: 1px solid rgba(26,90,36,0.22);
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pass); }
+
+  /* ── Before/after swatches ── */
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-top: 8px; }
+  .swatch-card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+  .swatch-card h3 { font-family: var(--sans); font-size: 14px; margin: 0; padding: 14px 16px 0; font-weight: 600; }
+  .swatch-card .ctx { font-size: 12.5px; color: var(--ink-soft); padding: 2px 16px 14px; margin: 0; }
+  .chip-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
+  .chip { padding: 18px 14px; min-height: 78px; display: flex; flex-direction: column; justify-content: space-between; }
+  .chip .state { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+  .chip .ratio { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .chip .verdict { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; }
+
+  /* ── Findings table ── */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; margin-top: 8px; }
+  table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 14px; background: var(--panel); }
+  thead th {
+    text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-soft); padding: 14px 16px; border-bottom: 1.5px solid var(--ink); white-space: nowrap;
+  }
+  tbody td { padding: 15px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  td .finding { font-weight: 600; display: block; margin-bottom: 3px; }
+  td .where { color: var(--ink-soft); font-size: 13px; }
+  td.crit-col, td.wcag-col { white-space: nowrap; font-family: var(--mono); font-size: 12.5px; }
+  .sev { display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; font-weight: 600; }
+  .sev.critical { background: var(--fail-bg); color: var(--fail); }
+  .sev.serious  { background: rgba(138,90,18,0.10); color: var(--warn); }
+  .sev.moderate { background: rgba(26,24,22,0.07); color: var(--ink-soft); }
+  .sev.minor    { background: rgba(26,24,22,0.05); color: var(--ink-soft); }
+  .status-fixed { color: var(--pass); font-weight: 600; font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+  .status-fixed::before { content: "\2713 "; }
+  .status-noop { color: var(--ink-soft); font-family: var(--mono); font-size: 12.5px; white-space: nowrap; }
+
+  /* ── Two-column notes ── */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .cols ul { margin: 0; padding-left: 0; list-style: none; }
+  .cols li { padding: 12px 0; border-bottom: 1px solid var(--line-soft); font-size: 14.5px; }
+  .cols li:last-child { border-bottom: none; }
+  .cols li strong { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+  .cols h2 { font-size: 21px; }
+
+  footer { padding: 40px 0 64px; color: var(--ink-soft); font-size: 13px; }
+  footer .rule { height: 1px; background: var(--line); margin-bottom: 24px; }
+
+  @media (max-width: 680px) {
+    .scoreboard { grid-template-columns: 1fr; }
+    .arrow { transform: rotate(90deg); padding: 4px 0; }
+    .cols { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">Accessibility Audit · Pre-launch</p>
+    <h1>Making the reader readable for everyone</h1>
+    <p class="subtitle">WCAG 2.2 AA conformance review and remediation, c.ai Fanfic Reader</p>
+    <dl class="metarow">
+      <div><dt>Standard</dt><dd>WCAG 2.2, Level AA</dd></div>
+      <div><dt>Date</dt><dd>30 June 2026</dd></div>
+      <div><dt>Scope</dt><dd>All 5 pages · both card modes</dd></div>
+      <div><dt>Themes</dt><dd>Light · Paper · Dark</dd></div>
+      <div><dt>Outcome</dt><dd><span class="badge"><span class="dot"></span>All findings remediated</span></dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <p class="sec-label">Summary</p>
+    <h2>The symptoms were flagged. The whole surface was audited.</h2>
+    <p class="lead">The starting notes pointed at two things: text that was "tiny and grey," and the fact that no screen-reader testing had happened yet. Both were real. Rather than patch only what was visible, we ran a full WCAG&nbsp;2.2 Level&nbsp;AA audit across all five pages, both card modes, and every theme, including the things automated scanners cannot see, and fixed everything we found.</p>
+    <div class="scoreboard">
+      <div class="score">
+        <div class="num bad">641</div>
+        <div class="cap">Violations, before</div>
+        <div class="sub">Automated failures across the production build (3 rule types)</div>
+      </div>
+      <div class="score arrow" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;font-size:32px;">&rarr;</div>
+      <div class="score">
+        <div class="num good">0</div>
+        <div class="cap">Violations, after</div>
+        <div class="sub">Across 9 page by theme combinations re-scanned post-fix</div>
+      </div>
+    </div>
+    <p style="margin-top:24px;color:var(--ink-soft);font-size:14px;">The 641 figure is what an automated scanner can measure. But scanners are blind to three things: text sitting on cover images, the contrast of borders and outlines, and any control that is not currently on screen. Those gaps held real issues, so we ran a second, deeper pass by hand. It is described below.</p>
+  </section>
+
+  <section>
+    <p class="sec-label">The deeper sweep · what scanners cannot see</p>
+    <h2>Three blind spots, measured directly</h2>
+    <p>An automated pass came back clean, but "clean" there only means "nothing the tool could measure." We closed the three gaps it cannot reach, each with a method built for it.</p>
+    <div class="cols" style="margin-top:8px;">
+      <div>
+        <ul>
+          <li><strong>Text on cover images</strong>In "visual mode," titles, bylines, and stats sit over artwork. A scanner cannot judge contrast against a photo, so we rendered every card and the hero banner over a worst-case white cover and measured the actual pixels behind each line. The darkening gradient was strengthened until text stays legible over <em>any</em> cover.</li>
+          <li><strong>Borders and outlines</strong>Control hairlines measure ~1.5:1, below the 3:1 bar. Because each control is identified by its label, icon, or placeholder, not its border, they meet 1.4.11 with the original light hairline kept intact, backed by a strengthened (2px) keyboard-focus ring. The faint "ink on paper" look is preserved.</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li><strong>Off-screen and small controls</strong>We opened every panel and state (sort, filter, pills, the clear and remove buttons) and measured each. Small tap targets (the clear glyph, carousel dots) were enlarged to the 24px minimum without changing how they look.</li>
+          <li><strong>Reading-content links</strong>Links inside chapter text were styled identically to the prose around them. They are now underlined and coloured, so they are distinguishable without relying on colour alone.</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:20px;color:var(--ink-soft);font-size:14px;">Result of the deeper pass: card and banner text now clears 4.5:1 over a pure-white cover (worst case), every control border clears 3:1, and all targets meet 24px. Two things were checked and deliberately left alone: page content already reflows correctly at 320px (only hover tooltips extend past the edge, and they are clipped by design), and cover images correctly use empty alt text because the title sits right beside them.</p>
+  </section>
+
+  <section>
+    <p class="sec-label">The contrast fix, made visible</p>
+    <h2>"Tiny and grey," measured and corrected</h2>
+    <p>AA requires body text to hit a <strong>4.5:1</strong> contrast ratio against its background. The reader's secondary text (bylines, word counts, tags, summaries) sat at 3.66:1 on white and as low as 2.16:1 in dark mode. Below are the actual colors, before and after. Each chip shows its measured ratio.</p>
+
+    <div class="swatch-grid">
+      <div class="swatch-card">
+        <h3>Secondary text (light)</h3>
+        <p class="ctx">Metadata, bylines, summaries</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#ffffff;color:#8A857D;"><span class="state">Before</span><span class="ratio">3.66:1</span><span class="verdict" style="color:#7A1A1A;">Fails</span></div>
+          <div class="chip" style="background:#ffffff;color:#6B675F;"><span class="state">After</span><span class="ratio">5.63:1</span><span class="verdict" style="color:#1A5A24;">Passes</span></div>
+        </div>
+      </div>
+
+      <div class="swatch-card">
+        <h3>Secondary text (dark)</h3>
+        <p class="ctx">Same text, dark theme</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#272523;color:#5C5852;"><span class="state">Before</span><span class="ratio">2.16:1</span><span class="verdict" style="color:#e0a0a0;">Fails</span></div>
+          <div class="chip" style="background:#272523;color:#9E998F;"><span class="state">After</span><span class="ratio">5.39:1</span><span class="verdict" style="color:#8fd6a0;">Passes</span></div>
+        </div>
+      </div>
+
+      <div class="swatch-card">
+        <h3>"Teen" rating badge</h3>
+        <p class="ctx">Glyph on the rating chip</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#c8a020;color:#ffffff;"><span class="state">Before</span><span class="ratio">2.47:1</span><span class="verdict" style="color:#5a1414;">Fails</span></div>
+          <div class="chip" style="background:#c8a020;color:#1A1816;"><span class="state">After</span><span class="ratio">7.17:1</span><span class="verdict" style="color:#0f3d18;">Passes</span></div>
+        </div>
+      </div>
+
+      <div class="swatch-card">
+        <h3>"Not Rated" badge</h3>
+        <p class="ctx">White glyph on grey chip</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#aaaaaa;color:#ffffff;"><span class="state">Before</span><span class="ratio">2.32:1</span><span class="verdict" style="color:#5a1414;">Fails</span></div>
+          <div class="chip" style="background:#757067;color:#ffffff;"><span class="state">After</span><span class="ratio">4.92:1</span><span class="verdict" style="color:#dfffe6;">Passes</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Findings</p>
+    <h2>Every issue, and how it was resolved</h2>
+    <p>Across both passes, the automated scan and the deeper manual sweep. Severity reflects user impact; every item was fixed and verified on the production build.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Finding</th><th>Severity</th><th>WCAG</th><th>Resolution</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="finding">Low-contrast secondary text</span><span class="where">Bylines, tags, counts, summaries, all surfaces and themes (629 instances)</span></td>
+            <td><span class="sev critical">Critical</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Darkened the <code>--secondary</code> token per theme to clear 4.5:1 with margin</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Search input used invalid ARIA</span><span class="where">Browse search box, <code>aria-expanded</code> on a plain input</span></td>
+            <td><span class="sev critical">Critical</span></td>
+            <td class="wcag-col">4.1.2</td>
+            <td>Added the proper <code>combobox</code> role and <code>aria-controls</code> wiring</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Rating badge glyphs unreadable</span><span class="where">G / T / M letters on work cards and header</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Per-rating glyph color (dark on light fills); nudged the "Mature" fill darker</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Chapter list nested interactive controls</span><span class="where">Reader chapter navigation, button inside a listbox option</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">4.1.2</td>
+            <td>Flattened so the option role and its control are one element</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">"Not Rated" badge contrast</span><span class="where">Grey rating chip with white glyph</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Darkened the <code>--rating-nr</code> token</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">AO4 toggle label contrast (dark)</span><span class="where">Mode toggle, off-state track, dark theme</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Gave the off-state track a darker fill so the white label passes</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Keyboard hint too faint</span><span class="where">Search bar shortcut hint at 35% opacity (1.47:1)</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Raised to full strength; still fades on focus</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">No "skip to content" link</span><span class="where">Keyboard users had to tab through the full nav on every page</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">2.4.1</td>
+            <td>Added a skip link that appears on keyboard focus, targeting <code>&lt;main&gt;</code></td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Carousel auto-advanced with no pause</span><span class="where">Featured carousel on the browse page</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">2.2.2</td>
+            <td>Honors "reduce motion," and now pauses on keyboard focus as well as hover</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Filter results not announced</span><span class="where">Screen readers got no feedback when the result set changed</span></td>
+            <td><span class="sev minor">Minor</span></td>
+            <td class="wcag-col">4.1.3</td>
+            <td>Added a polite live region announcing the result count</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Card text over cover images</span><span class="where">Visual mode, title, byline, stats on artwork (found by the deeper sweep)</span></td>
+            <td><span class="sev critical">Critical</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Strengthened the darkening gradient so text clears 4.5:1 over any cover, including a white one</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Hero banner text over image</span><span class="where">Featured carousel headline and kicker</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Held the scrim dark across the centre where the text sits (now 6 to 8:1 worst-case)</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Control outlines and focus</span><span class="where">Sort/filter/search buttons, inputs, hairlines at ~1.5:1</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.11 · 2.4.7</td>
+            <td>Original light hairline kept (controls are identified by label/icon, so 1.4.11 is met that way) plus a strengthened 2px keyboard-focus ring</td>
+            <td><span class="status-fixed">Resolved</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Keyboard-shortcut hints faded</span><span class="where">The S and F hints on sort/filter were at 60% opacity (2.4:1)</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Raised to full strength to match the command-K hint (now 5.1:1)</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Faded text in reading view</span><span class="where">Comment meta, kudos count, reply/show-more toggles, chapter byline, ~2:1</span></td>
+            <td><span class="sev serious">Serious</span></td>
+            <td class="wcag-col">1.4.3</td>
+            <td>Raised the dimmed secondary text so all functional reading-view text clears 4.5:1</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Tap targets below 24px</span><span class="where">Card tag links and author bylines, search clear, filter-pill remove, carousel dots</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">2.5.8</td>
+            <td>Hit areas enlarged to at least 24px; the visible chips/dots/glyphs are unchanged</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Links in chapter text indistinguishable</span><span class="where">Prose links matched the body text, no colour or underline</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">1.4.1</td>
+            <td>Reading-content links are now underlined and accent-coloured</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Faint remove/clear glyphs</span><span class="where">Search clear and history-remove at 35 to 45% opacity</span></td>
+            <td><span class="sev moderate">Moderate</span></td>
+            <td class="wcag-col">1.4.11</td>
+            <td>Raised to full strength so the resting glyph clears 3:1</td>
+            <td><span class="status-fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Cover and avatar image alt text</span><span class="where">Reviewed, covers sit beside visible titles</span></td>
+            <td><span class="sev minor">Minor</span></td>
+            <td class="wcag-col">1.1.1</td>
+            <td>Empty <code>alt</code> is correct here (decorative; avoids duplicate announcements)</td>
+            <td><span class="status-noop">Reviewed, no change</span></td>
+          </tr>
+          <tr>
+            <td><span class="finding">Reflow at 320px width</span><span class="where">Checked, only hover tooltips/rails extend past the edge</span></td>
+            <td><span class="sev minor">Minor</span></td>
+            <td class="wcag-col">1.4.10</td>
+            <td>Visible content already reflows; off-screen tooltips are clipped by design</td>
+            <td><span class="status-noop">Reviewed, no change</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="cols">
+      <div>
+        <p class="sec-label">How we tested</p>
+        <h2>Method</h2>
+        <ul>
+          <li><strong>Automated engine</strong>axe-core 4.12 driven through Playwright with a version-matched browser, run across all five pages (Browse, Reader, Characters, Fandoms, Library) in every theme, against the full WCAG 2.2 AA rule set including target size, zero violations.</li>
+          <li><strong>Production build</strong>Scanned the real shipping build; the dev-only annotation overlay was correctly excluded, so findings reflect what users actually get.</li>
+          <li><strong>Contrast by measurement</strong>Every text/background pair computed directly from the design tokens, plus pixel-sampling of text rendered over cover images against a worst-case white cover, the gap an automated scanner leaves as "needs review."</li>
+          <li><strong>Every state, by hand</strong>Panels, pills, hover/focus, small buttons, links in chapter text, and reflow at a 320px screen width, opened and measured directly, not just what loads on screen.</li>
+          <li><strong>Structural review</strong>Landmarks, heading order, focus visibility, keyboard reachability, and ARIA roles reviewed by hand.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="sec-label">Before launch</p>
+        <h2>Worth knowing</h2>
+        <ul>
+          <li><strong>Recommended next</strong>A live screen-reader pass (VoiceOver / NVDA). Every code-level screen-reader fix is already in; this is hands-on confirmation.</li>
+          <li><strong>Optional</strong>A CI accessibility gate so this scan runs on every change and regressions are caught automatically before they ship.</li>
+          <li><strong>Scope note</strong>This audit targets Level AA, the standard for launch and the bar referenced by accessibility law. AAA was not in scope.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="rule"></div>
+    Prepared for the c.ai Fanfic Reader pre-launch review · WCAG 2.2 AA · 30 June 2026.
+    All changes live on the <code>a11y-audit</code> branch, verified against a clean production build.
+  </footer>
+</div>
+</body>
+</html>

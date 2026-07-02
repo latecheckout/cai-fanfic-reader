@@ -126,17 +126,16 @@
   transform: rotate(180deg);
 }
 
-/* Embedded progress bar — clipped by pill's overflow: hidden.
-   Matches the continue-reading ("reading list") bar: full-opacity --rating-t
-   fill over a dark track, so the fill clears 3:1 (1.4.11). The 38% rating tint
-   was only ~1.6:1. */
+/* Embedded progress bar — clipped by pill's overflow: hidden. Trackless (per
+   design): the fill sits directly on the pill, so the FILL itself must clear
+   3:1 (1.4.11) against the pill bg. The bright gold (#e6c23c) can't do that on
+   the white pill (~1.97:1), so this uses a darker amber (#9a780e) that clears
+   3:1 on both the white (light/paper) and dark (#272523) pills. */
 .progressBar {
   position: absolute;
   bottom: 0;
   left: 0;
   height: 3px;
-  /* Trackless: darker amber that clears 3:1 against both the white pill (light)
-     and the dark pill #272523 — no track needed. */
   background: #9a780e;
   z-index: 1;
   border-radius: 0;

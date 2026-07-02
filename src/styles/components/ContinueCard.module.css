@@ -9,23 +9,19 @@
   width: 150px;                 /* visual mode */
   text-decoration: none;
   color: inherit;
+  /* Match the inner .media/.slotText radius so the focus ring rounds with the
+     card instead of drawing a sharp rectangle around it. */
+  border-radius: 14px;
 }
 
 
 /* ── Visual slot ── */
 .slot {
   display: block;
-  transition: transform var(--transition-micro);
 }
 
 :global(html[data-mode='text']) .slot {
   display: none;
-}
-
-/* Lift the wrapper, never the clipped .media — transforming a clip-path element
-   re-rasterises its edge and the cover fringes past the ring. */
-.card:hover .slot {
-  transform: translateY(-2px);
 }
 
 .media {
@@ -91,7 +87,8 @@
 
 /* Colours per slot: white over the cover, dark on the solid text card. */
 .media .title { color: #fff; }
-.media .meta { color: rgba(255, 255, 255, 0.94); }
+/* Dimmer than the title above it (still ~9:1 over the dark head scrim). */
+.media .meta { color: rgba(255, 255, 255, 0.72); }
 .slotText .title { color: var(--text); }
 .slotText .meta { color: var(--secondary); }
 
@@ -102,15 +99,17 @@
   left: 0;
   right: 0;
   height: 4px;
-  /* Trackless to match the chapter pill — the unfilled portion is transparent. */
-  background: transparent;
+  /* Visual mode (over the cover): dark black-overlay track. Against the brighter
+     gold fill this clears 3:1 over any cover (0.68 => 4.5:1) and gives the gold a
+     dark backdrop so it reads clearly over busy art. */
+  background: rgba(0, 0, 0, 0.68);
 }
 
 .progressFill {
   display: block;
   height: 100%;
-  /* Darker amber so the fill clears 3:1 trackless (matches the chapter pill). */
-  background: #9a780e;
+  /* Brighter progress gold; the track provides the 3:1 non-text boundary. */
+  background: var(--progress-fill);
   border-radius: 0 2px 2px 0;
 }
 
@@ -144,10 +143,10 @@
   border-color: var(--border-strong);
 }
 
-/* Trackless to match the chapter pill; the darker-amber fill (#9a780e) clears
-   3:1 on the solid card in both themes (light 4.14:1, dark 4.2:1). */
+/* Text mode (solid card): light-grey track — clears 3:1 vs the brighter gold
+   fill (#6a6a6a => 3.1:1), much lighter than the site-yellow version allowed. */
 .slotText .progressTrack {
-  background: transparent;
+  background: var(--progress-track);
 }
 
 /* ── Skeleton (mode-switch flash) — same 2:3 box + placeholder UI elements. ── */

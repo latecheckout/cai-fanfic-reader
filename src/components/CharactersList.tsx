@@ -74,6 +74,16 @@ export function CharactersList({ grouped }: Props) {
         )}
       </div>
 
+      {/* a11y (4.1.3): announce live filter results to screen readers, since the
+          list updates without moving focus. Silent when the query is empty. */}
+      <span className="visually-hidden" role="status" aria-live="polite">
+        {q
+          ? totalVisible === 0
+            ? `No characters match ${query}`
+            : `${totalVisible} ${totalVisible === 1 ? 'character' : 'characters'} match`
+          : ''}
+      </span>
+
       {/* Grouped list */}
       {filtered.length === 0 ? (
         <p className={styles.empty}>No characters match &ldquo;{query}&rdquo;.</p>
@@ -81,7 +91,9 @@ export function CharactersList({ grouped }: Props) {
         <div className={styles.groups}>
           {filtered.map((group) => (
             <div key={group.letter} className={styles.group}>
-              <div className={styles.groupLetter}>{group.letter}</div>
+              {/* Plain container (not a labelled <section>): the h2 gives heading-rotor
+                  letter navigation without turning every letter into a landmark region. */}
+              <h2 className={styles.groupLetter}>{group.letter}</h2>
               <ul className={styles.list}>
                 {group.items.map(({ name, count }) => (
                   <li key={name} className={styles.item}>

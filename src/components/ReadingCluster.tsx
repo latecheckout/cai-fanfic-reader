@@ -71,6 +71,17 @@ export function ReadingCluster() {
   const chapterPanelRef = useRef<HTMLDivElement>(null);
   const prefsPanelRef   = useRef<HTMLDivElement>(null);
 
+  // a11y: the panels are always mounted (portaled) for the morph animation, so
+  // while closed they'd otherwise leave their controls in the tab order + the
+  // accessibility tree (phantom chapter/prefs/metadata controls on the page).
+  // Mark every panel `inert` except the open one. The open panel's inert clears
+  // here on the activePanel change — before openPanel's timed focus-move runs.
+  useEffect(() => {
+    if (metaPanelRef.current)    metaPanelRef.current.inert    = activePanel !== 'metadata';
+    if (chapterPanelRef.current) chapterPanelRef.current.inert = activePanel !== 'chapter';
+    if (prefsPanelRef.current)   prefsPanelRef.current.inert   = activePanel !== 'prefs';
+  }, [activePanel, isMounted]);
+
   // Backdrop ref
   const backdropRef = useRef<HTMLDivElement>(null);
 
@@ -411,6 +422,7 @@ export function ReadingCluster() {
             className={`${styles.bubble} ${styles.titleBubble} ${!isSticky ? styles.titleHidden : ''}`}
             onClick={() => togglePanel('metadata')}
             aria-label="View work details"
+            aria-haspopup="dialog"
           >
             <span className={styles.titleText}>{workMeta.title}</span>
           </button>
@@ -423,6 +435,7 @@ export function ReadingCluster() {
               onClick={() => togglePanel('chapter')}
               data-active={activePanel === 'chapter' ? 'true' : undefined}
               aria-label="Chapter navigation"
+              aria-haspopup="dialog"
             >
               <span className={styles.chapterNum}>{activeChapterIndex + 1}</span>
               <span className={styles.chapterDivider} aria-hidden="true" />

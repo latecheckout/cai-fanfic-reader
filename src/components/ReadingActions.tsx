@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useReading } from '@/context/ReadingContext';
+import { BookmarkIcon } from './BookmarkIcon';
 import styles from '@/styles/components/ReadingActions.module.css';
 
 const SAVED_KEY = 'fanfic-saved-works';
@@ -57,6 +58,7 @@ export function ReadingActions() {
         className={styles.prefsBubble}
         onClick={() => prefsToggleFnRef.current?.()}
         aria-label="Reading preferences"
+        aria-haspopup="dialog"
       >
         <svg
           width="14"
@@ -87,20 +89,10 @@ export function ReadingActions() {
         <span className={styles.spark} aria-hidden="true" />
         <span className={styles.spark} aria-hidden="true" />
         {/* Bookmark ribbon icon — filled when saved, outline when not */}
-        <svg
-          width="13"
-          height="16"
-          viewBox="0 0 13 16"
-          fill={isBookmarked ? 'currentColor' : 'none'}
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+        <BookmarkIcon
+          filled={isBookmarked}
           className={isBookmarked ? styles.filled : styles.outline}
-        >
-          <path d="M2 1.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5V14l-4.5-3-4.5 3V1.5z" />
-        </svg>
+        />
       </button>
       {/* a11y (4.1.3): announce bookmark changes to screen readers */}
       <span className="visually-hidden" role="status" aria-live="polite">{announce}</span>

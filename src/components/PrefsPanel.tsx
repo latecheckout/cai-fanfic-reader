@@ -213,6 +213,7 @@ export const PrefsPanel = React.forwardRef<HTMLDivElement, Props>(
                     max={24}
                     step={1}
                     value={fontSize}
+                    aria-valuetext={`${fontSize}px`}
                     onChange={(e) => applyFontSize(Number(e.target.value))}
                     className={styles.range}
                   />

@@ -16,7 +16,7 @@
 /* ── Comments header ────────────────────────────────────────────────── */
 .header {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--secondary);
@@ -44,8 +44,10 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--secondary);
+  font-size: 11px;
+  /* --text (not --secondary): the monogram sits on a 10%-text-tint circle, where
+     --secondary lands at ~4.2:1 (just under AA). --text clears it in every theme. */
+  color: var(--text);
   flex-shrink: 0;
 }
 
@@ -70,7 +72,7 @@
 
 .date {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--secondary);
   opacity: 0.95;
 }
@@ -170,6 +172,12 @@
   font-size: 13px;
   color: var(--color-exclude);
 }
+/* --color-exclude (#7A1A1A) is a :root token shared with the filter pills; on the
+   dark bg it only clears ~1.8:1. Error text must be readable (1.4.3 / 3.3.1), so
+   lift it to a lighter red on dark only (#e57373 => ~6.6:1 on #141210). */
+:global(html[data-theme='dark']) .formError {
+  color: #e57373;
+}
 
 .commentInput {
   font-family: var(--font-sans);
@@ -187,7 +195,6 @@
   box-sizing: border-box;
 }
 .commentInput:focus {
-  outline: none;
   border-color: var(--border-strong);
 }
 .commentInput::placeholder {

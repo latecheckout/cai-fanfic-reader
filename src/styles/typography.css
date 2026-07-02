@@ -196,7 +196,7 @@
 /* Metadata labels — tracked uppercase (Character Sans reads beautifully at this size) */
 .meta-label {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: 0.08em;
@@ -224,7 +224,7 @@
 /* Peripheral label text */
 .label-tiny {
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.4;
   letter-spacing: 0.03em;

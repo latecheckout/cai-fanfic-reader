@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
 import { RailViewport } from './RailViewport';
+import { WORK_TITLES } from '@/lib/workTitles';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
@@ -42,12 +43,18 @@ export function ContinueReadingSection({ covers }: Props) {
         const items: Bookmark[] = Object.entries(data)
           .map(([slug, b]) => ({
             slug,
-            title: b.title ?? slug,
+            // ONLY trust the bundled content map — never the stored title and
+            // never the slug. A bookmark for anything that isn't a current work
+            // (an old/renamed/orphaned slug) resolves to '' and is dropped below.
+            // This makes it impossible to ever announce a slug like
+            // "sample-story-3" as a title.
+            title: WORK_TITLES[slug] ?? '',
             chapterIndex: b.activeChapterIndex ?? 0,
             totalChapters: b.totalChapters ?? 1,
             scrollPercent: b.scrollPercent ?? 0,
             timestamp: b.timestamp,
           }))
+          .filter((item) => item.title)
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, 8);
         setBookmarks(items);
@@ -68,10 +75,13 @@ export function ContinueReadingSection({ covers }: Props) {
   const pending = !loaded;
 
   return (
-    <section className={`${styles.section} ${pending ? styles.pending : ''}`}>
+    <section
+      className={`${styles.section} ${pending ? styles.pending : ''}`}
+      aria-labelledby="continue-reading-title"
+    >
       {/* Section header band */}
       <div className={styles.band}>
-        <span className={styles.bandLabel}>Continue Reading</span>
+        <h2 id="continue-reading-title" className={styles.bandLabel}>Continue Reading</h2>
         {!pending && (
           <span className={styles.bandMeta}>
             {bookmarks.length} in progress{' · '}

@@ -32,11 +32,18 @@
   --card-border: rgba(26, 24, 22, 0.09);
 
   /* Rating dot colors — per brief spec */
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #b5591a;
-  --rating-e:  #b02828;
-  --rating-nr: #757067;
+  --rating-g:  #337a5a;
+  --rating-t:  #8a6a0a;
+  --rating-m:  #a5511a;
+  --rating-e:  #c23232;
+  --rating-nr: #6f6a61;
+
+  /* Progress bars (continue-reading + chapter pill). Brighter than the Teen
+     rating yellow so the fill pops over cover photos; the fill/track pair clears
+     3:1 (1.4.11). Theme-constant. --progress-track is the solid text-mode track;
+     visual mode uses a darker black-overlay over the cover art. */
+  --progress-fill: #e6c23c;
+  --progress-track: #6a6a6a;
 
   /* Typography */
   --font-serif: "Lora", Georgia, 'Times New Roman', serif;
@@ -133,11 +140,11 @@
   --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #b5591a;
-  --rating-e:  #b02828;
-  --rating-nr: #757067;
+  --rating-g:  #337a5a;
+  --rating-t:  #8a6a0a;
+  --rating-m:  #a5511a;
+  --rating-e:  #c23232;
+  --rating-nr: #6f6a61;
   --bubble-bg: #ffffff;
   --grid-line: rgba(26, 24, 22, 0.055);
 }
@@ -155,11 +162,11 @@
   --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F4F1EB;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #b5591a;
-  --rating-e:  #b02828;
-  --rating-nr: #757067;
+  --rating-g:  #337a5a;
+  --rating-t:  #8a6a0a;
+  --rating-m:  #a5511a;
+  --rating-e:  #c23232;
+  --rating-nr: #6f6a61;
   --bubble-bg: #f5f0e8;
   --grid-line: rgba(26, 24, 22, 0.055);
 }
@@ -168,20 +175,23 @@
   --bg: #141210;
   --text: #E5E1D8;
   --secondary: #9E998F;
-  --border: rgba(229, 225, 216, 0.10);
-  --border-strong: rgba(229, 225, 216, 0.20);
-  --border-chip: rgba(229, 225, 216, 0.15);
-  --border-active: rgba(229, 225, 216, 0.38);
-  --border-control: rgba(229, 225, 216, 0.20);
+  /* Softer strokes on dark: a light-on-near-black border reads harsher than the
+     same alpha on light bg, so the resting card/input strokes are dialed down.
+     --border-active (selected/focus affordance) is kept strong. */
+  --border: rgba(229, 225, 216, 0.05);
+  --border-strong: rgba(229, 225, 216, 0.09);
+  --border-chip: rgba(229, 225, 216, 0.08);
+  --border-active: rgba(229, 225, 216, 0.34);
+  --border-control: rgba(229, 225, 216, 0.10);
   --accent: #C4785A;
   --accent-subtle: rgba(196, 120, 90, 0.14);
   --card-bg: #1D1B1A;
   --card-border: rgba(229, 225, 216, 0.12);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #b5591a;
-  --rating-e:  #b02828;
-  --rating-nr: #666666;
+  --rating-g:  #337a5a;
+  --rating-t:  #8a6a0a;
+  --rating-m:  #a5511a;
+  --rating-e:  #c23232;
+  --rating-nr: #6f6a61;
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);

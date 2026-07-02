@@ -39,7 +39,7 @@ export function ContinueCard({ item, cover }: Props) {
         <span className={styles.media}>
           <Image src={cover ?? GENERIC_COVER} alt="" fill sizes="150px" className={styles.coverImg} />
           <span className={styles.scrim} aria-hidden="true" />
-          <span className={styles.head}>
+          <span className={styles.head} aria-hidden="true">
             <span className={styles.title}>{item.title}</span>
             <span className={styles.meta}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
           </span>
@@ -51,7 +51,7 @@ export function ContinueCard({ item, cover }: Props) {
 
       {/* Text: same 2:3 box, solid fill — same top header + bottom progress */}
       <span className={styles.slotText}>
-        <span className={styles.head}>
+        <span className={styles.head} aria-hidden="true">
           <span className={styles.title}>{item.title}</span>
           <span className={styles.meta}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
         </span>
@@ -69,7 +69,7 @@ export function ContinueCardSkeleton() {
   return (
     <div className={styles.card} aria-hidden="true">
       <span className={styles.skelBox}>
-        <span className={styles.head}>
+        <span className={styles.head} aria-hidden="true">
           <span className={`${styles.skelLine} ${styles.skelTitle}`} />
           <span className={`${styles.skelLine} ${styles.skelMeta}`} />
         </span>

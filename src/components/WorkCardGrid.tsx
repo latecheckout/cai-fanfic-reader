@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatCount, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
-import { SignalStrip, Views, Avatar } from './WorkCardCover';
+import { SignalStrip, Views, Avatar, Stat } from './WorkCardCover';
 import styles from '@/styles/components/WorkCardGrid.module.css';
 
 interface Props {
@@ -38,7 +38,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
         {meta.cover && (
           <Image
             src={meta.cover}
-            alt={meta.title}
+            alt=""
             fill
             sizes={COVER_SIZES}
             priority={priority}
@@ -49,7 +49,9 @@ export function WorkCardGrid({ work, priority = false }: Props) {
       </div>
 
       {/* Whole-card link sits above the scrim; the metadata cluster is
-          pointer-events:none so clicks pass through, except the tag links. */}
+          pointer-events:none so clicks pass through, except the tag links.
+          The link is named by aria-label, so the visible title is aria-hidden
+          to avoid announcing the work twice (and the cover alt is empty). */}
       <Link href={`/works/${slug}`} className={styles.cardLink} aria-label={meta.title} />
 
       <div className={styles.content}>
@@ -62,14 +64,14 @@ export function WorkCardGrid({ work, priority = false }: Props) {
           onImage
         />
 
-        <span className={styles.title}>{meta.title}</span>
+        <span className={styles.title} aria-hidden="true">{meta.title}</span>
 
         {meta.author && (
           <span className={styles.byline}>
-            <span className={styles.by}>by</span>
+            <span className={styles.by} aria-hidden="true">by</span>
             <Avatar />
             <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
-              {meta.author}
+              <span className="visually-hidden">Author: </span>{meta.author}
             </Link>
           </span>
         )}
@@ -78,7 +80,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
           <div className={styles.tags}>
             {tags.map((t) => (
               <Link key={t} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tag}>
-                {t}
+                <span className="visually-hidden">Tag: </span>{t}
               </Link>
             ))}
           </div>
@@ -88,7 +90,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
           <div className={styles.metrics}>
             {meta.hits > 0 && <Views hits={meta.hits} />}
             {meta.hits > 0 && meta.kudos > 0 && ' · '}
-            {meta.kudos > 0 && `♥ ${formatCount(meta.kudos)}`}
+            {meta.kudos > 0 && <Stat glyph="♥" label="kudos" value={formatCount(meta.kudos)} />}
           </div>
         )}
       </div>

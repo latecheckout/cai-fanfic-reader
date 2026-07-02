@@ -16,6 +16,8 @@ import { applyFilters } from './filters';
 export interface Shelf {
   key: string;
   title: string;
+  /** Decorative emoji shown after the title; hidden from screen readers. */
+  emoji?: string;
   subtitle: string;
   /** Filter URL for the full result set; absent for manually curated shelves. */
   href?: string;
@@ -62,6 +64,8 @@ const FANDOM_ART: Record<string, string> = {
 interface ShelfDef {
   key: string;
   title: string;
+  /** Decorative emoji shown after the title; hidden from screen readers. */
+  emoji?: string;
   subtitle: string;
   /** Filter-driven shelf: works come from the filter engine. */
   filters?: FilterState;
@@ -94,14 +98,16 @@ const FEATURED_SLUGS: string[] = [
 const SHELF_DEFS: ShelfDef[] = [
   {
     key: 'trending',
-    title: 'Trending 🔥',
+    title: 'Trending',
+    emoji: '🔥',
     subtitle: 'What everyone is reading right now',
     filters: { sort: 'kudos' },
     params: { sort: 'kudos' },
   },
   {
     key: 'featured',
-    title: 'Featured ⭐',
+    title: 'Featured',
+    emoji: '⭐',
     subtitle: 'Hand-picked by the c.ai team',
     slugs: FEATURED_SLUGS,
   },
@@ -121,6 +127,7 @@ export function buildShelves(works: WorkSummary[]): Shelf[] {
     return {
       key: def.key,
       title: def.title,
+      emoji: def.emoji,
       subtitle: def.subtitle,
       href: def.params ? buildHref(def.params) : undefined,
       works: matched.slice(0, PER_SHELF),

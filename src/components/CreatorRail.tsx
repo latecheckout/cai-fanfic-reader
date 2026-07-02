@@ -15,10 +15,10 @@ export function CreatorRail({ creators }: Props) {
   if (creators.length === 0) return null;
 
   return (
-    <section className={styles.section} aria-label="Trending creators">
+    <section className={styles.section} aria-labelledby="creator-rail-title">
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          <h2 className={styles.title}>Trending creators ✍️</h2>
+          <h2 id="creator-rail-title" className={styles.title}>Trending creators <span aria-hidden="true">✍️</span></h2>
           <p className={styles.subtitle}>The humans behind the stories</p>
         </div>
       </div>

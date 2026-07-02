@@ -49,6 +49,8 @@
 /* ── Nav links: centered in the header (left & right zones flex:1 flank it) ── */
 .zoneCenter {
   display: flex;
+  /* Full-height links so the active underline sits flush on the header's
+     bottom stroke; the focus ring is moved to the inner label (below). */
   align-items: stretch;
   justify-content: center;
 }
@@ -62,7 +64,8 @@
   letter-spacing: 0.01em;
   color: var(--secondary);
   text-decoration: none;
-  /* 2px underline flush to header bottom border */
+  /* 2px active underline, pulled down 1px to overlap the header's bottom border
+     so it reads as flush with the navbar stroke. */
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   transition: color var(--transition-micro), border-color var(--transition-micro);
@@ -76,6 +79,18 @@
 .navActive {
   color: var(--text);
   border-bottom-color: var(--text);
+}
+
+/* Focus ring hugs the label, not the full-height link: suppress the link's own
+   ring and draw it on the inner label span instead. */
+.navLink:focus-visible {
+  outline: none;
+}
+
+.navLink:focus-visible .navLabel {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
 }
 
 /* ── Right zone ── */

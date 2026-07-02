@@ -9,6 +9,7 @@ import { FilterPanel } from './FilterPanel';
 // (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
+import { BookmarkIcon } from './BookmarkIcon';
 import styles from '@/styles/components/LibraryShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
 
@@ -218,6 +219,9 @@ export function LibraryShell({
         aria-labelledby={`library-tab-${activeTab}`}
         tabIndex={0}
       >
+        {/* Heading level between the page h1 and the card h3s, so screen-reader
+            heading navigation has a rung for the active section. */}
+        <h2 className="visually-hidden">{TAB_LABELS[activeTab]}</h2>
         {isFiltering || viewSwitching ? (
           // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
           Array.from(
@@ -254,9 +258,8 @@ export function LibraryShell({
                   aria-label="Remove bookmark"
                   title="Remove bookmark"
                 >
-                  <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
-                    <path d="M0 0h14v18l-7-5-7 5V0z" />
-                  </svg>
+                  {/* Same ribbon as the reader, always filled (this work is saved). */}
+                  <BookmarkIcon filled width={15} height={18} />
                 </button>
               </div>
             ) : view === 'grid' ? (

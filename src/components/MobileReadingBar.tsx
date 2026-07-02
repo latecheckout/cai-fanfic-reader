@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useReading } from '@/context/ReadingContext';
 import { PrefsPanel } from './PrefsPanel';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import styles from '@/styles/components/MobileReadingBar.module.css';
 
 export function MobileReadingBar() {
@@ -10,6 +11,8 @@ export function MobileReadingBar() {
   const [chapterSheetOpen, setChapterSheetOpen] = useState(false);
   const [prefsSheetOpen, setPrefsSheetOpen] = useState(false);
   const prefsPanelRef = useRef<HTMLDivElement>(null);
+  const chapterSheetRef = useRef<HTMLDivElement>(null);
+  const prefsSheetRef = useRef<HTMLDivElement>(null);
 
   // Wire prefsToggleFnRef so external triggers work
   useEffect(() => {
@@ -17,17 +20,10 @@ export function MobileReadingBar() {
     return () => { prefsToggleFnRef.current = null; };
   }, [prefsToggleFnRef]);
 
-  // Close sheets on Escape
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        if (prefsSheetOpen) { setPrefsSheetOpen(false); return; }
-        if (chapterSheetOpen) { setChapterSheetOpen(false); return; }
-      }
-    }
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [chapterSheetOpen, prefsSheetOpen]);
+  // Both bottom-sheets are modal dialogs: move focus in, trap Tab, close on
+  // Escape, and return focus to the trigger button on close (2.4.3 / 2.1.2).
+  useFocusTrap(chapterSheetRef, chapterSheetOpen, () => setChapterSheetOpen(false));
+  useFocusTrap(prefsSheetRef, prefsSheetOpen, () => setPrefsSheetOpen(false));
 
   const chapterLabel = chapterTitles[activeChapterIndex]
     ? `Ch. ${activeChapterIndex + 1} / ${totalChapters} — ${chapterTitles[activeChapterIndex]}`
@@ -40,7 +36,14 @@ export function MobileReadingBar() {
       {/* Chapter list sheet */}
       {chapterSheetOpen && (
         <div className={styles.sheetOverlay} onClick={() => setChapterSheetOpen(false)}>
-          <div className={styles.chapterSheet} onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={chapterSheetRef}
+            className={styles.chapterSheet}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Chapters"
+          >
             <div className={styles.sheetHandle} aria-hidden="true" />
             <div className={styles.sheetHeader}>
               <span className={styles.sheetTitle}>Chapters</span>
@@ -72,7 +75,14 @@ export function MobileReadingBar() {
       {/* Prefs sheet */}
       {prefsSheetOpen && (
         <div className={styles.sheetOverlay} onClick={() => setPrefsSheetOpen(false)}>
-          <div className={styles.prefsSheet} onClick={(e) => e.stopPropagation()}>
+          <div
+            ref={prefsSheetRef}
+            className={styles.prefsSheet}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Reading preferences"
+          >
             <div className={styles.sheetHandle} aria-hidden="true" />
             <PrefsPanel ref={prefsPanelRef} onClose={() => setPrefsSheetOpen(false)} inSheet />
           </div>
@@ -93,6 +103,7 @@ export function MobileReadingBar() {
           className={styles.chapterBtn}
           onClick={() => setChapterSheetOpen((v) => !v)}
           aria-label="Chapter navigation"
+          aria-haspopup="dialog"
         >
           {totalChapters > 1 && (
             <span className={styles.chapterLabel}>{truncated}</span>

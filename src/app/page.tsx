@@ -115,7 +115,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
               covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
             />
             <div className={styles.forYouHeader}>
-              <h2 className={styles.forYouTitle}>Stories for you 📚</h2>
+              <h2 className={styles.forYouTitle}>Stories for you <span aria-hidden="true">📚</span></h2>
               <p className={styles.forYouSubtitle}>The whole archive, ready to filter</p>
             </div>
           </>

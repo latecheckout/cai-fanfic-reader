@@ -16,6 +16,10 @@ export function EndOfStory({ recommendations }: Props) {
           and CSS picks one, so this stays a server component. */}
       {recommendations.length > 0 && (
         <div className={styles.recommendations}>
+          {/* Heading rung so the recommendation cards (h3 titles) never skip a
+              level after the work h1 — matters on single-chapter works, which
+              render no chapter h2. Visually hidden; the cards carry the visuals. */}
+          <h2 className="visually-hidden">More stories like this</h2>
           {recommendations.map((work) => (
             <div key={work.slug} className={styles.recItem}>
               <div className={styles.slot}>

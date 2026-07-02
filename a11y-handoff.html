@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Accessibility Changes · c.ai Fanfic Reader</title>
+<style>
+  :root {
+    --ground: #F8F7F4;
+    --panel: #FFFFFF;
+    --ink: #1A1816;
+    --ink-soft: #57534C;
+    --line: rgba(26,24,22,0.13);
+    --line-soft: rgba(26,24,22,0.07);
+    --accent: #8B4040;
+    --pass: #1A5A24;
+    --fail: #7A1A1A;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+    --maxw: 940px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; overflow-x: hidden;
+    background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  header.masthead { padding: 64px 0 40px; border-bottom: 2px solid var(--ink); }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; }
+  h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(34px, 6vw, 56px); line-height: 1.04; letter-spacing: -0.01em; margin: 0 0 8px; text-wrap: balance; }
+  .subtitle { font-family: var(--serif); font-style: italic; font-size: clamp(18px,2.6vw,23px); color: var(--ink-soft); margin: 0; }
+  .metarow { display: flex; flex-wrap: wrap; gap: 0 44px; margin-top: 30px; font-size: 14px; }
+  .metarow div { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
+  .metarow dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .metarow dd { margin: 0; font-weight: 600; }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--line-soft); }
+  .sec-label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 12px; display: flex; align-items: center; gap: 12px; }
+  .sec-label::before { content: ""; width: 26px; height: 2px; background: var(--accent); }
+  h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(23px,3.2vw,30px); margin: 0 0 14px; letter-spacing: -0.01em; }
+  p { max-width: 68ch; }
+  .lead { font-size: 18px; }
+  ul { margin: 6px 0 0; padding-left: 20px; max-width: 68ch; }
+  li { margin: 7px 0; font-size: 15.5px; }
+
+  .chip-caption { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin: 26px 0 10px; }
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; }
+  .swatch-card { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); }
+  .swatch-card h3 { font-family: var(--sans); font-size: 14px; margin: 0; padding: 14px 16px 0; font-weight: 600; }
+  .swatch-card .ctx { font-size: 12.5px; color: var(--ink-soft); padding: 2px 16px 14px; margin: 0; }
+  .chip-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
+  .chip { padding: 18px 14px; min-height: 78px; display: flex; flex-direction: column; justify-content: space-between; }
+  .chip .state { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+  .chip .ratio { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .chip .verdict { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; }
+
+  .notes { margin-top: 6px; }
+  .note { border-left: 3px solid var(--line); padding: 4px 0 4px 16px; margin: 0 0 16px; max-width: 68ch; }
+  .note strong { display: block; font-size: 15px; margin-bottom: 2px; }
+  .note p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+  .table-scroll { overflow-x: auto; }
+  .filemap { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14.5px; min-width: 560px; }
+  .filemap th, .filemap td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  .filemap th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); border-bottom: 1px solid var(--line); }
+  .filemap td:first-child { font-weight: 600; white-space: nowrap; }
+  .filemap tbody tr:last-child td { border-bottom: none; }
+  .filemap code { font-family: var(--mono); font-size: 12.5px; background: rgba(26,24,22,0.05); padding: 1px 5px; border-radius: 4px; }
+  footer { padding: 40px 0 64px; color: var(--ink-soft); font-size: 13px; }
+  footer .rule { height: 1px; background: var(--line); margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">Accessibility · Handoff</p>
+    <h1>What changed for accessibility</h1>
+    <p class="subtitle">WCAG 2.2 AA updates across the reader front-end</p>
+  </header>
+
+  <section>
+    <p class="sec-label">Summary</p>
+    <h2>The reader now meets WCAG 2.2 AA</h2>
+    <p class="lead">Nothing about the stories or how they load changed. The updates fall into the areas below, and everything was checked on every page, in all three themes, and in both card modes.</p>
+    <dl class="metarow">
+      <div><dt>Standard</dt><dd>WCAG 2.2, Level AA</dd></div>
+      <div><dt>Pages</dt><dd>Home, browse, reader, reading list, library, characters, fandoms</dd></div>
+      <div><dt>Card modes</dt><dd>Image and text (list)</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Color</h2>
+    <ul>
+      <li>Secondary and label text darkened in every theme to meet contrast.</li>
+      <li>All five rating chips reworked: a white letter on a deeper fill.</li>
+      <li>Reading progress bars given a visible fill and track.</li>
+      <li>Form error text lightened so it is readable on the dark theme.</li>
+      <li>Dark-mode card and input borders softened.</li>
+    </ul>
+
+    <p class="chip-caption">The five biggest color changes, before and after</p>
+    <div class="swatch-grid">
+      <div class="swatch-card">
+        <h3>Secondary text (light)</h3>
+        <p class="ctx">Metadata, bylines, summaries</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#ffffff;color:#8A857D;"><span class="state">Before</span><span class="ratio">3.66:1</span><span class="verdict" style="color:#7A1A1A;">Fails</span></div>
+          <div class="chip" style="background:#ffffff;color:#6B675F;"><span class="state">After</span><span class="ratio">5.63:1</span><span class="verdict" style="color:#1A5A24;">Passes</span></div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <h3>Secondary text (dark)</h3>
+        <p class="ctx">Same text, dark theme</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#272523;color:#5C5852;"><span class="state">Before</span><span class="ratio">2.16:1</span><span class="verdict" style="color:#e0a0a0;">Fails</span></div>
+          <div class="chip" style="background:#272523;color:#9E998F;"><span class="state">After</span><span class="ratio">5.39:1</span><span class="verdict" style="color:#8fd6a0;">Passes</span></div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <h3>Teen rating chip</h3>
+        <p class="ctx">White letter on the gold fill</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#c8a020;color:#ffffff;"><span class="state">Before</span><span class="ratio">4.15:1</span><span class="verdict" style="color:#5a1414;">Fails</span></div>
+          <div class="chip" style="background:#8a6a0a;color:#ffffff;"><span class="state">After</span><span class="ratio">5.06:1</span><span class="verdict" style="color:#dfffe6;">Passes</span></div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <h3>Not Rated chip</h3>
+        <p class="ctx">White letter on the grey fill</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#aaaaaa;color:#ffffff;"><span class="state">Before</span><span class="ratio">2.32:1</span><span class="verdict" style="color:#5a1414;">Fails</span></div>
+          <div class="chip" style="background:#6f6a61;color:#ffffff;"><span class="state">After</span><span class="ratio">5.37:1</span><span class="verdict" style="color:#dfffe6;">Passes</span></div>
+        </div>
+      </div>
+      <div class="swatch-card">
+        <h3>Form error text (dark)</h3>
+        <p class="ctx">Comment form validation message</p>
+        <div class="chip-row">
+          <div class="chip" style="background:#141210;color:#7A1A1A;"><span class="state">Before</span><span class="ratio">1.77:1</span><span class="verdict" style="color:#e0a0a0;">Fails</span></div>
+          <div class="chip" style="background:#141210;color:#e57373;"><span class="state">After</span><span class="ratio">6.26:1</span><span class="verdict" style="color:#8fd6a0;">Passes</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Text</h2>
+    <ul>
+      <li>Smallest text raised to 11px across the site.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Screen reader</h2>
+    <ul>
+      <li>Decorative icons hidden; stats read as words ("kudos 1,200", not "heart 1,200").</li>
+      <li>Card titles announced once instead of two or three times.</li>
+      <li>Metadata links say their category (author, tag, fandom, and so on).</li>
+      <li>Chapter menu rebuilt as a proper labelled list.</li>
+      <li>Headings and regions cleaned up so nothing is announced twice or skipped.</li>
+      <li>Skip-to-content link, a distinct title per page, and the page language set.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Keyboard and focus</h2>
+    <ul>
+      <li>A consistent, visible focus outline on every control.</li>
+      <li>Every dialog and sheet moves focus in, keeps it inside, closes on Escape, and returns focus on close.</li>
+      <li>Hidden panels kept out of the tab order.</li>
+      <li>The carousel is a single tab stop, moved with the arrow keys.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Motion</h2>
+    <ul>
+      <li>All animation respects the "reduce motion" system setting.</li>
+      <li>The carousel pauses on hover and keyboard focus.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Targets and forms</h2>
+    <ul>
+      <li>Tap targets meet the 24px minimum.</li>
+      <li>Every input is labelled and form errors are announced.</li>
+      <li>Live updates (result counts, bookmarks) are announced to screen readers.</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="sec-label">Trade-offs</p>
+    <h2>Conscious decisions, documented</h2>
+    <p>Places where the design and a strict automated reading differ. Each is safe and noted so it is not mistaken for an oversight.</p>
+    <div class="notes">
+      <div class="note"><strong>Carousel auto-advance</strong><p>The hero carousel advances on a timer, pausing on hover and focus and stopping under reduced motion, but has no separate visible pause button.</p></div>
+      <div class="note"><strong>Progress bar over cover art</strong><p>The gold progress fill clears its boundary on the standard surfaces. On the rare cover that is itself gold, the bar can blend in. Cover art is user content, so this is a known edge case.</p></div>
+      <div class="note"><strong>Carousel dots on mobile</strong><p>The small position dots are supplementary. On mobile the primary navigation is swipe and the dots are not keyboard targets, so their compact size is acceptable; the full-size arrows carry the same action on larger screens.</p></div>
+      <div class="note"><strong>Desktop filter panel</strong><p>On desktop the filter panel shifts the page and stays visible, so it is intentionally non-modal and not focus-trapped. On mobile it behaves as a standard modal dialog.</p></div>
+      <div class="note"><strong>Pixel-based font sizes</strong><p>Text sizes are in pixels. Browser zoom scales the whole interface, which satisfies the resize requirement; the trade-off is that text does not grow from a raised browser default on its own, only through zoom.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Reference</p>
+    <h2>Where the changes live</h2>
+    <div class="table-scroll">
+      <table class="filemap">
+        <thead><tr><th>Area</th><th>Key files</th></tr></thead>
+        <tbody>
+          <tr><td>Color, borders, progress</td><td><code>src/styles/tokens.css</code></td></tr>
+          <tr><td>Focus outline, reduced motion</td><td><code>src/app/globals.css</code></td></tr>
+          <tr><td>Font sizes</td><td><code>src/styles/typography.css</code> and the component <code>.module.css</code> files</td></tr>
+          <tr><td>Focus management</td><td><code>src/hooks/useFocusTrap.ts</code></td></tr>
+          <tr><td>Reading-page panels</td><td><code>ReadingCluster.tsx</code>, <code>ChapterPanel.tsx</code>, <code>MobileReadingBar.tsx</code></td></tr>
+          <tr><td>Carousel</td><td><code>HeroCarousel.tsx</code></td></tr>
+          <tr><td>Cards and metadata</td><td><code>WorkCardCover.tsx</code>, <code>WorkCardGrid.tsx</code>, <code>WorkHeader.tsx</code>, <code>MetadataOverlay.tsx</code></td></tr>
+          <tr><td>Landmarks and headings</td><td><code>CreatorRail.tsx</code>, <code>ShelfRail.tsx</code>, <code>ContinueReadingSection.tsx</code>, <code>ChapterList.tsx</code>, <code>EndOfStory.tsx</code>, <code>CharactersList.tsx</code></td></tr>
+          <tr><td>Forms and status</td><td><code>ChapterComments.tsx</code>, <code>FilterPanel.tsx</code>, <code>PrefsPanel.tsx</code>, <code>BrowseSearchBar.tsx</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Summary of the accessibility pass on branch <code>a11y-audit</code>. The branch diff is the authoritative change list.
+  </footer>
+</div>
+</body>
+</html>

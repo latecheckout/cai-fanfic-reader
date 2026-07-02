@@ -88,30 +88,47 @@
 /* ── Card wrapper (for bookmarked tab — adds remove button) ── */
 .cardWrapper {
   position: relative;
+  /* Match the browse grid: the card must fill the (stretched) grid cell so every
+     card in a row is equal height. Without this the wrapper stretches to the row
+     height but the card inside stays at its content height, leaving low-content
+     cards visibly short. `display: grid` stretches the single card child to fill;
+     the absolute button is out of flow, so it's unaffected. */
+  display: grid;
 }
 
-/* Bookmark button — filled ribbon icon, always visible; fades on hover to signal removal */
+/* Bookmark button — filled ribbon, top-right, aligned to the card padding. */
 .bookmarkBtn {
   position: absolute;
-  top: 16px;
-  right: 4px;
+  top: var(--space-3);
+  right: var(--space-3);
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+  background: transparent;
   color: var(--text);
-  opacity: 0.75;
-  transition: opacity 150ms ease;
-  z-index: 3;
+  transition: transform var(--transition-micro), color var(--transition-micro);
+  /* Above the card's overlaid content (z3) AND its hover state (.card:hover
+     lifts to z5) — otherwise the card covers the button on hover. */
+  z-index: 6;
 }
 
+/* Hover: a subtle scale (no chip) so it stays fully visible and reads as
+   actionable — it must never fade out. */
 .bookmarkBtn:hover {
-  opacity: 0.3;
+  transform: scale(1.12);
+}
+
+/* Visual mode (grid cards over cover art): a bare dark icon vanished on dark
+   covers. No chip — use a white ribbon with a drop-shadow so it reads over both
+   light and dark cover art. */
+:global(html[data-mode='visual']) .bookmarkBtn {
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 
 /* ── Empty states ── */

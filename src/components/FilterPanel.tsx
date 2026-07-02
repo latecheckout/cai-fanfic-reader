@@ -253,6 +253,8 @@ export function FilterPanel({
   const savePopoverRef = useRef<HTMLDivElement>(null);
   const savePresetBtnRef = useRef<HTMLButtonElement>(null);
   const popoverBtnRect = useRef<DOMRect | null>(null);
+  // Whatever had focus when the drawer opened (the filter toggle) — restored on close.
+  const drawerOpenerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
@@ -268,6 +270,8 @@ export function FilterPanel({
     setTimeout(() => {
       setDrawerOpen(false);
       setDrawerClosing(false);
+      // Return focus to the trigger so keyboard users resume in place (2.4.3).
+      drawerOpenerRef.current?.focus?.();
     }, 200);
   }, []);
 
@@ -300,9 +304,10 @@ export function FilterPanel({
     return () => document.body.classList.remove('filter-open');
   }, [drawerOpen, isMobile]);
 
-  // Focus close button when drawer opens
+  // Focus close button when drawer opens (capturing the opener for focus-return)
   useEffect(() => {
     if (drawerOpen) {
+      drawerOpenerRef.current = document.activeElement as HTMLElement | null;
       requestAnimationFrame(() => drawerCloseBtnRef.current?.focus());
     }
   }, [drawerOpen]);
@@ -1201,7 +1206,7 @@ export function FilterPanel({
                           onClick={() => cyclePill(s, 'status', 'ex_status')}
                           title={state === 'neutral' ? `Include: ${s}` : state === 'include' ? `Exclude: ${s}` : `Remove: ${s}`}
                         >
-                          <span className={styles.statusIcon}>{s === 'Complete' ? '✓' : '~'}</span>
+                          <span className={styles.statusIcon} aria-hidden="true">{s === 'Complete' ? '✓' : '~'}</span>
                           <span className={styles.statusLabel}>{s}</span>
                         </button>
                       );

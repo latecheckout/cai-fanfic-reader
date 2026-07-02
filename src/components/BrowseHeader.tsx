@@ -63,7 +63,7 @@ export function BrowseHeader({ search }: Props = {}) {
               aria-current={pathname === href ? 'page' : undefined}
               className={`${styles.navLink} ${pathname === href ? styles.navActive : ''}`}
             >
-              {label}
+              <span className={styles.navLabel}>{label}</span>
             </a>
           ))}
         </nav>

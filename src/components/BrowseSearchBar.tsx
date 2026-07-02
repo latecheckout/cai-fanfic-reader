@@ -462,7 +462,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
           {/* Vibe section — loading or result */}
           {!isDefaultState && (vibeLoading || vibeResult) && (
             <div>
-              <div className={styles.groupHeader}>✦ Vibe</div>
+              <div className={styles.groupHeader}><span aria-hidden="true">✦</span> Vibe</div>
               {vibeLoading ? (
                 <div className={styles.vibeLoading}>
                   <span className={styles.vibeLoadingDot} />
@@ -551,7 +551,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
           {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
           {showVibeHint && (
             <div className={styles.vibeHint}>
-              ✦ try: cozy · slow burn · found family · enemies to lovers
+              <span aria-hidden="true">✦</span> try: cozy · slow burn · found family · enemies to lovers
             </div>
           )}
 

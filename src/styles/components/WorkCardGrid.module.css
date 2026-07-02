@@ -87,6 +87,9 @@
   position: absolute;
   inset: 0;
   z-index: 2;
+  /* Match the card radius so the keyboard focus ring rounds with the card
+     instead of drawing a sharp rectangle past the rounded corners. */
+  border-radius: 14px;
 }
 
 /* Metadata cluster — anchored bottom-left, inset by the card padding.

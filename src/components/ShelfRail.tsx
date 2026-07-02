@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Shelf } from '@/lib/shelves';
 import { WorkCardGrid } from './WorkCardGrid';
 import { WorkCardCover } from './WorkCardCover';
@@ -20,18 +19,17 @@ interface Props {
  * Edge fades are directional via a CSS scroll-driven animation (see .rail).
  */
 export function ShelfRail({ shelf, priority = false }: Props) {
+  const headingId = `shelf-${shelf.key}-heading`;
   return (
-    <section className={styles.section} aria-label={shelf.title}>
+    <section className={styles.section} aria-labelledby={headingId}>
       <div className={styles.header}>
         <div className={styles.titleWrap}>
-          {/* Filter-driven shelves link their title to the full result set;
-              manually curated shelves have no filter URL. */}
-          <h2 className={styles.title}>
-            {shelf.href ? (
-              <Link href={shelf.href} className={styles.titleLink}>{shelf.title}</Link>
-            ) : (
-              shelf.title
-            )}
+          {/* Plain heading — not a link. The section is named by this heading
+              (aria-labelledby) so the shelf name isn't announced twice; the
+              emoji is decorative and hidden from screen readers. */}
+          <h2 className={styles.title} id={headingId}>
+            {shelf.title}
+            {shelf.emoji && <span aria-hidden="true"> {shelf.emoji}</span>}
           </h2>
           <p className={styles.subtitle}>{shelf.subtitle}</p>
         </div>

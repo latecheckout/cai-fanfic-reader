@@ -26,7 +26,7 @@ export function CreatorCard({ creator }: Props) {
       <span className={styles.name}>{creator.name}</span>
       {creator.bio && <span className={styles.bio}>{creator.bio}</span>}
       <span className={styles.meta}>
-        {creator.workCount} {creator.workCount === 1 ? 'work' : 'works'} · ♥ {formatCount(creator.kudos)}
+        {creator.workCount} {creator.workCount === 1 ? 'work' : 'works'} · <span aria-hidden="true">♥</span> <span className="visually-hidden">kudos </span>{formatCount(creator.kudos)}
       </span>
     </Link>
   );

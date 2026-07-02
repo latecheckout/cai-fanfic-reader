@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useReading } from '@/context/ReadingContext';
 import { TagChip } from './TagChip';
-import { SignalStrip, Avatar } from './WorkCardCover';
+import { SignalStrip, Avatar, Stat } from './WorkCardCover';
 import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import styles from '@/styles/components/MetadataOverlay.module.css';
 
@@ -32,17 +32,16 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
       : null;
 
     // Same stats line as the work header (status lives in the badge strip now).
-    const statsLine = [
+    // Glyph stats use <Stat> so screen readers hear "kudos 1,200", not "heart".
+    const statNodes: React.ReactNode[] = [
       formatWords(workMeta.words),
       readingTime(workMeta.words),
       totalChapters > 1 ? formatChapters(workMeta.chaptersPosted, workMeta.chapters) : null,
       seriesStr,
       workMeta.language !== 'English' ? workMeta.language : null,
-      workMeta.kudos > 0 ? `♥ ${formatCount(workMeta.kudos)}` : null,
-      workMeta.bookmarks > 0 ? `⚑ ${formatCount(workMeta.bookmarks)}` : null,
-    ]
-      .filter(Boolean)
-      .join(' · ');
+      workMeta.kudos > 0 ? <Stat key="kudos" glyph="♥" label="kudos" value={formatCount(workMeta.kudos)} /> : null,
+      workMeta.bookmarks > 0 ? <Stat key="bookmarks" glyph="⚑" label="bookmarks" value={formatCount(workMeta.bookmarks)} /> : null,
+    ].filter(Boolean);
 
     return (
       <div
@@ -106,15 +105,22 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
                   )}
                 </p>
               )}
-              <p className={styles.stats}>{statsLine}</p>
+              <p className={styles.stats}>
+                {statNodes.map((node, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && ' · '}
+                    {node}
+                  </React.Fragment>
+                ))}
+              </p>
             </div>
 
             {/* Signals */}
             <div className={styles.zone2}>
               {workMeta.warnings.length > 0 && (
                 <div className={styles.tagRow}>
-                  <span className={styles.tagLabel}>Warnings</span>
-                  <div className={styles.tagGroup}>
+                  <span className={styles.tagLabel} id="mo-warnings" aria-hidden="true">Warnings</span>
+                  <div className={styles.tagGroup} role="group" aria-labelledby="mo-warnings">
                     {workMeta.warnings.map((w) => (
                       <TagChip key={w} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
                     ))}
@@ -123,8 +129,8 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
               )}
               {workMeta.fandom.length > 0 && (
                 <div className={styles.tagRow}>
-                  <span className={styles.tagLabel}>Fandom</span>
-                  <div className={styles.tagGroup}>
+                  <span className={styles.tagLabel} id="mo-fandom" aria-hidden="true">Fandom</span>
+                  <div className={styles.tagGroup} role="group" aria-labelledby="mo-fandom">
                     {workMeta.fandom.map((f) => (
                       <TagChip key={f} tag={f} category="fandom" clickable href={`/?fandom=${encodeURIComponent(f)}`} />
                     ))}
@@ -133,8 +139,8 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
               )}
               {workMeta.relationships.length > 0 && (
                 <div className={styles.tagRow}>
-                  <span className={styles.tagLabel}>Ships</span>
-                  <div className={styles.tagGroup}>
+                  <span className={styles.tagLabel} id="mo-ships" aria-hidden="true">Ships</span>
+                  <div className={styles.tagGroup} role="group" aria-labelledby="mo-ships">
                     {workMeta.relationships.map((r) => (
                       <TagChip key={r} tag={r} category="relationship" clickable href={`/?relationship=${encodeURIComponent(r)}`} />
                     ))}
@@ -143,8 +149,8 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
               )}
               {workMeta.characters.length > 0 && (
                 <div className={styles.tagRow}>
-                  <span className={styles.tagLabel}>Characters</span>
-                  <div className={styles.tagGroup}>
+                  <span className={styles.tagLabel} id="mo-characters" aria-hidden="true">Characters</span>
+                  <div className={styles.tagGroup} role="group" aria-labelledby="mo-characters">
                     {workMeta.characters.map((c) => (
                       <TagChip key={c} tag={c} category="character" clickable href={`/?character=${encodeURIComponent(c)}`} />
                     ))}
@@ -153,8 +159,8 @@ export const MetadataOverlay = React.forwardRef<HTMLDivElement, Props>(
               )}
               {workMeta.tags.length > 0 && (
                 <div className={styles.tagRow}>
-                  <span className={styles.tagLabel}>Tags</span>
-                  <div className={styles.tagGroup}>
+                  <span className={styles.tagLabel} id="mo-tags" aria-hidden="true">Tags</span>
+                  <div className={styles.tagGroup} role="group" aria-labelledby="mo-tags">
                     {workMeta.tags.map((t) => (
                       <TagChip key={t} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
                     ))}

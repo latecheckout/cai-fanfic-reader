@@ -4,8 +4,10 @@
    left (rating + completion badges overlaid on it), text on the right. The view
    toggle only changes how many cards sit per row and the cover width (via
    --cover-w). .list adds a row divider; grid modes use the container gap.
-   Stretched link: titleLink::after covers the whole card → /works/[slug];
-   tag chips sit above it via z-index: 1.
+   Links: the TITLE is the primary link to /works/[slug]; author, tags, ships,
+   and characters are their own links. The card is NOT one big stretched link
+   (that overlapped ~20 metadata links and made hover/screen-reader hit-testing
+   unpredictable — you'd land on a tag or the "+N" button instead of the title).
    ============================================================ */
 
 .card {
@@ -163,13 +165,6 @@
   color: inherit;
 }
 
-.titleLink::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
 .title {
   font-family: var(--font-serif);
   font-size: 17px;
@@ -207,6 +202,9 @@
   position: relative;
   z-index: 1;
   pointer-events: none;
+  /* Override the .author overflow:hidden (ellipsis) on the byline: otherwise it
+     clips the author link's focus ring down to a sliver on the left edge. */
+  overflow: visible;
 }
 
 .bylineBy {
@@ -381,7 +379,7 @@
   justify-content: center;
   border-radius: 2px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   flex-shrink: 0;
@@ -396,11 +394,9 @@
 .ratingE  { background: var(--rating-e); }
 .ratingNR { background: var(--rating-nr); }
 
-/* a11y: light fills (green/yellow) need dark glyph to reach WCAG AA 4.5:1
-   with white text. Fills are theme-constant, so the dark value is literal
-   (not var(--text), which inverts to light in dark theme). */
-.ratingG,
-.ratingT { color: #1A1816; }
+/* a11y: every rating fill is now deep enough to carry the base white glyph at
+   >=4.5:1 (white-on-fill: G 5.16, T 5.06, M 5.54, E 5.53, NR 5.37), so all five
+   use the white letter for one consistent, readable look. No per-chip override. */
 
 /* Category is a filled chip — solid like the rating, but a neutral tone
    so it never shares a color with the rating hue. Grows wider than the
@@ -500,7 +496,7 @@
 }
 
 .tooltipDesc {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   opacity: 0.65;
   letter-spacing: 0.02em;

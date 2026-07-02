@@ -46,7 +46,7 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
     summaryHasMore && !summaryExpanded ? sentences.slice(0, 4).join('').trim() : meta.summary;
 
   return (
-    <header className={styles.header} aria-label="Work information">
+    <header className={styles.header}>
       {/* Top block — identity-first, mirroring the list card hierarchy:
           thumbnail → badges → title → author (with avatar) → summary → stats */}
       <div className={styles.headerRow}>
@@ -96,8 +96,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
       <div className={styles.zone2}>
         {meta.warnings.length > 0 && (
           <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Warnings</span>
-            <div className={styles.tagGroup}>
+            <span className={styles.tagLabel} id="wh-warnings" aria-hidden="true">Warnings</span>
+            <div className={styles.tagGroup} role="group" aria-labelledby="wh-warnings">
               {meta.warnings.map((w) => (
                 <TagChip key={w} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
               ))}
@@ -106,8 +106,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
         )}
         {meta.fandom.length > 0 && (
           <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Fandom</span>
-            <div className={styles.tagGroup}>
+            <span className={styles.tagLabel} id="wh-fandom" aria-hidden="true">Fandom</span>
+            <div className={styles.tagGroup} role="group" aria-labelledby="wh-fandom">
               {meta.fandom.map((f) => (
                 <TagChip key={f} tag={f} category="fandom" clickable href={`/?fandom=${encodeURIComponent(f)}`} />
               ))}
@@ -116,8 +116,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
         )}
         {meta.relationships.length > 0 && (
           <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Ships</span>
-            <div className={styles.tagGroup}>
+            <span className={styles.tagLabel} id="wh-ships" aria-hidden="true">Ships</span>
+            <div className={styles.tagGroup} role="group" aria-labelledby="wh-ships">
               {meta.relationships.map((r) => (
                 <TagChip key={r} tag={r} category="relationship" clickable href={`/?relationship=${encodeURIComponent(r)}`} />
               ))}
@@ -126,8 +126,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
         )}
         {meta.characters.length > 0 && (
           <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Characters</span>
-            <div className={styles.tagGroup}>
+            <span className={styles.tagLabel} id="wh-characters" aria-hidden="true">Characters</span>
+            <div className={styles.tagGroup} role="group" aria-labelledby="wh-characters">
               {meta.characters.map((c) => (
                 <TagChip key={c} tag={c} category="character" clickable href={`/?character=${encodeURIComponent(c)}`} />
               ))}
@@ -136,8 +136,8 @@ export function WorkHeader({ meta, slug: _slug, totalChapters }: Props) {
         )}
         {meta.tags.length > 0 && (
           <div className={styles.tagRow}>
-            <span className={styles.tagLabel}>Tags</span>
-            <div className={styles.tagGroup}>
+            <span className={styles.tagLabel} id="wh-tags" aria-hidden="true">Tags</span>
+            <div className={styles.tagGroup} role="group" aria-labelledby="wh-tags">
               {meta.tags.map((t) => (
                 <TagChip key={t} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
               ))}

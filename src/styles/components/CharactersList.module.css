@@ -35,7 +35,6 @@
   font-family: var(--font-sans);
   font-size: 15px;
   color: var(--text);
-  outline: none;
   transition: border-color 150ms ease;
 }
 
