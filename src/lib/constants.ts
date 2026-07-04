@@ -7,6 +7,13 @@ export const HISTORY_KEY = 'cai_search_history';
 // Reading-page (per-work) state keys.
 export const SAVED_KEY = 'fanfic-saved-works'; // reading-list (bookmarked work slugs)
 export const BOOKMARKS_KEY = 'fanfic-bookmarks'; // scroll position + furthest + last chapter
+export const KUDOS_KEY = 'fanfic-kudos';        // slugs the reader has left kudos on
+
+// Reading preferences (typography + theme).
+export const FONT_KEY = 'fanfic-font';
+export const FONT_SIZE_KEY = 'fanfic-font-size';
+export const LINE_WIDTH_KEY = 'fanfic-line-width';
+export const THEME_KEY = 'fanfic-reader-theme';
 
 // ── Filter taxonomy ────────────────────────────────────────────────────────
 // These are the canonical AO3-style filter values used in both FilterPanel

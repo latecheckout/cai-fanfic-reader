@@ -1,13 +1,16 @@
+import { THEME_KEY, BOOKMARKS_KEY, FONT_KEY, FONT_SIZE_KEY, LINE_WIDTH_KEY } from '@/lib/constants';
+
 /**
  * ThemeScript — inlined into <head> to prevent FOUC.
  * Reads localStorage before the page paints and sets data-theme + CSS vars.
+ * Storage keys are interpolated from constants.ts so they can't drift.
  */
 export function ThemeScript() {
   const script = `
 (function() {
   try {
     var root = document.documentElement;
-    var readerTheme = localStorage.getItem('fanfic-reader-theme');
+    var readerTheme = localStorage.getItem('${THEME_KEY}');
     if (readerTheme && readerTheme !== 'default') {
       root.setAttribute('data-theme', readerTheme);
     } else {
@@ -16,7 +19,7 @@ export function ThemeScript() {
     }
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-        var current = localStorage.getItem('fanfic-reader-theme');
+        var current = localStorage.getItem('${THEME_KEY}');
         if (!current || current === 'default') {
           document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
         }
@@ -26,11 +29,11 @@ export function ThemeScript() {
     root.setAttribute('data-mode', siteMode === 'text' ? 'text' : 'visual');
     // Reserve the Continue Reading rail's space before paint when the reading
     // list is non-empty, so it doesn't pop in late after hydration reads it.
-    var bm = localStorage.getItem('fanfic-bookmarks');
+    var bm = localStorage.getItem('${BOOKMARKS_KEY}');
     if (bm) { try { if (Object.keys(JSON.parse(bm)).length > 0) root.setAttribute('data-has-reading', ''); } catch(e) {} }
-    var font = localStorage.getItem('fanfic-font') || 'serif';
-    var fontSize = localStorage.getItem('fanfic-font-size') || '19';
-    var lineWidth = localStorage.getItem('fanfic-line-width');
+    var font = localStorage.getItem('${FONT_KEY}') || 'serif';
+    var fontSize = localStorage.getItem('${FONT_SIZE_KEY}') || '19';
+    var lineWidth = localStorage.getItem('${LINE_WIDTH_KEY}');
     root.setAttribute('data-font', font);
     root.style.setProperty('--font-size-body', fontSize + 'px');
     if (lineWidth) {

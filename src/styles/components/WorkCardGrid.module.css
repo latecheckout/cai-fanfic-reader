@@ -10,7 +10,7 @@
   position: relative;
   aspect-ratio: 2 / 3;
   /* Concentric with the rating badge: badge radius (2px) + padding (12px). */
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   padding: var(--space-3);
   /* No overflow:hidden here — it would clip the badge tooltips. Clipping lives
      on .media instead. */
@@ -30,7 +30,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   clip-path: inset(0 round 14px);
   /* Dark neutral so the scrim + white text still read if a cover is missing. */
   background: #1a1614;
@@ -47,7 +47,7 @@
      the stroke reads as a complete outline, not cut off by the gradient. */
   z-index: 2;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   pointer-events: none;
 }
 

@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
 import { BOOKMARKS_KEY } from '@/lib/constants';
 import { EASE_OUT_EXPO } from '@/lib/motion';
+import { ArrowDownIcon } from './icons';
 
 interface BookmarkEntry {
   furthestScrollPercent?: number;
@@ -66,12 +67,7 @@ export function ReturnToPositionFAB() {
           transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
           className="fixed bottom-7 right-6 z-[var(--z-dropdown)] inline-flex items-center gap-2 rounded-full bg-bubble py-2 pl-[11px] pr-[14px] font-mono text-[11px] tracking-[0.03em] text-text shadow-bubble transition-shadow duration-[120ms] ease-out-expo hover:shadow-bubble-hover max-md:bottom-[calc(20px+var(--safe-bottom)+44px+12px)] max-md:left-0 max-md:right-0 max-md:mx-auto max-md:w-fit"
         >
-          <svg
-            width="11" height="11" viewBox="0 0 11 11" fill="none"
-            stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-          >
-            <path d="M5.5 1.5v8M2 6l3.5 3.5L9 6" />
-          </svg>
+          <ArrowDownIcon width={15} height={15} />
           <span>Your place</span>
         </motion.button>
       )}

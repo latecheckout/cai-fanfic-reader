@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { HeartIcon } from './icons';
+import { KUDOS_KEY } from '@/lib/constants';
 
 interface Props {
   slug: string;
@@ -8,16 +10,18 @@ interface Props {
 }
 
 export function KudosSection({ slug, totalKudos }: Props) {
-  const [given, setGiven] = useState<boolean>(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('fanfic-kudos') || '[]');
-      return Array.isArray(saved) && saved.includes(slug);
-    } catch {
-      return false;
-    }
-  });
+  // Start false so SSR and the first client render match; read the persisted
+  // state after mount to avoid a hydration mismatch (this component is SSR-ed).
+  const [given, setGiven] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [displayCount, setDisplayCount] = useState(totalKudos);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KUDOS_KEY) || '[]');
+      if (Array.isArray(saved) && saved.includes(slug)) setGiven(true);
+    } catch {}
+  }, [slug]);
 
   // @WIRE  — Add to handleKudos(): POST /works/:slug/kudos after optimistic update.
   //          On error: roll back setGiven(false) + setDisplayCount(c => c - 1).
@@ -30,9 +34,9 @@ export function KudosSection({ slug, totalKudos }: Props) {
     setAnimating(true);
     setDisplayCount((c) => c + 1);
     try {
-      const saved = JSON.parse(localStorage.getItem('fanfic-kudos') || '[]');
+      const saved = JSON.parse(localStorage.getItem(KUDOS_KEY) || '[]');
       if (Array.isArray(saved) && !saved.includes(slug)) {
-        localStorage.setItem('fanfic-kudos', JSON.stringify([...saved, slug]));
+        localStorage.setItem(KUDOS_KEY, JSON.stringify([...saved, slug]));
       }
     } catch {}
     setTimeout(() => setAnimating(false), 620);
@@ -52,10 +56,13 @@ export function KudosSection({ slug, totalKudos }: Props) {
         aria-label={given ? 'Kudos given' : 'Leave kudos for this work'}
       >
         {Array.from({ length: 12 }).map((_, i) => (
-          <span key={i} className="kudos-heart absolute top-1/2 left-1/2 text-[10px] text-text opacity-0 pointer-events-none -translate-x-1/2 -translate-y-1/2 select-none leading-none" aria-hidden="true">♥</span>
+          <span key={i} className="kudos-heart absolute top-1/2 left-1/2 text-text opacity-0 pointer-events-none -translate-x-1/2 -translate-y-1/2 select-none leading-none" aria-hidden="true">
+            <HeartIcon width={10} height={10} />
+          </span>
         ))}
-        <span className="relative z-[1] pointer-events-none">
-          {given ? '♥ Kudos left' : '♥ Leave Kudos'}
+        <span className="relative z-[1] pointer-events-none inline-flex items-center gap-1.5">
+          <HeartIcon width={13} height={13} />
+          {given ? 'Kudos left' : 'Leave Kudos'}
         </span>
       </button>
       <p className={[

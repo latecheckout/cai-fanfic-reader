@@ -1,12 +1,13 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useReading } from '@/context/ReadingContext';
 import { TagChip } from './TagChip';
-import { SignalStrip, Avatar } from './WorkCardCover';
+import { SignalStrip, Avatar, Kudos, Bookmarks, StatsLine } from './WorkCardCover';
 import { ExpandableSummary } from './ExpandableSummary';
-import { formatWords, formatCount, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
+import { formatWords, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 
 const TAG_LABEL = 'w-[70px] shrink-0 pt-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary';
 const TAG_ROW = 'flex items-baseline gap-3';
@@ -22,32 +23,29 @@ export function MetadataOverlay() {
     ? `Part ${workMeta.series.position} of ${workMeta.series.name}`
     : null;
 
-  const statsLine = [
+  const statNodes: ReactNode[] = [
     formatWords(workMeta.words),
     readingTime(workMeta.words),
     totalChapters > 1 ? formatChapters(workMeta.chaptersPosted, workMeta.chapters) : null,
     seriesStr,
     workMeta.language !== 'English' ? workMeta.language : null,
-    workMeta.kudos > 0 ? `♥ ${formatCount(workMeta.kudos)}` : null,
-    workMeta.bookmarks > 0 ? `⚑ ${formatCount(workMeta.bookmarks)}` : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+    workMeta.kudos > 0 ? <Kudos key="kudos" count={workMeta.kudos} /> : null,
+    workMeta.bookmarks > 0 ? <Bookmarks key="bookmarks" count={workMeta.bookmarks} /> : null,
+  ].filter(Boolean);
 
   return (
     <>
-      {/* Header band */}
-      <div className="flex shrink-0 items-center px-[18px] pt-4 pb-2">
-        <span className="font-mono text-[9px] font-medium uppercase tracking-[0.12em] text-secondary/70">
-          Story info
-        </span>
-      </div>
-
-      {/* Scrollable body — thumbnail → badges → title → author → summary → stats → tags */}
-      <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-6 py-5">
+      {/* Scrollable body — the "Story info" heading scrolls with the content. */}
+      <div className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden px-6 pb-5 pt-5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mb-4 flex items-center">
+          <span className="font-serif text-[16px] font-medium text-text">
+            Story info
+          </span>
+        </div>
         {workMeta.cover && (
           <div className="relative mb-4 aspect-[2/3] w-[104px] overflow-hidden rounded-[10px] bg-border">
             <Image src={workMeta.cover} alt="" fill sizes="104px" className="rounded-[10px] object-cover" />
+            <span className="pointer-events-none absolute inset-0 rounded-[10px] shadow-[inset_0_0_0_1px_var(--image-outline)]" aria-hidden="true" />
           </div>
         )}
 
@@ -62,7 +60,7 @@ export function MetadataOverlay() {
               isWip={isWip}
             />
           </div>
-          <h2 className="mb-1.5 min-w-0 font-serif text-[24px] font-medium leading-[1.2] tracking-[-0.01em] text-text [overflow-wrap:anywhere]">
+          <h2 className="mb-1.5 min-w-0 text-balance font-serif text-[24px] font-medium leading-[1.2] tracking-[-0.01em] text-text [overflow-wrap:anywhere]">
             {workMeta.title}
           </h2>
           <p className="mb-1.5 inline-flex items-center font-sans text-[14px] text-secondary">
@@ -76,7 +74,7 @@ export function MetadataOverlay() {
             </Link>
           </p>
           <ExpandableSummary summary={workMeta.summary} />
-          <p className="mt-4 font-mono text-[13px] text-secondary">{statsLine}</p>
+          <StatsLine items={statNodes} className="mt-4 font-mono text-[13px] text-secondary" />
         </div>
 
         {/* Zone 2: Signals */}

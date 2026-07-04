@@ -20,8 +20,11 @@ export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
       {chapters.map((title, i) => {
         const active = i === activeIndex;
         const raw = title || `Chapter ${i + 1}`;
-        // The leading "01" already conveys the number — drop a "Chapter N:" prefix.
+        // The leading number already conveys the index — drop a "Chapter N:" prefix.
         const label = stripChapterPrefix(raw);
+        // Zero-pad to two digits so every row's number column is the same width
+        // (01, 02, … 10, 11) — keeps the divider line vertically aligned.
+        const num = String(i + 1).padStart(2, '0');
         return (
           <li key={i} role="option" aria-selected={active}>
             <button
@@ -29,8 +32,8 @@ export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
               onClick={() => onSelect(i)}
             >
               {/* Mirror the main pill: mono number · divider line · sans title */}
-              <span className={`min-w-[16px] shrink-0 font-mono text-[12px] tabular-nums ${active ? 'text-text' : 'text-secondary'}`}>
-                {String(i + 1).padStart(2, '0')}
+              <span className={`shrink-0 font-mono text-[12px] tabular-nums ${active ? 'text-text' : 'text-secondary'}`}>
+                {num}
               </span>
               <span className="h-3.5 w-px shrink-0 bg-border-strong" aria-hidden="true" />
               <span className={`min-w-0 flex-1 truncate font-sans text-[13px] ${active ? 'font-medium text-text' : 'text-secondary'}`}>

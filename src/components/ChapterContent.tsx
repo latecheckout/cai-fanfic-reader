@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Chapter } from '@/types';
 import { Avatar } from './WorkCardCover';
+import { ChapterCallout } from './ChapterCallout';
+import { AuthorNote } from './AuthorNote';
 
 interface Props {
   chapter: Chapter;
@@ -12,72 +14,54 @@ interface Props {
   workTitle?: string;
 }
 
-const NOTE_LABEL = 'mb-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary';
-const NOTE_TEXT = 'font-sans text-[13px] leading-[1.6] text-secondary';
-const AUTHOR_NOTE = 'border-l-2 border-border-strong px-5 py-4';
-
 export function ChapterContent({ chapter, chapterHtml, totalChapters, author, workTitle }: Props) {
   return (
     <div className="max-w-[var(--reader-max-width)]">
       {/* Chapter title + author byline */}
       {totalChapters > 1 && (
         <header className="mb-16 text-center">
-          <p className="mb-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary">
-            Chapter {chapter.index + 1}
-          </p>
-          <h2 className="text-center font-sans text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-text">
-            {chapter.title}
-          </h2>
+          {workTitle && (
+            <h2 className="text-balance font-serif text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-text">
+              {workTitle}
+            </h2>
+          )}
           {author && (
-            <p className="mt-3 flex flex-nowrap items-center justify-center font-serif text-[14px] text-secondary opacity-[0.65] max-md:flex-col max-md:gap-1">
-              {workTitle && (
-                <>
-                  <span className="min-w-0 max-w-[24ch] overflow-hidden text-ellipsis whitespace-nowrap font-medium text-text max-md:max-w-full">
-                    {workTitle}
-                  </span>
-                  <span className="mx-2 shrink-0 text-secondary opacity-[0.45] max-md:hidden" aria-hidden="true">|</span>
-                </>
-              )}
-              <span className="inline-flex shrink-0 items-center">
-                <span className="mr-1.5 shrink-0">by</span>
-                <Avatar />
-                <Link
-                  href={`/?q=${encodeURIComponent(author)}`}
-                  className="shrink-0 text-inherit hover:text-text hover:underline hover:underline-offset-2"
-                >
-                  {author}
-                </Link>
-              </span>
+            <p className="mt-3 flex flex-nowrap items-center justify-center font-serif text-[14px] text-secondary opacity-[0.65]">
+              <span className="mr-1.5 shrink-0">by</span>
+              <Avatar />
+              <Link
+                href={`/?q=${encodeURIComponent(author)}`}
+                className="shrink-0 text-inherit hover:text-text hover:underline hover:underline-offset-2"
+              >
+                {author}
+              </Link>
             </p>
           )}
         </header>
       )}
 
-      {/* Author's beginning notes */}
+      {/* Author's beginning notes — message bubble from the author */}
       {chapter.notesBegin && (
-        <aside className={`${AUTHOR_NOTE} mb-8`}>
-          <p className={NOTE_LABEL}>Author&rsquo;s note</p>
-          <p className={NOTE_TEXT}>{chapter.notesBegin}</p>
-        </aside>
+        <AuthorNote author={author} className="mb-8">
+          {chapter.notesBegin}
+        </AuthorNote>
       )}
 
-      {/* Chapter summary */}
+      {/* Chapter summary — flat callout */}
       {chapter.summary && (
-        <aside className="mb-8 rounded-[3px] border border-border-chip bg-transparent px-5 py-4">
-          <p className={NOTE_LABEL}>Summary</p>
-          <p className={NOTE_TEXT}>{chapter.summary}</p>
-        </aside>
+        <ChapterCallout label="Summary" className="mb-8">
+          {chapter.summary}
+        </ChapterCallout>
       )}
 
       {/* Story text — data-chapter-prose scopes the selection toolbar to story text */}
       <article data-chapter-prose className="prose" dangerouslySetInnerHTML={{ __html: chapterHtml }} />
 
-      {/* Author's ending notes */}
+      {/* Author's ending notes — message bubble from the author */}
       {chapter.notesEnd && (
-        <aside className={`${AUTHOR_NOTE} mt-8`}>
-          <p className={NOTE_LABEL}>Author&rsquo;s note</p>
-          <p className={NOTE_TEXT}>{chapter.notesEnd}</p>
-        </aside>
+        <AuthorNote author={author} className="mt-8">
+          {chapter.notesEnd}
+        </AuthorNote>
       )}
     </div>
   );

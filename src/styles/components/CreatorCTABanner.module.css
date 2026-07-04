@@ -8,6 +8,6 @@
 .banner {
   display: flex;               /* the reused .slide is flex:0 0 100% — needs a flex parent */
   margin: 0 0 var(--space-12);
-  border-radius: 14px;         /* match the cards / hero */
+  border-radius: var(--card-radius);         /* match the cards / hero */
   overflow: hidden;            /* clip the reused image slide to the radius */
 }

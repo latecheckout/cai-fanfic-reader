@@ -35,7 +35,7 @@
   padding: var(--space-3);
   border: 1px solid var(--card-border);
   /* Concentric with the rating badge: badge radius (2px) + padding (12px). */
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   /* A shade lighter than --card-bg — lifts the fill off the page tone. */
   background: color-mix(in srgb, var(--card-bg), #fff 35%);
   transition: border-color var(--transition-micro);

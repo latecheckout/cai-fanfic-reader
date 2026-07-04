@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
+import { HeartIcon, FlagIcon } from './icons';
 import styles from '@/styles/components/WorkCardCover.module.css';
 
 interface Props {
@@ -93,6 +94,27 @@ export function Views({ hits }: { hits: number }) {
   );
 }
 
+/** Kudos count with the heart icon. Shared across cards + work headers so the
+ *  icon/number treatment matches the views stat exactly. */
+export function Kudos({ count }: { count: number }) {
+  return (
+    <span className={styles.statViews}>
+      <HeartIcon width={12} height={12} className={styles.statIcon} />
+      {formatCount(count)}
+    </span>
+  );
+}
+
+/** Bookmark count with the flag icon. */
+export function Bookmarks({ count }: { count: number }) {
+  return (
+    <span className={styles.statViews}>
+      <FlagIcon width={12} height={12} className={styles.statIcon} />
+      {formatCount(count)}
+    </span>
+  );
+}
+
 /** Circular author avatar with a faint white ring.
  *  Shared by the list and grid bylines so the photo treatment is identical. */
 export function Avatar() {
@@ -105,7 +127,7 @@ export function Avatar() {
 }
 
 /** Dot-separated stats line (supports JSX items like the views icon). */
-function StatsLine({ items, className }: { items: ReactNode[]; className: string }) {
+export function StatsLine({ items, className }: { items: ReactNode[]; className: string }) {
   return (
     <div className={className}>
       {items.map((node, i) => (
@@ -172,8 +194,8 @@ export function WorkCardCover({ work }: Props) {
     formatWords(meta.words),
     formatChapters(meta.chaptersPosted, meta.chapters),
     meta.updated || meta.published ? `updated ${meta.updated || meta.published}` : null,
-    meta.kudos > 0 ? `♥ ${formatCount(meta.kudos)}` : null,
-    meta.bookmarks > 0 ? `⚑ ${formatCount(meta.bookmarks)}` : null,
+    meta.kudos > 0 ? <Kudos key="kudos" count={meta.kudos} /> : null,
+    meta.bookmarks > 0 ? <Bookmarks key="bookmarks" count={meta.bookmarks} /> : null,
     meta.hits > 0 ? <Views key="views" hits={meta.hits} /> : null,
   ].filter(Boolean);
   const visibleTags = tagsExpanded ? meta.tags : meta.tags.slice(0, MAX_TAGS_LIST);

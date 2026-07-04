@@ -32,6 +32,7 @@
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
   --color-bubble: var(--bubble-bg);
+  --color-bubble-ring: var(--bubble-ring);
   --color-overlay-soft: var(--overlay-soft);
   --color-overlay-medium: var(--overlay-medium);
 
@@ -62,6 +63,57 @@
   --shadow-bubble: var(--bubble-shadow);
   --shadow-bubble-hover: var(--bubble-shadow-hover);
   --shadow-float: var(--shadow-float);
+
+  /* Radius → rounded-chip (metadata tag chips) / rounded-card (cover images, cards).
+     --radius-card points at the raw --card-radius token so CSS Modules + utilities
+     share one source of truth. */
+  --radius-chip: 4.5px;
+  --radius-card: var(--card-radius);
+
+  /* ── Character brand palette → bg-/text-/border- utilities ── */
+  --color-pure-white: var(--pure-white);
+  --color-off-white: var(--off-white);
+  --color-pure-black: var(--pure-black);
+  --color-blue: var(--default-blue);
+
+  --color-pure-white-1: var(--pure-white-1);
+  --color-pure-white-2: var(--pure-white-2);
+  --color-pure-white-3: var(--pure-white-3);
+
+  --color-off-white-1: var(--off-white-1);
+  --color-off-white-2: var(--off-white-2);
+  --color-off-white-3: var(--off-white-3);
+
+  --color-pure-black-1: var(--pure-black-1);
+  --color-pure-black-2: var(--pure-black-2);
+  --color-pure-black-3: var(--pure-black-3);
+
+  --color-slippery-butter: var(--slippery-butter);
+  --color-wired-lime: var(--wired-lime);
+  --color-icy-sky: var(--icy-sky);
+  --color-lowkey-lavender: var(--lowkey-lavender);
+  --color-irl-rose: var(--irl-rose);
+
+  --color-gold-rush: var(--gold-rush);
+  --color-lucky-emerald: var(--lucky-emerald);
+  --color-refresh-cyan: var(--refresh-cyan);
+  --color-alt-violet: var(--alt-violet);
+  --color-hot-pink: var(--hot-pink);
+
+  --color-toasty-amber: var(--toasty-amber);
+  --color-dark-sage: var(--dark-sage);
+  --color-cloudy-blue: var(--cloudy-blue);
+  --color-pinned-purple: var(--pinned-purple);
+  --color-hyperlink-magenta: var(--hyperlink-magenta);
+
+  --color-cached-crimson: var(--cached-crimson);
+  --color-midnight-forest: var(--midnight-forest);
+  --color-quill-ink: var(--quill-ink);
+  --color-lock-in-espresso: var(--lock-in-espresso);
+
+  /* Author-note bubble (theme-adaptive quill-ink) */
+  --color-author-bubble: var(--author-bubble);
+  --color-author-bubble-fg: var(--author-bubble-fg);
 }
 
 /* ============================================================
@@ -153,6 +205,8 @@
 
   .prose p {
     margin-bottom: 1.4em;
+    /* Avoid single-word orphans / ragged short lines in long reading text. */
+    text-wrap: pretty;
   }
   .prose p:last-child {
     margin-bottom: 0;

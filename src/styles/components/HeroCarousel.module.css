@@ -15,7 +15,7 @@
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  border-radius: 14px; /* match the cards */
+  border-radius: var(--card-radius); /* match the cards */
 }
 
 .viewport::-webkit-scrollbar {
@@ -42,7 +42,7 @@
   inset: 0;
   z-index: 2;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   pointer-events: none;
 }
 

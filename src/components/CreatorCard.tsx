@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Creator } from '@/lib/shelves';
-import { formatCount } from '@/lib/utils';
+import { Kudos } from './WorkCardCover';
 import styles from '@/styles/components/CreatorCard.module.css';
 
 /** @DUMMY — placeholder until real author photos exist. */
@@ -26,7 +26,7 @@ export function CreatorCard({ creator }: Props) {
       <span className={styles.name}>{creator.name}</span>
       {creator.bio && <span className={styles.bio}>{creator.bio}</span>}
       <span className={styles.meta}>
-        {creator.workCount} {creator.workCount === 1 ? 'work' : 'works'} · ♥ {formatCount(creator.kudos)}
+        {creator.workCount} {creator.workCount === 1 ? 'work' : 'works'} · <Kudos count={creator.kudos} />
       </span>
     </Link>
   );

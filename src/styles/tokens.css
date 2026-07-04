@@ -25,6 +25,10 @@
   /* Card surface ("page on paper") — solid colours for cross-browser safety */
   --card-bg: #FBFAF8;
   --card-border: rgba(26, 24, 22, 0.09);
+  /* Shared card/cover corner radius (also exposed as Tailwind `rounded-card`). */
+  --card-radius: 14px;
+  /* Subtle 1px image edge — pure black in light, pure white in dark (see dark block). */
+  --image-outline: rgba(0, 0, 0, 0.1);
 
   /* Rating dot colors — per brief spec */
   --rating-g:  #3d9970;
@@ -56,6 +60,9 @@
   --bubble-bg: #ffffff;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.055);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.07);
+  /* The 1px ring inside bubble-shadow-hover — so an open popover's border can
+     match the stroke of the bubble pill/HUD control that triggered it. */
+  --bubble-ring: rgba(0, 0, 0, 0.07);
   /* Floating panels (popovers, selection toolbar) — deeper than bubble chrome. */
   --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.14);
 
@@ -120,6 +127,58 @@
   --color-exclude:    #7A1A1A;
   --color-exclude-bg: rgba(140, 30, 30, 0.10);
   --color-star:       #B8952A;
+
+  /* ── Character brand palette (imported from character-brain) ──
+     Fixed brand hues (theme-independent). Exposed as bg-/text-/border-
+     utilities via the @theme block in globals.css (e.g. bg-quill-ink). */
+  --pure-white: #ffffff;
+  --off-white:  #e5dfeb;
+  --pure-black: #000000;
+  --default-blue: #195eff;
+
+  --pure-white-1: #f2f2f2;
+  --pure-white-2: #d9d9d9;
+  --pure-white-3: #bfbfbf;
+
+  --off-white-1: #dad4df;
+  --off-white-2: #c3bec8;
+  --off-white-3: #aca7b0;
+
+  --pure-black-1: #0d0d0d;
+  --pure-black-2: #262626;
+  --pure-black-3: #404040;
+
+  /* Secondary palette — Light */
+  --slippery-butter: #fff59e;
+  --wired-lime:      #aed900;
+  --icy-sky:         #abf5ed;
+  --lowkey-lavender: #df91f2;
+  --irl-rose:        #ffadd2;
+
+  /* Secondary palette — Vivid */
+  --gold-rush:      #ffe600;
+  --lucky-emerald:  #00d973;
+  --refresh-cyan:   #00d9d9;
+  --alt-violet:     #ae00d9;
+  --hot-pink:       #ff4dc9;
+
+  /* Secondary palette — Warm */
+  --toasty-amber:      #f28500;
+  --dark-sage:         #65a98f;
+  --cloudy-blue:       #7db4ff;
+  --pinned-purple:     #6b2e63;
+  --hyperlink-magenta: #d90082;
+
+  /* Secondary palette — Deep */
+  --cached-crimson:   #d90000;
+  --midnight-forest:  #2b9247;
+  --quill-ink:        #3e2733;
+  --lock-in-espresso: #652e1f;
+
+  /* Author-note bubble — quill-ink base, lightened per theme so it stays
+     legible on dark backgrounds (see the dark override). */
+  --author-bubble:    var(--quill-ink);
+  --author-bubble-fg: #ECE5EA;
 }
 
 [data-theme="light"] {
@@ -176,6 +235,7 @@
   --accent-subtle: rgba(196, 120, 90, 0.14);
   --card-bg: #1D1B1A;
   --card-border: rgba(229, 225, 216, 0.20);
+  --image-outline: rgba(255, 255, 255, 0.1);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
   --rating-m:  #c0601a;
@@ -184,6 +244,9 @@
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.24);
+  --bubble-ring: rgba(255, 255, 255, 0.24);
+  /* Lift quill-ink off the near-black bg so the author bubble stays visible. */
+  --author-bubble: color-mix(in srgb, var(--quill-ink) 78%, #ffffff 22%);
   --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.45);
   --grid-line: rgba(229, 225, 216, 0.055);
 }

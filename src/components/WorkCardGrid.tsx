@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { WorkSummary } from '@/types';
-import { formatCount, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
-import { SignalStrip, Views, Avatar } from './WorkCardCover';
+import { ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
+import { SignalStrip, Views, Kudos, Avatar } from './WorkCardCover';
 import styles from '@/styles/components/WorkCardGrid.module.css';
 
 interface Props {
@@ -88,7 +88,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
           <div className={styles.metrics}>
             {meta.hits > 0 && <Views hits={meta.hits} />}
             {meta.hits > 0 && meta.kudos > 0 && ' · '}
-            {meta.kudos > 0 && `♥ ${formatCount(meta.kudos)}`}
+            {meta.kudos > 0 && <Kudos count={meta.kudos} />}
           </div>
         )}
       </div>

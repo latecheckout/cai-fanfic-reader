@@ -6,6 +6,7 @@ import { useReading } from '@/context/ReadingContext';
 import { ratingClass, stripChapterPrefix } from '@/lib/utils';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { BUBBLE_PILL } from './readingChrome';
+import { ChevronDownIcon } from './icons';
 import { MetadataOverlay } from './MetadataOverlay';
 import { ChapterPanel } from './ChapterPanel';
 import { Popover } from './Popover';
@@ -92,7 +93,7 @@ export function ReadingCluster() {
               <Popover
                 align="center"
                 ariaLabel="Work details"
-                contentClassName="flex max-h-[70vh] w-[360px] flex-col overflow-hidden"
+                contentClassName="flex max-h-[70vh] w-[460px] flex-col overflow-hidden"
                 renderTrigger={({ open, toggle }) => (
                   <button
                     onClick={toggle}
@@ -126,17 +127,16 @@ export function ReadingCluster() {
                   aria-expanded={open}
                   className={`${BUBBLE_PILL} relative min-w-0 max-w-[240px] gap-2 overflow-hidden px-4 ${open ? 'shadow-bubble-hover' : ''}`}
                 >
-                  <span className="shrink-0 font-mono text-[12px] tabular-nums text-secondary">{activeChapterIndex + 1}</span>
+                  <span className="shrink-0 font-mono text-[12px] tabular-nums text-secondary">{String(activeChapterIndex + 1).padStart(2, '0')}</span>
                   <span className="h-3.5 w-px shrink-0 bg-border-strong" aria-hidden="true" />
                   <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[13px]">
                     {chapterTitle}
                   </span>
-                  <svg
+                  <ChevronDownIcon
+                    width={17}
+                    height={17}
                     className={`shrink-0 text-secondary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-                    width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"
-                  >
-                    <path d="M2 4L5 7L8 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                  />
                   <span
                     className={`absolute bottom-0 left-0 h-[3px] rounded-none opacity-[0.38] transition-[width] duration-[120ms] ${PROGRESS_BG[rClass] ?? 'bg-secondary'}`}
                     style={{ width: `${scrollPct}%` }}

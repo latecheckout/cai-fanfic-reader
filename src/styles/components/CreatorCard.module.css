@@ -14,7 +14,7 @@
   text-align: center;
   padding: var(--space-5);
   border: 1px solid var(--card-border);
-  border-radius: 14px;            /* matches the work cards */
+  border-radius: var(--card-radius);            /* matches the work cards */
   background: var(--card-bg);     /* solid fill token */
   text-decoration: none;
   color: inherit;

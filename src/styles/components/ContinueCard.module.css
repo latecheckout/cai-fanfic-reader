@@ -32,7 +32,7 @@
   position: relative;
   display: block;
   aspect-ratio: 2 / 3;
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   /* clip-path (not overflow:hidden) so the cover doesn't bleed past the ring. */
   clip-path: inset(0 round 14px);
   background: var(--border);
@@ -48,7 +48,7 @@
   position: absolute;
   inset: 0;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   pointer-events: none;
 }
 
@@ -120,7 +120,7 @@
   position: relative;
   display: block;
   aspect-ratio: 2 / 3;
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   clip-path: inset(0 round 14px);
   background: var(--card-bg);
 }
@@ -131,7 +131,7 @@
   position: absolute;
   inset: 0;
   border: 1px solid var(--card-border);
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   pointer-events: none;
   transition: border-color var(--transition-micro);
 }
@@ -150,7 +150,7 @@
   position: relative;
   display: block;
   aspect-ratio: 2 / 3;
-  border-radius: 14px;
+  border-radius: var(--card-radius);
   border: 1px solid var(--card-border);
   background: var(--card-bg);
   overflow: hidden;

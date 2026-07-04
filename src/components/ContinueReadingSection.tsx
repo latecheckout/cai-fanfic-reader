@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
 import { RailViewport } from './RailViewport';
+import { BOOKMARKS_KEY } from '@/lib/constants';
 import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
@@ -36,7 +37,7 @@ export function ContinueReadingSection({ covers }: Props) {
 
   useIsomorphicLayoutEffect(() => {
     try {
-      const raw = localStorage.getItem('fanfic-bookmarks');
+      const raw = localStorage.getItem(BOOKMARKS_KEY);
       if (raw) {
         const data: Record<string, RawBookmark> = JSON.parse(raw);
         const items: Bookmark[] = Object.entries(data)

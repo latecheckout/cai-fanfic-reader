@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useRef, useCallback, useState, useEffect } from 'react';
 import { WorkMeta } from '@/types';
+import { THEME_KEY } from '@/lib/constants';
 
 interface ReadingContextValue {
   activeChapterIndex: number;
@@ -44,7 +45,7 @@ export function ReadingProvider({
   // when no user preference is stored. This guard mirrors ThemeScript's fallback logic.
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('fanfic-reader-theme');
+      const saved = localStorage.getItem(THEME_KEY);
       if (!saved || saved === 'default') {
         const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
         document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');

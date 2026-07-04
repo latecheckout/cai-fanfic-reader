@@ -42,7 +42,7 @@ export function Segmented({
             aria-checked={active}
             aria-label={opt.label}
             onClick={() => onChange(opt.value)}
-            className="relative z-10 flex min-h-[54px] flex-1 cursor-pointer items-center justify-center rounded-lg px-2 py-2"
+            className="relative z-10 flex aspect-square flex-1 cursor-pointer items-center justify-center rounded-lg px-2 py-2"
           >
             {active && (
               <motion.span

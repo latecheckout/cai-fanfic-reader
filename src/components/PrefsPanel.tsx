@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, type ComponentType, type SVGProps } from 'react';
 import { Segmented } from './Segmented';
 import { SizeSlider } from './SizeSlider';
+import { SystemThemeIcon, LightModeIcon, PaperModeIcon, DarkModeIcon } from './icons';
+import { FONT_KEY, FONT_SIZE_KEY, LINE_WIDTH_KEY, THEME_KEY } from '@/lib/constants';
 
 // The popover (desktop) and bottom sheet (mobile) own their own close affordances
 // (click-outside / Escape / overlay tap), so this panel is just the controls.
@@ -23,33 +25,35 @@ const FONT_OPTIONS: { value: FontFamily; label: string; fontFamily: string }[] =
   { value: 'dyslexic', label: 'Dyslexic', fontFamily: '"OpenDyslexic", cursive' },
 ];
 
-const THEME_SWATCHES: { value: Theme; color: string | null; label: string }[] = [
-  { value: 'default', color: null, label: 'System' },
-  { value: 'light', color: '#FFFFFF', label: 'Light' },
-  { value: 'paper', color: '#EDE8DE', label: 'Paper' },
-  { value: 'dark', color: '#141210', label: 'Dark' },
+const THEME_OPTIONS: { value: Theme; label: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { value: 'default', label: 'System', Icon: SystemThemeIcon },
+  { value: 'light', label: 'Light', Icon: LightModeIcon },
+  { value: 'paper', label: 'Paper', Icon: PaperModeIcon },
+  { value: 'dark', label: 'Dark', Icon: DarkModeIcon },
 ];
 
+// 20×20 box (matching the theme icons) with the three lines vertically centered,
+// so the icon reads at the same size and has the same padding-to-label as Font/Theme.
 const WIDTH_ICONS: Record<LineWidth, React.ReactNode> = {
   narrow: (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2" x2="11" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="5.5" x2="9" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="9" x2="11" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <line x1="2" y1="6.5" x2="11" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="10" x2="9" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="13.5" x2="11" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
   default: (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2" x2="15" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="5.5" x2="13" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="9" x2="15" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <line x1="2" y1="6.5" x2="15" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="10" x2="13" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="13.5" x2="15" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
   wide: (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <line x1="2" y1="2" x2="18" y2="2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="5.5" x2="16" y2="5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="2" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <line x1="2" y1="6.5" x2="18" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="10" x2="16" y2="10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="2" y1="13.5" x2="18" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
 };
@@ -63,49 +67,38 @@ export function PrefsPanel() {
   // their saved positions immediately. No value change after mount = no slide.
   // (Safe: this panel only renders client-side, gated behind the open popover.)
   const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
-    try { return (localStorage.getItem('fanfic-font') as FontFamily) || 'serif'; }
+    try { return (localStorage.getItem(FONT_KEY) as FontFamily) || 'serif'; }
     catch { return 'serif'; }
   });
   const [fontSize, setFontSize] = useState<number>(() => {
-    try { const s = localStorage.getItem('fanfic-font-size'); return s ? Number(s) : 19; }
+    try { const s = localStorage.getItem(FONT_SIZE_KEY); return s ? Number(s) : 19; }
     catch { return 19; }
   });
   const [lineWidth, setLineWidth] = useState<LineWidth>(() => {
-    try { return (localStorage.getItem('fanfic-line-width') as LineWidth) || 'default'; }
+    try { return (localStorage.getItem(LINE_WIDTH_KEY) as LineWidth) || 'default'; }
     catch { return 'default'; }
   });
   const [theme, setTheme] = useState<Theme>(() => {
-    try { return (localStorage.getItem('fanfic-reader-theme') as Theme) || 'default'; }
+    try { return (localStorage.getItem(THEME_KEY) as Theme) || 'default'; }
     catch { return 'default'; }
   });
-  // Track the OS scheme so the "System" swatch shows the bg it actually resolves to.
-  const [systemDark, setSystemDark] = useState<boolean>(() => {
-    try { return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false; }
-    catch { return false; }
-  });
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
-    mq.addEventListener?.('change', onChange);
-    return () => mq.removeEventListener?.('change', onChange);
-  }, []);
 
   function applyFontFamily(f: FontFamily) {
     setFontFamily(f);
     document.documentElement.setAttribute('data-font', f);
-    try { localStorage.setItem('fanfic-font', f); } catch { /**/ }
+    try { localStorage.setItem(FONT_KEY, f); } catch { /**/ }
   }
 
   function applyFontSize(size: number) {
     setFontSize(size);
     document.documentElement.style.setProperty('--font-size-body', `${size}px`);
-    try { localStorage.setItem('fanfic-font-size', String(size)); } catch { /**/ }
+    try { localStorage.setItem(FONT_SIZE_KEY, String(size)); } catch { /**/ }
   }
 
   function applyLineWidth(w: LineWidth) {
     setLineWidth(w);
     document.documentElement.style.setProperty('--reader-line-width', LINE_WIDTH_VALUES[w]);
-    try { localStorage.setItem('fanfic-line-width', w); } catch { /**/ }
+    try { localStorage.setItem(LINE_WIDTH_KEY, w); } catch { /**/ }
   }
 
   function applyThemeVisual(t: Theme) {
@@ -121,9 +114,9 @@ export function PrefsPanel() {
     setTheme(t);
     applyThemeVisual(t);
     if (t === 'default') {
-      try { localStorage.removeItem('fanfic-reader-theme'); } catch {}
+      try { localStorage.removeItem(THEME_KEY); } catch {}
     } else {
-      try { localStorage.setItem('fanfic-reader-theme', t); } catch {}
+      try { localStorage.setItem(THEME_KEY, t); } catch {}
     }
   }
 
@@ -181,7 +174,7 @@ export function PrefsPanel() {
               value: w,
               label: w === 'narrow' ? 'Narrow' : w === 'default' ? 'Default' : 'Wide',
               content: (
-                <span className="flex flex-col items-center gap-1.5">
+                <span className="flex flex-col items-center gap-1">
                   {WIDTH_ICONS[w]}
                   <span className="font-mono text-[11px] tracking-[0.02em]">
                     {w === 'narrow' ? 'Narrow' : w === 'default' ? 'Default' : 'Wide'}
@@ -192,37 +185,25 @@ export function PrefsPanel() {
           />
         </div>
 
-        {/* Theme — each option in its own card */}
+        {/* Theme — segmented slide (like Font / Line width) with mode icons */}
         <div className="flex flex-col gap-2.5">
           <span className={SECTION_LABEL}>Theme</span>
-          <div className="grid grid-cols-4 gap-1">
-            {THEME_SWATCHES.map((s) => {
-              const active = theme === s.value;
-              return (
-                <button
-                  key={s.value}
-                  onClick={() => applyTheme(s.value)}
-                  onMouseEnter={() => applyThemeVisual(s.value)}
-                  onMouseLeave={() => applyThemeVisual(theme)}
-                  aria-label={s.label}
-                  aria-pressed={active}
-                  className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl p-2 transition-colors ${active ? 'bg-[color-mix(in_srgb,var(--text)_12%,transparent)]' : 'bg-[color-mix(in_srgb,var(--text)_6%,transparent)] hover:bg-[color-mix(in_srgb,var(--text)_10%,transparent)]'}`}
-                >
-                  <span
-                    className="h-7 w-7 rounded-full border-[1.5px] border-border-chip"
-                    style={s.color === null
-                      ? { background: systemDark ? '#141210' : '#FFFFFF' }
-                      : { background: s.color }
-                    }
-                    aria-hidden="true"
-                  />
-                  <span className={`font-mono text-[10px] tracking-[0.04em] ${active ? 'text-text' : 'text-secondary/60'}`}>
-                    {s.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <Segmented
+            id="theme"
+            ariaLabel="Theme"
+            value={theme}
+            onChange={(v) => applyTheme(v as Theme)}
+            options={THEME_OPTIONS.map(({ value, label, Icon }) => ({
+              value,
+              label,
+              content: (
+                <span className="flex flex-col items-center gap-1">
+                  <Icon width={20} height={20} />
+                  <span className="font-mono text-[11px] tracking-[0.02em]">{label}</span>
+                </span>
+              ),
+            }))}
+          />
         </div>
       </div>
     </>

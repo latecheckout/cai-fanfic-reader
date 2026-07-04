@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { AnimatePresence, motion } from 'motion/react';
 import { CHAT_CHARACTERS, CHAT_CHARACTER_KEY } from '@/lib/chatCharacters';
 import { EASE_SPRING_OUT } from '@/lib/motion';
+import { CheckIcon } from './icons';
 
 interface Anchor {
   top: number;
@@ -128,9 +129,9 @@ export function SelectionToolbar() {
                 onClick={() => setPickerOpen((v) => !v)}
                 aria-label="Change character"
                 aria-expanded={pickerOpen}
-                className="group/av relative block h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-border"
+                className="group/av relative block h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-border"
               >
-                <Image src={activeChar.src} alt="" fill sizes="36px" className="object-cover" />
+                <Image src={activeChar.src} alt="" fill sizes="40px" className="object-cover" />
                 <span className="pointer-events-none absolute inset-0 rounded-xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]" />
                 {/* change icon — fades in on avatar hover */}
                 <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/45 opacity-0 transition-opacity duration-150 group-hover/av:opacity-100">
@@ -167,7 +168,7 @@ export function SelectionToolbar() {
                   exit={{ opacity: 0, scale: 0.9, y: 4 }}
                   transition={{ duration: 0.16, ease: EASE_SPRING_OUT }}
                   style={{ transformOrigin: 'bottom left' }}
-                  className="absolute bottom-full left-1 mb-2 flex items-center gap-1.5 rounded-[18px] border border-card-border bg-bubble p-1.5 shadow-float"
+                  className="absolute bottom-full left-0.5 mb-1.5 flex items-center gap-1.5 rounded-[18px] border border-card-border bg-bubble p-1.5 shadow-float"
                 >
                   {CHAT_CHARACTERS.map((c, i) => (
                     <button
@@ -176,15 +177,13 @@ export function SelectionToolbar() {
                       onClick={(e) => { e.stopPropagation(); pickCharacter(c.id); }}
                       aria-label={`Character ${i + 1}`}
                       aria-pressed={c.id === charId}
-                      className="relative block h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-border transition-transform hover:scale-105"
+                      className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-border transition-transform hover:scale-105"
                     >
-                      <Image src={c.src} alt="" fill sizes="36px" className="object-cover" />
+                      <Image src={c.src} alt="" fill sizes="40px" className="object-cover" />
                       {/* active = same scrim as the change overlay, with a check */}
                       {c.id === charId && (
-                        <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/45">
-                          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
-                          </svg>
+                        <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/45 text-white">
+                          <CheckIcon width={14} height={14} />
                         </span>
                       )}
                     </button>

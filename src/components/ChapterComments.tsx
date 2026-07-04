@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getComments, Comment } from '@/data/comments';
+import { HeartIcon } from './icons';
 
 const PREVIEW_COUNT = 2;
 
@@ -30,7 +31,8 @@ function CommentItem({ comment }: { comment: Comment }) {
         <p className="font-sans text-[13px] leading-[1.55] text-text opacity-85">{comment.text}</p>
         <div className="mt-2 flex items-center gap-3">
           <span className="flex cursor-pointer items-center gap-1 border-none bg-none p-0 font-mono text-[11px] text-secondary opacity-60 transition-opacity duration-[120ms] [transition-timing-function:ease] hover:opacity-100">
-            ♥ {comment.likes.toLocaleString()}
+            <HeartIcon width={11} height={11} className="shrink-0" />
+            {comment.likes.toLocaleString()}
           </span>
           {hasReplies && (
             <button

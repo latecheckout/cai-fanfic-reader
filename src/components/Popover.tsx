@@ -84,7 +84,7 @@ export function Popover({
             exit={{ opacity: 0, scale: 0.98, y: -4, ...centerX, transition: { duration: 0.16, ease: 'easeIn' } }}
             transition={{ duration: 0.26, ease: EASE_SPRING_OUT }}
             style={{ transformOrigin: ORIGIN[align] }}
-            className={`absolute top-full z-[var(--z-popover)] mt-2 rounded-[24px] border border-card-border bg-bubble text-text shadow-float ${POS[align]} ${contentClassName}`}
+            className={`absolute top-full z-[var(--z-popover)] mt-2 rounded-[24px] border border-bubble-ring bg-bubble text-text shadow-float ${POS[align]} ${contentClassName}`}
           >
             {typeof children === 'function' ? children({ close }) : children}
           </motion.div>
