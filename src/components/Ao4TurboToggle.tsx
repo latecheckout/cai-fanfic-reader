@@ -23,12 +23,13 @@ const AURA_BG =
   'color-mix(in_srgb,var(--bg),transparent_82%)_78%,' +
   'color-mix(in_srgb,var(--bg),transparent_93%)_90%,transparent_100%)]';
 
-// Mouse-tracked dual-radial oklch glow (the ActionButton signature).
-const GLOW_BG =
-  'bg-[radial-gradient(120px_circle_at_var(--mx)_var(--my),' +
-  'color-mix(in_oklch,var(--ab-hot-pink)_85%,transparent),transparent_60%),' +
-  'radial-gradient(200px_circle_at_calc(100%_-_var(--mx))_calc(100%_-_var(--my)),' +
-  'color-mix(in_oklch,var(--ab-alt-violet)_85%,transparent),transparent_65%)]';
+// Mouse-tracked dual-radial oklch glow (the ActionButton signature). Set as an
+// inline background-image, NOT a Tailwind arbitrary `bg-[…]` — the value is too
+// complex (nested color-mix/calc + two gradients) for Tailwind to emit, which
+// silently dropped the class and left the hover glow invisible.
+const GLOW_IMAGE =
+  'radial-gradient(120px circle at var(--mx) var(--my), color-mix(in oklch, var(--ab-hot-pink) 85%, transparent), transparent 60%), ' +
+  'radial-gradient(200px circle at calc(100% - var(--mx)) calc(100% - var(--my)), color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%)';
 
 const BoltIcon = () => (
   <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
@@ -135,8 +136,12 @@ export function Ao4TurboToggle() {
               (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary')
             }
           >
-            {/* Mouse-tracked dual-radial oklch glow — only on real pointers (hover:hover). */}
-            <span className={`absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300 ease-out group-hover/thumb:opacity-100 ${GLOW_BG}`} aria-hidden="true" />
+            {/* Mouse-tracked dual-radial oklch glow (fades in on hover). */}
+            <span
+              className="absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300 ease-out group-hover/thumb:opacity-100"
+              style={{ backgroundImage: GLOW_IMAGE }}
+              aria-hidden="true"
+            />
             {/* Plush inner drop-shadow + glass stroke; dark mode dials the white insets back. */}
             <span
               className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.44),inset_0_2.5px_5px_0_rgba(255,255,255,0.44)] theme-dark:shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.24),inset_0_2.5px_5px_0_rgba(255,255,255,0.24)] [outline:1.25px_solid_rgba(255,255,255,0.22)] [outline-offset:-1.25px]"
