@@ -29,7 +29,7 @@ Static Next.js 15 fanfic reader for Character.ai. Two surfaces: Browse page (fil
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **UI**: React 19
-- **Styling**: CSS Modules — zero Tailwind, all purpose-written
+- **Styling**: Tailwind v4 (utility-first, CSS-first config via `@theme inline`) backed by CSS custom-property design tokens; `motion` for animation. No CSS Modules — the whole site was migrated off them (Pass 2, 2026-07).
 - **Content**: gray-matter (YAML frontmatter) + remark/rehype pipeline
 - **Runtime**: Node.js 22 LTS (not compatible with Node 24)
 
@@ -59,15 +59,23 @@ npm run build     # Production build
 - `src/lib/constants.ts` — Canonical filter taxonomy (`RATINGS`, `WARNINGS`, `CATEGORIES`, `STATUSES`) + localStorage keys (`PRESETS_KEY`, `HISTORY_KEY`)
 - `src/lib/library.ts` — `@DUMMY` — `MOCK_LIBRARY` simulates logged-in user reading state
 - `src/data/comments.ts` — `@DUMMY` — hardcoded comment threads (~1100 lines)
-- `src/styles/globals.css` — Design tokens (CSS custom properties)
-- `src/styles/components/` — One `.module.css` per component
+- `src/styles/tokens.css` — Design tokens (CSS custom properties: color, type, shadow, radius, easing, z-index; light/paper/dark via `data-theme`)
+- `src/app/globals.css` — `@import "tailwindcss"` + `@theme inline` mapping tokens → utilities, global keyframes, `.cai-rail` scroller, `@custom-variant theme-dark`
+- `src/lib/motion.ts` — shared easing arrays (`EASE_OUT_EXPO`, `EASE_SPRING_OUT`) for `motion`
+- `src/lib/ratings.ts` — `RATING_TIERS` config (single source for rating letter/color/tooltip); `ratingTier()`
+- `src/lib/filterParams.ts` — shared filter-URL helpers (comma-list, 3-state pill, presets)
+- `src/hooks/` — `useViewMode`, `useDrawer`, `usePresets`, `useSelectionAnchor`, `useChatCharacter`
+- `src/components/` — All UI (shared primitives: `FilterPill`, `RatingBadge`, `DrawerSection`, `EmptyState`, `RailViewport`, `TagChip`, `WorkCardCover` exports)
 - `src/types/index.ts` — WorkMeta, WorkSummary, Chapter, FilterState types
 
 ## Styling Conventions
 
-- All visual tokens are CSS custom properties in `src/styles/globals.css`
-- Key token groups: Typography (`--font-serif`, `--font-sans`, `--font-mono`), Color (`--text`, `--secondary`, `--bg`, `--card-bg`, `--border`), Rating colors (`--rating-g/t/m/e/nr`), Bubble system (`--bubble-bg`, `--bubble-shadow`), Layout (`--reader-line-width: 60ch`), Animation (`--spring`, `--collapse`, `--ease-out-expo`)
-- No Tailwind — use CSS Modules for component styles
+- **Tailwind v4, token-backed.** Style on-element with utilities. Visual tokens are CSS custom properties in `src/styles/tokens.css`, mapped to utilities via the `@theme inline` block in `src/app/globals.css` — e.g. `--color-bubble: var(--bubble-bg)` → `bg-bubble`; likewise `text-secondary`, `border-border`, `shadow-float`, `rounded-card`, `ease-out-expo`, `text-rating-g`, the Character palette (`bg-quill-ink`…). To expose a new token as a utility, add `--<namespace>-<name>: var(--token)` there.
+- **Values without a mapped utility** use arbitrary refs to the raw var, never hardcoded numbers: `z-[var(--z-popover)]`, `max-w-[var(--browse-max-width)]`.
+- **Spacing** uses the default Tailwind scale (4px step) — it already equals the `--space-*` tokens, so it's intentionally not mapped.
+- **Theming**: `data-theme` (`light`/`paper`/`dark`) on `<html>` overrides only the changed vars; utilities re-resolve live. Dark-only overrides use the `theme-dark:` variant. Global-attribute descendant styles use arbitrary variants, e.g. `[html[data-mode=text]_&]:hidden`.
+- **Animation**: `motion` (`motion/react`) with easings from `src/lib/motion.ts`; guard entrances with `useReducedMotion()`; `initial={false}` when state is localStorage-seeded. Keyframes shared across components live top-level in `globals.css` (`fadeIn`, `caiRevealUp`, `caiRailFade*`, `caiSkeletonShimmer`, kudos set); reference via `animate-[name…]`.
+- **Shared chrome** as exported class-string constants co-located in a `*.ts` (e.g. `readingChrome.ts` `HUD_BUBBLE`/`BUBBLE_PILL`, `heroChrome.ts`).
 
 ---
 

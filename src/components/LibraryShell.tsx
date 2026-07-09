@@ -11,6 +11,7 @@ import { FilterPanel } from './FilterPanel';
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
 import { SkeletonCard } from './SkeletonCard';
+import { EmptyState } from './EmptyState';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -192,16 +193,17 @@ export function LibraryShell({
             ),
           )
         ) : displayedWorks.length === 0 ? (
-          <div className="py-12 text-center font-sans text-base text-secondary">
-            <p className="m-0 mb-2 text-base font-medium text-text">
-              {activeTab === 'continuing' && 'Nothing in progress.'}
-              {activeTab === 'bookmarked' && 'No bookmarks.'}
-              {activeTab === 'completed' && 'Nothing completed yet.'}
-            </p>
-            <p className="m-0 text-[15px] text-secondary">
-              <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
-            </p>
-          </div>
+          <EmptyState
+            title={
+              activeTab === 'continuing'
+                ? 'Nothing in progress.'
+                : activeTab === 'bookmarked'
+                ? 'No bookmarks.'
+                : 'Nothing completed yet.'
+            }
+          >
+            <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
+          </EmptyState>
         ) : (
           displayedWorks.map((work) =>
             activeTab === 'bookmarked' ? (

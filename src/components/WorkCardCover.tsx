@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, Fragment } from 'react';
+import { memo, useState, Fragment } from 'react';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
+import { ratingTier } from '@/lib/ratings';
 import { HeartIcon, FlagIcon } from './icons';
 
 interface Props {
@@ -17,27 +18,6 @@ const MAX_TAGS_LIST = 8;
 
 /** @DUMMY — placeholder until real author photos exist. */
 const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
-
-const RATING_LETTER: Record<string, string> = {
-  G: 'G', T: 'T', M: 'M', E: 'E', 'Not Rated': 'NR', NR: 'NR',
-};
-
-// rClass from ratingClass() → filled badge background utility.
-const RATING_BG: Record<string, string> = {
-  ratingG: 'bg-rating-g',
-  ratingT: 'bg-rating-t',
-  ratingM: 'bg-rating-m',
-  ratingE: 'bg-rating-e',
-  ratingNR: 'bg-rating-nr',
-};
-
-const RATING_TOOLTIPS: Record<string, { title: string; desc: string }> = {
-  'General Audiences':     { title: 'General Audiences',     desc: 'Suitable for all ages' },
-  'Teen And Up Audiences': { title: 'Teen And Up Audiences', desc: 'Mild themes or language' },
-  'Mature':                { title: 'Mature',                desc: 'Adult themes, violence, or strong language' },
-  'Explicit':              { title: 'Explicit',              desc: 'Contains explicit sexual content' },
-  'Not Rated':             { title: 'Not Rated',             desc: 'Rating not provided by the author' },
-};
 
 const CATEGORY_TOOLTIPS: Record<string, { title: string; desc: string }> = {
   'M/M':   { title: 'Male / Male',     desc: 'A relationship between two male characters' },
@@ -162,6 +142,21 @@ export function StatsLine({ items, className }: { items: ReactNode[]; className:
 const BADGE_BASE =
   'group/badge flex h-5 items-center justify-center rounded-[2px] shrink-0 font-mono pointer-events-auto cursor-default';
 
+/** Filled rating badge (letter + hover tooltip). All presentation is derived
+ *  from the shared rating tier config so the card and filter pill stay in sync.
+ *  Top-level + memoized since many render at once across a results list. */
+const RatingBadge = memo(function RatingBadge({ rating, onImage }: { rating: string; onImage?: boolean }) {
+  const tier = ratingTier(rating);
+  return (
+    <span
+      className={`${BADGE_BASE} w-5 text-[10px] font-bold tracking-[0.02em] text-white ${tier.bg}`}
+    >
+      {tier.letter}
+      <BadgeTooltip title={tier.tooltip.title} desc={tier.tooltip.desc} onImage={onImage} />
+    </span>
+  );
+});
+
 /** Signal row — rating · category · status, with single-line tooltips.
  *  Exported so the AO4 text cards reuse the exact same badge components. */
 export function SignalStrip({
@@ -177,16 +172,7 @@ export function SignalStrip({
 }) {
   return (
     <div className="pointer-events-none relative z-[2] flex flex-row items-center gap-[7px]">
-      <span
-        className={`${BADGE_BASE} w-5 text-[10px] font-bold tracking-[0.02em] text-white ${RATING_BG[rClass] ?? RATING_BG.ratingNR}`}
-      >
-        {RATING_LETTER[rating] ?? rating.charAt(0)}
-        <BadgeTooltip
-          title={RATING_TOOLTIPS[rating]?.title ?? rating}
-          desc={RATING_TOOLTIPS[rating]?.desc ?? ''}
-          onImage={onImage}
-        />
-      </span>
+      <RatingBadge rating={rating} onImage={onImage} />
       {catLabel && (
         <div
           className={`${BADGE_BASE} min-w-5 bg-secondary px-[6px] text-[11px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white`}

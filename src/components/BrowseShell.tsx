@@ -9,6 +9,7 @@ import { FilterPanel } from './FilterPanel';
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
 import { SkeletonCard } from './SkeletonCard';
+import { EmptyState } from './EmptyState';
 
 interface Props {
   works: WorkSummary[];
@@ -132,15 +133,14 @@ export function BrowseShell({
             ),
           )
         ) : works.length === 0 ? (
-          <div className="col-[1/-1] py-12 text-center font-sans text-base text-secondary">
-            <p className="m-0 mb-2 text-base font-medium text-text">No works match your filters.</p>
+          <EmptyState className="col-[1/-1]" title="No works match your filters.">
             {activeFilterLabels.length > 0 && (
-              <p className="m-0 text-[15px] text-secondary">
+              <>
                 Try removing a filter or{' '}
                 <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">clear all</a>.
-              </p>
+              </>
             )}
-          </div>
+          </EmptyState>
         ) : (
           works.map((work, i) =>
             view === 'grid' ? (

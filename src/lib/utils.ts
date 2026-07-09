@@ -1,3 +1,5 @@
+import { ratingTier } from './ratings';
+
 /** Estimate reading time in minutes at 250wpm */
 export function readingTime(words: number): string {
   const minutes = Math.round(words / 250);
@@ -20,14 +22,9 @@ export function formatCount(n: number): string {
   return String(n);
 }
 
-/** Return CSS class key for rating dot */
+/** Return CSS class key for rating dot (see RATING_TIERS for the source of truth). */
 export function ratingClass(rating: string): string {
-  const r = rating.toLowerCase();
-  if (r.includes('general')) return 'ratingG';
-  if (r.includes('teen')) return 'ratingT';
-  if (r.includes('explicit')) return 'ratingE';
-  if (r.includes('mature')) return 'ratingM';
-  return 'ratingNR';
+  return ratingTier(rating).classKey;
 }
 
 /**
