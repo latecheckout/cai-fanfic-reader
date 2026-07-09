@@ -2,25 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
-import { PRESETS_KEY, HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
-import styles from '@/styles/components/BrowseSearchBar.module.css';
+import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
+import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
 
 const HISTORY_LIMIT = 5;
-
-interface Preset {
-  name: string;
-  params: string;
-}
-
-function loadPresets(): Preset[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    return JSON.parse(localStorage.getItem(PRESETS_KEY) ?? '[]');
-  } catch {
-    return [];
-  }
-}
 
 function loadHistory(): string[] {
   if (typeof window === 'undefined') return [];
@@ -48,13 +35,6 @@ const MULTI_FILTER_KEYS = [
   'fandom', 'tag', 'rating', 'warning', 'category', 'status', 'character', 'relationship',
   'ex_fandom', 'ex_tag', 'ex_rating', 'ex_warning', 'ex_category', 'ex_status', 'ex_character', 'ex_relationship',
 ];
-
-function addToCommaList(current: string | undefined, value: string): string {
-  if (!current) return value;
-  const parts = current.split(',').map((s) => s.trim()).filter(Boolean);
-  if (parts.map((p) => p.toLowerCase()).includes(value.toLowerCase())) return current;
-  return [...parts, value].join(',');
-}
 
 // Static filter AC data — imported from constants
 
@@ -89,6 +69,7 @@ interface Props {
 export function BrowseSearchBar({ options, basePath = '/' }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const reduceMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const vibeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -376,13 +357,28 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
   const hasACResults = items.length > 0;
   const showVibeHint = !isDefaultState && !vibeLoading && !vibeResult && hasACResults;
 
+  // ── Shared utility strings (repeated across dropdown rows) ──
+  const groupHeaderCls =
+    'font-mono text-[11.5px] font-medium tracking-[0.1em] uppercase text-secondary px-[18px] pt-3 pb-[6px] underline decoration-1 [text-underline-offset:4px] decoration-[var(--border-strong)]';
+  const rowHover = 'hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)]';
+
   return (
-    <div ref={containerRef} className={`${styles.wrap} ${isMobileFS ? styles.wrapMobileFS : ''}`}>
+    <div
+      ref={containerRef}
+      className={`group relative min-w-0 flex-1 ${
+        isMobileFS
+          ? 'fixed inset-0 z-[400] flex flex-col bg-bg pt-[calc(8px+var(--safe-top))] pr-0 pb-0 pl-0'
+          : ''
+      }`}
+    >
       {/* inputRow: inputWrap + close × button (mobileFS only) */}
-      <div className={`${styles.inputRow} ${isMobileFS ? styles.inputRowMobileFS : ''}`}>
-        <div className={styles.inputWrap}>
+      <div className={isMobileFS ? 'mb-2 flex flex-shrink-0 items-center gap-2 px-4' : ''}>
+        <div className={`relative flex items-center ${isMobileFS ? 'min-w-0 flex-1' : ''}`}>
           {/* Search icon */}
-          <svg className={styles.searchIcon} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <svg
+            className="pointer-events-none absolute left-[13px] top-1/2 flex-shrink-0 -translate-y-1/2 text-secondary opacity-[0.45] transition-opacity duration-150 group-focus-within:opacity-70"
+            width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"
+          >
             <circle cx="5.8" cy="5.8" r="4.2" stroke="currentColor" strokeWidth="1.4" />
             <path d="M9 9L12 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
           </svg>
@@ -390,7 +386,9 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
           <input
             ref={inputRef}
             type="text"
-            className={`${styles.input} ${query ? styles.inputWithActions : ''}`}
+            className={`h-9 max-[768px]:h-11 w-full rounded-full border border-border-strong bg-transparent pl-[34px] font-sans text-[15px] text-text outline-none transition-colors duration-150 hover:border-border-active focus:border-border-active placeholder:text-secondary placeholder:opacity-[0.55] ${
+              query ? 'pr-[72px]' : 'pr-9'
+            }`}
             placeholder="Search…"
             value={query}
             onChange={(e) => {
@@ -408,13 +406,17 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
           />
 
           {/* ⌘K hint — hidden when query is present */}
-          {!query && <kbd className={styles.kbdHint}>⌘K</kbd>}
+          {!query && (
+            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[12px] text-secondary opacity-[0.35] transition-opacity duration-150 group-focus-within:opacity-0">
+              ⌘K
+            </kbd>
+          )}
 
           {/* Clear × and submit circle — visible whenever there's a query */}
           {query && (
             <>
               <button
-                className={styles.clearBtn}
+                className="absolute right-[38px] top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center p-0 text-[17px] leading-none text-secondary opacity-[0.45] transition-[opacity,color] duration-150 ease-in-out hover:text-text hover:opacity-100"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   setQuery('');
@@ -426,7 +428,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                 ×
               </button>
               <button
-                className={styles.submitBtn}
+                className="absolute right-[6px] top-1/2 flex h-[26px] w-[26px] origin-center -translate-y-1/2 items-center justify-center rounded-full bg-text p-0 text-bg transition-[opacity,transform] duration-150 hover:scale-105 hover:opacity-80 active:scale-95"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleSubmit();
@@ -443,7 +445,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
         {/* Close × — mobile fullscreen only, right of input */}
         {isMobileFS && (
           <button
-            className={styles.mobileBackBtn}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-secondary transition-[color,background] duration-150 ease-in-out hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)] hover:text-text"
             onMouseDown={(e) => { e.preventDefault(); close(); }}
             aria-label="Close search"
           >
@@ -454,167 +456,196 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
         )}
       </div>
 
-      {focused && (
-        <div className={styles.dropdown} role="listbox">
+      <AnimatePresence>
+        {focused && (
+          <motion.div
+            role="listbox"
+            initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.13, ease: 'easeOut' }}
+            className={
+              isMobileFS
+                ? 'flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] mt-0 border-none bg-transparent py-[6px]'
+                : 'absolute left-0 right-0 top-[calc(100%+5px)] z-[var(--z-dropdown)] overflow-hidden rounded-[14px] border border-border-strong bg-card py-[6px] shadow-[0_4px_20px_rgba(26,24,22,0.10)]'
+            }
+          >
 
-          {/* Vibe section — loading or result */}
-          {!isDefaultState && (vibeLoading || vibeResult) && (
-            <div>
-              <div className={styles.groupHeader}>✦ Vibe</div>
-              {vibeLoading ? (
-                <div className={styles.vibeLoading}>
-                  <span className={styles.vibeLoadingDot} />
-                  <span className={styles.vibeLoadingDot} />
-                  <span className={styles.vibeLoadingDot} />
-                </div>
-              ) : vibeResult ? (
-                <button
-                  className={styles.vibeRow}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    applyVibeItem(vibeResult);
-                  }}
-                  role="option"
-                  aria-selected={false}
-                >
-                  <span className={styles.vibeDesc}>{vibeResult.desc}</span>
-                  <div className={styles.vibePills}>
-                    {vibeResult.pills.map((pill, i) => (
-                      <span
+            {/* Vibe section — loading or result */}
+            {!isDefaultState && (vibeLoading || vibeResult) && (
+              <div>
+                <div className={groupHeaderCls}>✦ Vibe</div>
+                {vibeLoading ? (
+                  <div className="flex items-center gap-[5px] px-[18px] pt-3 pb-[14px]">
+                    {[0, 0.15, 0.3].map((delay, i) => (
+                      <motion.span
                         key={i}
-                        className={`${styles.vibePill} ${
-                          pill.mode === 'include' ? styles.vibePillInclude : styles.vibePillExclude
-                        }`}
-                      >
-                        {pill.mode === 'include' ? '+' : '−'} {pill.label}
-                      </span>
+                        className="h-[5px] w-[5px] rounded-full bg-secondary"
+                        animate={reduceMotion ? undefined : { y: [0, -4, 0, 0], opacity: [0.3, 1, 0.3, 0.3] }}
+                        transition={
+                          reduceMotion
+                            ? undefined
+                            : { duration: 1.1, times: [0, 0.3, 0.6, 1], repeat: Infinity, ease: 'easeInOut', delay }
+                        }
+                      />
                     ))}
                   </div>
-                </button>
-              ) : null}
-            </div>
-          )}
-
-          {/* Text search row — always available when typing; also what Enter submits */}
-          {!isDefaultState && query.trim() && (
-            <button
-              className={styles.textSearchRow}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleTextSearch();
-              }}
-              role="option"
-              aria-selected={false}
-            >
-              <span className={styles.textSearchLabel}>Search text for</span>
-              <span className={styles.textSearchQuery}>&ldquo;{query.trim()}&rdquo;</span>
-            </button>
-          )}
-
-          {/* Grouped AC results */}
-          {hasACResults &&
-            groupedItems.map(({ group, items: gItems }) => (
-              <div key={group}>
-                <div className={styles.groupHeader}>{group}</div>
-                {gItems.map((item) => (
+                ) : vibeResult ? (
                   <button
-                    key={`${item.group}-${item.name}`}
-                    className={`${styles.acItem} ${
-                      item.flatIdx === selectedIndex ? styles.itemSelected : ''
-                    } ${
-                      group === 'Fandoms' || group === 'Popular Fandoms' ? styles.acItemFandom : ''
-                    } ${
-                      item.kind === 'filter-ac' ? styles.acItemFilter : ''
-                    }`}
+                    className={`flex w-full cursor-pointer flex-col gap-[6px] border-none bg-[color-mix(in_srgb,var(--text)_3%,transparent)] px-[18px] py-[10px] text-left transition-colors duration-[80ms] hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)]`}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      applyACItem(item);
+                      applyVibeItem(vibeResult);
                     }}
                     role="option"
-                    aria-selected={item.flatIdx === selectedIndex}
+                    aria-selected={false}
                   >
-                    <span className={styles.acItemName}>{item.name}</span>
-                    {item.kind === 'filter-ac' ? (
-                      <span className={styles.acFilterBadge}>{item.badge}</span>
-                    ) : (
-                      item.count != null && (
-                        <span className={styles.acItemCount}>{item.count}</span>
-                      )
-                    )}
+                    <span className="font-sans text-[15px] text-text">{vibeResult.desc}</span>
+                    <div className="flex flex-wrap gap-1">
+                      {vibeResult.pills.map((pill, i) => (
+                        <span
+                          key={i}
+                          className={`rounded-[20px] border-none px-[9px] py-[2px] font-sans text-[13px] ${
+                            pill.mode === 'include'
+                              ? 'bg-[var(--color-include-bg)] text-[var(--color-include)]'
+                              : 'bg-[var(--color-exclude-bg)] text-[var(--color-exclude)] line-through decoration-current'
+                          }`}
+                        >
+                          {pill.mode === 'include' ? '+' : '−'} {pill.label}
+                        </span>
+                      ))}
+                    </div>
                   </button>
-                ))}
+                ) : null}
               </div>
-            ))}
+            )}
 
-          {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
-          {showVibeHint && (
-            <div className={styles.vibeHint}>
-              ✦ try: cozy · slow burn · found family · enemies to lovers
-            </div>
-          )}
+            {/* Text search row — always available when typing; also what Enter submits */}
+            {!isDefaultState && query.trim() && (
+              <button
+                className={`flex w-full cursor-pointer items-baseline gap-[5px] border-b border-solid border-b-border bg-transparent px-[18px] py-[9px] text-left transition-colors duration-[80ms] ${rowHover}`}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleTextSearch();
+                }}
+                role="option"
+                aria-selected={false}
+              >
+                <span className="flex-shrink-0 font-sans text-[14px] text-secondary">Search text for</span>
+                <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[14px] font-medium text-text">&ldquo;{query.trim()}&rdquo;</span>
+              </button>
+            )}
 
-          {/* Default state: search history + saved presets */}
-          {isDefaultState && (
-            <>
-              {history.length > 0 && (
-                <div className={styles.historySection}>
-                  <div className={styles.groupHeader}>Recent</div>
-                  {history.map((h) => (
-                    <div key={h} className={styles.historyRow}>
+            {/* Grouped AC results */}
+            {hasACResults &&
+              groupedItems.map(({ group, items: gItems }) => (
+                <div key={group}>
+                  <div className={groupHeaderCls}>{group}</div>
+                  {gItems.map((item) => {
+                    const isFandom = group === 'Fandoms' || group === 'Popular Fandoms';
+                    const selected = item.flatIdx === selectedIndex;
+                    return (
                       <button
-                        className={styles.historyItem}
+                        key={`${item.group}-${item.name}`}
+                        className={`flex w-full cursor-pointer items-baseline justify-between gap-[10px] border-none bg-transparent px-[18px] py-[9px] text-left transition-colors duration-[80ms] ${rowHover} ${
+                          selected ? 'bg-[color-mix(in_srgb,var(--text)_5%,transparent)]' : ''
+                        }`}
                         onMouseDown={(e) => {
                           e.preventDefault();
-                          applyHistoryItem(h);
+                          applyACItem(item);
+                        }}
+                        role="option"
+                        aria-selected={selected}
+                      >
+                        <span
+                          className={`min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-text ${
+                            isFandom ? 'font-serif text-[15.5px] italic' : 'font-sans text-[15px]'
+                          }`}
+                        >
+                          {item.name}
+                        </span>
+                        {item.kind === 'filter-ac' ? (
+                          <span className="flex-shrink-0 rounded-[3px] bg-border px-[5px] py-[1px] font-mono text-[11px] uppercase tracking-[0.07em] text-secondary opacity-70">{item.badge}</span>
+                        ) : (
+                          item.count != null && (
+                            <span className="flex-shrink-0 font-mono text-[12px] text-secondary">{item.count}</span>
+                          )
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+
+            {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
+            {showVibeHint && (
+              <div className="border-t border-border px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
+                ✦ try: cozy · slow burn · found family · enemies to lovers
+              </div>
+            )}
+
+            {/* Default state: search history + saved presets */}
+            {isDefaultState && (
+              <>
+                {history.length > 0 && (
+                  <div className="pb-1">
+                    <div className={groupHeaderCls}>Recent</div>
+                    {history.map((h) => (
+                      <div key={h} className="group/hist flex items-center hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]">
+                        <button
+                          className="flex flex-1 cursor-pointer items-center gap-[7px] border-none bg-transparent px-[18px] py-[7px] text-left font-sans text-[15px] text-secondary transition-colors duration-[80ms] hover:text-text group-hover/hist:text-text"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            applyHistoryItem(h);
+                          }}
+                        >
+                          <svg className="flex-shrink-0 text-secondary opacity-[0.55]" width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+                            <circle cx="5.5" cy="5.5" r="4.2" stroke="currentColor" strokeWidth="1.2" />
+                            <path d="M5.5 3.2V5.5L7 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                          </svg>
+                          <span>{h}</span>
+                        </button>
+                        <button
+                          className="cursor-pointer border-none bg-none pl-[6px] pr-3 py-[7px] font-mono text-[17px] leading-none text-secondary opacity-[0.35] transition-opacity duration-[80ms] hover:text-text hover:opacity-90"
+                          onMouseDown={(e) => handleRemoveHistory(h, e)}
+                          aria-label={`Remove "${h}" from history`}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {savedPresets.length > 0 && (
+                  <div className="border-t border-border-strong">
+                    <div className={groupHeaderCls}>Saved filters</div>
+                    {savedPresets.map((preset, i) => (
+                      <button
+                        key={i}
+                        className={`flex w-full cursor-pointer items-center gap-2 border-none bg-transparent px-[18px] py-2 text-left transition-colors duration-[80ms] ${rowHover}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          applyPreset(preset);
                         }}
                       >
-                        <svg className={styles.historyIcon} width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                          <circle cx="5.5" cy="5.5" r="4.2" stroke="currentColor" strokeWidth="1.2" />
-                          <path d="M5.5 3.2V5.5L7 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                        </svg>
-                        <span>{h}</span>
+                        <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[15px] text-text">{preset.name}</span>
                       </button>
-                      <button
-                        className={styles.historyRemove}
-                        onMouseDown={(e) => handleRemoveHistory(h, e)}
-                        aria-label={`Remove "${h}" from history`}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
 
-              {savedPresets.length > 0 && (
-                <div className={styles.savedSection}>
-                  <div className={styles.groupHeader}>Saved filters</div>
-                  {savedPresets.map((preset, i) => (
-                    <button
-                      key={i}
-                      className={styles.savedRow}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        applyPreset(preset);
-                      }}
-                    >
-                      <span className={styles.savedName}>{preset.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          <div className={styles.hint}>
-            {isDefaultState
-              ? 'type to search · ↑↓ navigate · esc to close'
-              : vibeLoading
-              ? 'analyzing vibe…'
-              : '↑↓ select · enter to search text · esc to close'}
-          </div>
-        </div>
-      )}
+            <div className="border-t border-border-strong px-[18px] py-2 font-mono text-[12px] text-secondary opacity-70">
+              {isDefaultState
+                ? 'type to search · ↑↓ navigate · esc to close'
+                : vibeLoading
+                ? 'analyzing vibe…'
+                : '↑↓ select · enter to search text · esc to close'}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

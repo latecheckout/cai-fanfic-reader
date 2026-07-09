@@ -2,17 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { WorkSummary, LayoutView } from '@/types';
+import { WorkSummary } from '@/types';
 import { SearchOptions } from '@/lib/filters';
 import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
+import { useViewMode } from '@/hooks/useViewMode';
 import { FilterPanel } from './FilterPanel';
 // (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
-import styles from '@/styles/components/LibraryShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
-
-const VIEW_PREF_KEY = 'cai_view_pref';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -58,6 +56,25 @@ interface Props {
 
 const SKELETON_COUNT = 3;
 
+// Per-view layouts — identical to Browse: list = 1-then-2 columns, grid = 4→3→2→1.
+const GRID_CLS =
+  'grid grid-cols-4 gap-4 max-[1100px]:grid-cols-3 max-[768px]:grid-cols-2 max-[460px]:grid-cols-1';
+const LIST_CLS = 'grid grid-cols-1 gap-4 min-[1100px]:grid-cols-2';
+
+// Card wrapper (bookmarked tab) — page-load fade with an nth-child stagger.
+const CARD_WRAPPER_CLS =
+  'relative ' +
+  'motion-reduce:animate-[fadeIn_150ms_ease_both] ' +
+  'motion-safe:animate-[fadeIn_450ms_var(--ease-out-expo)_both] ' +
+  'motion-safe:[&:nth-child(2)]:animate-[fadeIn_450ms_var(--ease-out-expo)_20ms_both] ' +
+  'motion-safe:[&:nth-child(3)]:animate-[fadeIn_450ms_var(--ease-out-expo)_40ms_both] ' +
+  'motion-safe:[&:nth-child(4)]:animate-[fadeIn_450ms_var(--ease-out-expo)_60ms_both] ' +
+  'motion-safe:[&:nth-child(5)]:animate-[fadeIn_450ms_var(--ease-out-expo)_80ms_both] ' +
+  'motion-safe:[&:nth-child(6)]:animate-[fadeIn_450ms_var(--ease-out-expo)_100ms_both] ' +
+  'motion-safe:[&:nth-child(7)]:animate-[fadeIn_450ms_var(--ease-out-expo)_120ms_both] ' +
+  'motion-safe:[&:nth-child(8)]:animate-[fadeIn_450ms_var(--ease-out-expo)_140ms_both] ' +
+  'motion-safe:[&:nth-child(n+9)]:animate-[fadeIn_450ms_var(--ease-out-expo)_160ms_both]';
+
 export function LibraryShell({
   works,
   tabCounts,
@@ -70,9 +87,8 @@ export function LibraryShell({
   const searchParams = useSearchParams();
   const [removedSlugs, setRemovedSlugs] = useState<Set<string>>(new Set());
   const [isFiltering, setIsFiltering] = useState(false);
-  const [view, setView] = useState<LayoutView>('list');
-  const [viewSwitching, setViewSwitching] = useState(false);
-  const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Global site mode (nav toggle) is the single source of layout truth.
+  const { view, viewSwitching } = useViewMode({ initial: 'list' });
   const filterKey = JSON.stringify(currentFilters);
   const prevFilterKey = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -85,36 +101,6 @@ export function LibraryShell({
       setRemovedSlugs(new Set(Array.isArray(stored) ? stored : []));
     } catch { /* ignore */ }
   }, []);
-
-  // The global site mode (nav toggle) is the single source of layout truth.
-  useEffect(() => {
-    setView(localStorage.getItem('cai_site_mode') === 'text' ? 'list' : 'grid');
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const { mode, sweep } = (e as CustomEvent).detail;
-      handleViewChange(mode === 'text' ? 'list' : 'grid', sweep);
-    };
-    window.addEventListener('cai-mode-change', handler);
-    return () => window.removeEventListener('cai-mode-change', handler);
-  });
-
-  const handleViewChange = (v: LayoutView, skipSkeleton = false) => {
-    if (v === view) return;
-    setView(v);
-    localStorage.setItem(VIEW_PREF_KEY, v);
-    // A glimm sweep covers the swap — skip the skeleton flash on mode toggles.
-    if (skipSkeleton) {
-      setViewSwitching(false);
-      if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-      return;
-    }
-    setViewSwitching(true);
-    if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-    // 500ms so the skeleton dust-particle moment reads on mode switches.
-    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 500);
-  };
 
   // Show skeleton briefly when filters change (skip initial mount)
   useEffect(() => {
@@ -160,22 +146,24 @@ export function LibraryShell({
   return (
     <>
       {/* ── Page heading ── */}
-      <div className={styles.pageHeader}>
-        <h2 className={styles.heading}>Library</h2>
+      <div className="mb-5">
+        <h2 className="m-0 font-sans text-[28px] font-semibold tracking-[-0.01em] text-text">Library</h2>
       </div>
 
       {/* ── Tab bar ── */}
-      <div className={styles.tabs} role="tablist">
+      <div className="mb-2 flex gap-6 border-b border-border" role="tablist">
         {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
           <button
             key={tab}
             role="tab"
             aria-selected={activeTab === tab}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+            className={`-mb-px inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 bg-transparent pt-2 pb-3 font-mono text-[13px] tracking-[0.04em] transition-[color,border-color] duration-[120ms] hover:text-text ${
+              activeTab === tab ? 'border-text text-text' : 'border-transparent text-secondary'
+            }`}
             onClick={() => handleTabChange(tab)}
           >
             {TAB_LABELS[tab]}
-            <span className={styles.tabCount}>{displayedTabCounts[tab]}</span>
+            <span className="font-mono text-xs text-inherit opacity-[0.55]">{displayedTabCounts[tab]}</span>
           </button>
         ))}
       </div>
@@ -189,7 +177,7 @@ export function LibraryShell({
       />
 
       {/* ── Work list ── */}
-      <div className={`${styles.workList} ${styles[view]}`}>
+      <div className={view === 'grid' ? GRID_CLS : LIST_CLS}>
         {isFiltering || viewSwitching ? (
           // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
           Array.from(
@@ -198,30 +186,29 @@ export function LibraryShell({
               <SkeletonCard
                 key={i}
                 index={i}
-                styles={styles}
                 variant="library"
-                layout={isFiltering ? 'list' : view}
+                layout={view}
               />
             ),
           )
         ) : displayedWorks.length === 0 ? (
-          <div className={styles.empty}>
-            <p className={styles.emptyHeading}>
+          <div className="py-12 text-center font-sans text-base text-secondary">
+            <p className="m-0 mb-2 text-base font-medium text-text">
               {activeTab === 'continuing' && 'Nothing in progress.'}
               {activeTab === 'bookmarked' && 'No bookmarks.'}
               {activeTab === 'completed' && 'Nothing completed yet.'}
             </p>
-            <p className={styles.emptyHint}>
-              <a href="/" className={styles.emptyClearLink}>Browse works →</a>
+            <p className="m-0 text-[15px] text-secondary">
+              <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
             </p>
           </div>
         ) : (
           displayedWorks.map((work) =>
             activeTab === 'bookmarked' ? (
-              <div key={work.slug} className={styles.cardWrapper}>
+              <div key={work.slug} className={CARD_WRAPPER_CLS}>
                 {view === 'grid' ? <WorkCardGrid work={work} /> : <WorkCardCover work={work} />}
                 <button
-                  className={styles.bookmarkBtn}
+                  className="absolute top-4 right-1 z-[3] flex h-7 w-7 cursor-pointer items-center justify-center border-none bg-transparent p-0 text-text opacity-75 transition-opacity duration-150 hover:opacity-30"
                   onClick={() => handleRemove(work.slug)}
                   aria-label="Remove bookmark"
                   title="Remove bookmark"

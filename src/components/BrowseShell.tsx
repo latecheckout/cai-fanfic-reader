@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { WorkSummary, LayoutView } from '@/types';
-
-const VIEW_PREF_KEY = 'cai_view_pref';
+import { WorkSummary } from '@/types';
 import { SearchOptions } from '@/lib/filters';
+import { useViewMode } from '@/hooks/useViewMode';
 import { FilterPanel } from './FilterPanel';
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
-import styles from '@/styles/components/BrowseShell.module.css';
 import { SkeletonCard } from './SkeletonCard';
 
 interface Props {
@@ -56,6 +54,12 @@ const FROM_LABELS: Record<string, { href: string; label: string }> = {
   characters: { href: '/characters', label: '← Characters' },
 };
 
+// Layout modes (driven by the view toggle). Image cards: 4→3→2→1. Text/list
+// cards: single column, two on wide desktops so they fill the extra width.
+const GRID_CLS =
+  'grid grid-cols-4 gap-4 max-[1100px]:grid-cols-3 max-[768px]:grid-cols-2 max-[460px]:grid-cols-1';
+const LIST_CLS = 'grid grid-cols-1 gap-4 min-[1100px]:grid-cols-2';
+
 export function BrowseShell({
   works,
   searchOptions,
@@ -63,29 +67,14 @@ export function BrowseShell({
   filteredCount,
   from,
 }: Props) {
-  const [view, setView] = useState<LayoutView>('grid');
+  // Global site mode (nav toggle) is the single source of layout truth: text
+  // mode renders the rich-metadata list, visual mode the cover grid.
+  const { view, viewSwitching } = useViewMode({ initial: 'grid' });
   const [isFiltering, setIsFiltering] = useState(false);
-  const [viewSwitching, setViewSwitching] = useState(false);
-  const viewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterKey = JSON.stringify(currentFilters);
   const prevFilterKey = useRef<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(false);
-
-  // The global site mode (nav toggle) is the single source of layout truth:
-  // text mode renders the rich-metadata list, visual mode the cover grid.
-  useEffect(() => {
-    setView(localStorage.getItem('cai_site_mode') === 'text' ? 'list' : 'grid');
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const { mode, sweep } = (e as CustomEvent).detail;
-      handleViewChange(mode === 'text' ? 'list' : 'grid', sweep);
-    };
-    window.addEventListener('cai-mode-change', handler);
-    return () => window.removeEventListener('cai-mode-change', handler);
-  });
 
   // Show skeleton briefly when filters change (skip initial mount)
   useEffect(() => {
@@ -103,23 +92,6 @@ export function BrowseShell({
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [filterKey]);
 
-  const handleViewChange = (v: LayoutView, skipSkeleton = false) => {
-    if (v === view) return;
-    setView(v);
-    localStorage.setItem(VIEW_PREF_KEY, v);
-    // A glimm sweep covers the swap on mode toggles — skip the skeleton flash.
-    if (skipSkeleton) {
-      setViewSwitching(false);
-      if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-      return;
-    }
-    // Brief skeleton in the new layout, then cards fade/stagger in (character-brain feel).
-    setViewSwitching(true);
-    if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
-    // 500ms so the skeleton dust-particle moment reads on mode switches.
-    viewTimerRef.current = setTimeout(() => setViewSwitching(false), 500);
-  };
-
   const activeFilterLabels = Object.entries(currentFilters)
     .filter(([k, v]) => v && k !== 'sort' && k !== 'order')
     .map(([k, v]) => ({ key: k, value: v as string }));
@@ -133,12 +105,19 @@ export function BrowseShell({
       />
 
       {from && FROM_LABELS[from] && (
-        <Link href={FROM_LABELS[from].href} className={styles.backLink}>
+        <Link
+          href={FROM_LABELS[from].href}
+          className="mb-4 inline-block font-mono text-[13px] tracking-[0.04em] text-secondary no-underline transition-colors duration-[120ms] hover:text-text"
+        >
           {FROM_LABELS[from].label}
         </Link>
       )}
 
-      <div className={`${styles.workList} ${isFiltering ? styles.list : styles[view]}`}>
+      <div
+        className={`transition-opacity duration-[180ms] ease-[ease] motion-safe:animate-[fadeIn_650ms_var(--ease-out-expo)_400ms_both] ${
+          isFiltering ? LIST_CLS : view === 'grid' ? GRID_CLS : LIST_CLS
+        }`}
+      >
         {isFiltering || viewSwitching ? (
           // On a view switch keep the page the same height (one skeleton per work)
           // so the scrollbar never toggles → no horizontal shift of the fixed FAB.
@@ -148,18 +127,17 @@ export function BrowseShell({
               <SkeletonCard
                 key={i}
                 index={i}
-                styles={styles}
                 layout={isFiltering ? 'list' : view}
               />
             ),
           )
         ) : works.length === 0 ? (
-          <div className={styles.empty}>
-            <p className={styles.emptyHeading}>No works match your filters.</p>
+          <div className="col-[1/-1] py-12 text-center font-sans text-base text-secondary">
+            <p className="m-0 mb-2 text-base font-medium text-text">No works match your filters.</p>
             {activeFilterLabels.length > 0 && (
-              <p className={styles.emptyHint}>
+              <p className="m-0 text-[15px] text-secondary">
                 Try removing a filter or{' '}
-                <a href="/" className={styles.emptyClearLink}>clear all</a>.
+                <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">clear all</a>.
               </p>
             )}
           </div>

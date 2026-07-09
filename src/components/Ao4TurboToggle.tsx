@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
 import { useGlimm } from 'glimm/next';
+import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
 
 export type SiteMode = 'visual' | 'text';
-export const SITE_MODE_KEY = 'cai_site_mode';
-export const SITE_MODE_EVENT = 'cai-mode-change';
+// Re-exported for back-compat; canonical definitions live in @/lib/constants.
+export { SITE_MODE_KEY, SITE_MODE_EVENT };
 
 const TRAVEL = 48; // px the thumb slides between off (left) and on (right)
 const SNAP = { type: 'spring' as const, duration: 0.42, bounce: 0.3 };

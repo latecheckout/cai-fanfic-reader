@@ -4,6 +4,11 @@
 export const PRESETS_KEY = 'cai_fanfic_presets';
 export const HISTORY_KEY = 'cai_search_history';
 
+// Site layout mode (nav toggle) + card view preference.
+export const SITE_MODE_KEY = 'cai_site_mode';       // 'text' | 'visual'
+export const VIEW_PREF_KEY = 'cai_view_pref';        // 'list' | 'grid'
+export const SITE_MODE_EVENT = 'cai-mode-change';    // window CustomEvent name
+
 // Reading-page (per-work) state keys.
 export const SAVED_KEY = 'fanfic-saved-works'; // reading-list (bookmarked work slugs)
 export const BOOKMARKS_KEY = 'fanfic-bookmarks'; // scroll position + furthest + last chapter
