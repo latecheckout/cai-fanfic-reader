@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { WorkMeta } from '@/types';
 import type { ReactNode } from 'react';
 import { formatWords, formatChapters, readingTime, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
-import { TagChip } from './TagChip';
+import { TagRow } from './TagChip';
 import { SignalStrip, Avatar, Kudos, Bookmarks, StatsLine } from './WorkCardCover';
 import { ExpandableSummary } from './ExpandableSummary';
 
@@ -13,10 +13,6 @@ interface Props {
   meta: WorkMeta;
   totalChapters: number;
 }
-
-const TAG_ROW = 'flex items-baseline gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5';
-const TAG_LABEL = 'w-[70px] shrink-0 pt-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary max-md:w-auto max-md:shrink max-md:text-[9px]';
-const TAG_GROUP = 'flex flex-wrap gap-1';
 
 export function WorkHeader({ meta, totalChapters }: Props) {
   const chaptersStr = formatChapters(meta.chaptersPosted, meta.chapters);
@@ -73,56 +69,11 @@ export function WorkHeader({ meta, totalChapters }: Props) {
 
       {/* Signals — full width below */}
       <div className="mt-4 flex flex-col gap-[14px] border-t border-dashed border-border pt-4">
-        {meta.warnings.length > 0 && (
-          <div className={TAG_ROW}>
-            <span className={TAG_LABEL}>Warnings</span>
-            <div className={TAG_GROUP}>
-              {meta.warnings.map((w) => (
-                <TagChip key={w} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
-              ))}
-            </div>
-          </div>
-        )}
-        {meta.fandom.length > 0 && (
-          <div className={TAG_ROW}>
-            <span className={TAG_LABEL}>Fandom</span>
-            <div className={TAG_GROUP}>
-              {meta.fandom.map((f) => (
-                <TagChip key={f} tag={f} category="fandom" clickable href={`/?fandom=${encodeURIComponent(f)}`} />
-              ))}
-            </div>
-          </div>
-        )}
-        {meta.relationships.length > 0 && (
-          <div className={TAG_ROW}>
-            <span className={TAG_LABEL}>Ships</span>
-            <div className={TAG_GROUP}>
-              {meta.relationships.map((r) => (
-                <TagChip key={r} tag={r} category="relationship" clickable href={`/?relationship=${encodeURIComponent(r)}`} />
-              ))}
-            </div>
-          </div>
-        )}
-        {meta.characters.length > 0 && (
-          <div className={TAG_ROW}>
-            <span className={TAG_LABEL}>Characters</span>
-            <div className={TAG_GROUP}>
-              {meta.characters.map((c) => (
-                <TagChip key={c} tag={c} category="character" clickable href={`/?character=${encodeURIComponent(c)}`} />
-              ))}
-            </div>
-          </div>
-        )}
-        {meta.tags.length > 0 && (
-          <div className={TAG_ROW}>
-            <span className={TAG_LABEL}>Tags</span>
-            <div className={TAG_GROUP}>
-              {meta.tags.map((t) => (
-                <TagChip key={t} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
-              ))}
-            </div>
-          </div>
-        )}
+        <TagRow label="Warnings" items={meta.warnings} category="warning" param="warning" />
+        <TagRow label="Fandom" items={meta.fandom} category="fandom" param="fandom" />
+        <TagRow label="Ships" items={meta.relationships} category="relationship" param="relationship" />
+        <TagRow label="Characters" items={meta.characters} category="character" param="character" />
+        <TagRow label="Tags" items={meta.tags} category="additional" param="tag" />
       </div>
     </header>
   );

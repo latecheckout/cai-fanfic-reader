@@ -4,12 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { heroSlide } from './heroChrome';
+import { CarouselArrow } from './CarouselArrow';
 
 const AUTOPLAY_MS = 6000;
-
-const ARROW =
-  'absolute top-1/2 z-[3] flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/55 bg-transparent text-white opacity-0 ' +
-  'transition-[opacity,background-color,border-color] duration-150 ease-in-out group-hover/hero:opacity-100 hover:border-white hover:bg-white/[0.14] max-sm:hidden';
 
 interface Slide {
   image: string;
@@ -176,16 +173,18 @@ export function HeroCarousel() {
         ))}
       </div>
 
-      <button type="button" className={`${ARROW} left-[14px]`} onClick={retreat} aria-label="Previous">
-        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      <button type="button" className={`${ARROW} right-[14px]`} onClick={advance} aria-label="Next">
-        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      <CarouselArrow
+        direction="left"
+        onClick={retreat}
+        label="Previous"
+        positionClassName="left-[14px] opacity-0 group-hover/hero:opacity-100 max-sm:hidden"
+      />
+      <CarouselArrow
+        direction="right"
+        onClick={advance}
+        label="Next"
+        positionClassName="right-[14px] opacity-0 group-hover/hero:opacity-100 max-sm:hidden"
+      />
 
       <div className="absolute bottom-[14px] left-1/2 z-[3] flex -translate-x-1/2 gap-[7px]">
         {SLIDES.map((s, i) => (

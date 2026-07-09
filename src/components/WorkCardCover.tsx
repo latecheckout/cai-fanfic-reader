@@ -8,6 +8,7 @@ import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { ratingTier } from '@/lib/ratings';
 import { HeartIcon, FlagIcon } from './icons';
+import { TagChip } from './TagChip';
 
 interface Props {
   work: WorkSummary;
@@ -137,10 +138,31 @@ export function StatsLine({ items, className }: { items: ReactNode[]; className:
   );
 }
 
-// Shared badge chrome — square, mono, non-interactive whitespace but hoverable
-// for the tooltip (group/badge scopes each tooltip to its own badge).
+// Shared badge chrome — mono, rounded-chip (matches tags), non-interactive
+// whitespace but hoverable for the tooltip (group/badge scopes each tooltip).
 const BADGE_BASE =
-  'group/badge flex h-5 items-center justify-center rounded-[2px] shrink-0 font-mono pointer-events-auto cursor-default';
+  'group/badge flex h-6 items-center justify-center rounded-chip shrink-0 font-mono pointer-events-auto cursor-default';
+
+/** Shared badge box for the signal row (rating / category / status). One chrome
+ *  + optional hover tooltip so the three badges can't drift apart. */
+function Badge({
+  className = '',
+  tooltip,
+  onImage,
+  children,
+}: {
+  className?: string;
+  tooltip?: { title: string; desc: string };
+  onImage?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <span className={`${BADGE_BASE} ${className}`}>
+      {children}
+      {tooltip && <BadgeTooltip title={tooltip.title} desc={tooltip.desc} onImage={onImage} />}
+    </span>
+  );
+}
 
 /** Filled rating badge (letter + hover tooltip). All presentation is derived
  *  from the shared rating tier config so the card and filter pill stay in sync.
@@ -148,12 +170,13 @@ const BADGE_BASE =
 const RatingBadge = memo(function RatingBadge({ rating, onImage }: { rating: string; onImage?: boolean }) {
   const tier = ratingTier(rating);
   return (
-    <span
-      className={`${BADGE_BASE} w-5 text-[10px] font-bold tracking-[0.02em] text-white ${tier.bg}`}
+    <Badge
+      className={`w-6 text-[13px] font-bold tracking-[0.02em] text-white ${tier.bg}`}
+      tooltip={tier.tooltip}
+      onImage={onImage}
     >
       {tier.letter}
-      <BadgeTooltip title={tier.tooltip.title} desc={tier.tooltip.desc} onImage={onImage} />
-    </span>
+    </Badge>
   );
 });
 
@@ -174,27 +197,28 @@ export function SignalStrip({
     <div className="pointer-events-none relative z-[2] flex flex-row items-center gap-[7px]">
       <RatingBadge rating={rating} onImage={onImage} />
       {catLabel && (
-        <div
-          className={`${BADGE_BASE} min-w-5 bg-secondary px-[6px] text-[11px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white`}
+        <Badge
+          className="min-w-6 bg-secondary px-[6px] text-[13px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white"
+          tooltip={{
+            title: CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel,
+            desc: CATEGORY_TOOLTIPS[category[0]]?.desc ?? '',
+          }}
+          onImage={onImage}
         >
           {catLabel}
-          <BadgeTooltip
-            title={CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel}
-            desc={CATEGORY_TOOLTIPS[category[0]]?.desc ?? ''}
-            onImage={onImage}
-          />
-        </div>
+        </Badge>
       )}
-      <div
-        className={`${BADGE_BASE} w-5 border border-dashed ${
+      <Badge
+        className={`w-6 border border-dashed ${
           onImage
             ? 'border-white/45 text-white/70'
             : 'border-border-active text-secondary theme-dark:text-[color-mix(in_srgb,var(--text)_70%,transparent)]'
         }`}
+        tooltip={isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done}
+        onImage={onImage}
       >
         {isWip ? <ProgressGlyph /> : <CheckGlyph />}
-        <BadgeTooltip {...(isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done)} onImage={onImage} />
-      </div>
+      </Badge>
     </div>
   );
 }
@@ -285,15 +309,15 @@ export function WorkCardCover({ work }: Props) {
         {meta.summary && <p className="m-0 line-clamp-2 font-serif text-[15px] italic leading-[1.55] text-secondary">{meta.summary}</p>}
 
         {(warnings.length > 0 || meta.tags.length > 0) && (
-          <div className="relative z-[1] flex flex-wrap gap-[6px] pointer-events-none">
+          <div className="relative z-[1] flex flex-wrap gap-[6px] pointer-events-auto">
             {warnings.map((w) => (
-              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className="pointer-events-auto inline-block rounded-[3px] bg-text px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-bg no-underline transition-opacity duration-150 ease-in-out hover:opacity-75">{w}</Link>
+              <TagChip key={`warn-${w}`} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
             ))}
             {visibleTags.map((t) => (
-              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className="pointer-events-auto inline-block rounded-[3px] bg-border px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-secondary no-underline transition-colors duration-150 ease-in-out hover:bg-border-strong hover:text-text">{t}</Link>
+              <TagChip key={`tag-${t}`} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
             ))}
             {hiddenTagCount > 0 && (
-              <button type="button" className="pointer-events-auto inline-flex items-center rounded-[3px] border border-dashed border-border-chip px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-secondary transition-colors duration-150 ease-in-out cursor-pointer hover:text-text" onClick={() => setTagsExpanded(!tagsExpanded)}>
+              <button type="button" className="inline-flex items-center rounded-chip border border-dashed border-border-chip px-2 py-[3px] font-sans text-[13px] leading-[18px] text-secondary transition-colors duration-150 ease-in-out cursor-pointer hover:border-border-active hover:text-text" onClick={() => setTagsExpanded(!tagsExpanded)}>
                 {tagsExpanded ? 'show less' : `+${hiddenTagCount}`}
               </button>
             )}

@@ -3,15 +3,30 @@ import type { SVGProps } from 'react';
 // Reading-page HUD icons (24×24 grid). All use `currentColor` so they inherit
 // the button's text color (a theme token) and recolor automatically on theme change.
 
+// Filled chevrons (character-brain source-of-truth glyphs, stroke=2/radius=2/
+// join=round baked into the fill). `fill="currentColor"` so they inherit the
+// button's themed text color and recolor on theme change.
 export function ChevronLeftIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
       <path
-        d="M13.5858 16L10.2929 12.7071C9.90237 12.3166 9.90237 11.6834 10.2929 11.2929L13.5858 8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M14.293 7.29289C13.9025 6.90237 13.2694 6.90237 12.8788 7.29289L9.58594 10.5858C8.80489 11.3668 8.80489 12.6332 9.58594 13.4142L12.8788 16.7071C13.2694 17.0976 13.9025 17.0976 14.293 16.7071C14.6836 16.3166 14.6836 15.6834 14.293 15.2929L11.0002 12L14.293 8.70711C14.6836 8.31658 14.6836 7.68342 14.293 7.29289Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function ChevronRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M9.29289 7.29289C9.68342 6.90237 10.3166 6.90237 10.7071 7.29289L14 10.5858C14.781 11.3668 14.781 12.6332 14 13.4142L10.7071 16.7071C10.3166 17.0976 9.68342 17.0976 9.29289 16.7071C8.90237 16.3166 8.90237 15.6834 9.29289 15.2929L12.5858 12L9.29289 8.70711C8.90237 8.31658 8.90237 7.68342 9.29289 7.29289Z"
+        fill="currentColor"
       />
     </svg>
   );

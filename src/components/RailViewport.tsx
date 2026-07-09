@@ -1,12 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback, type ReactNode } from 'react';
-
-const ARROW =
-  'absolute top-1/2 -translate-y-1/2 z-[4] flex items-center justify-center w-10 h-10 ' +
-  'rounded-full border border-border-strong text-text bg-bg shadow-[0_2px_10px_rgba(26,24,22,0.14)] ' +
-  'transition-[opacity,background-color,border-color] duration-150 ease-in-out ' +
-  'hover:bg-card hover:border-border-active disabled:opacity-0 disabled:pointer-events-none';
+import { CarouselArrow } from './CarouselArrow';
 
 interface Props {
   /** The rail frame class (position:relative + edge fades) from the caller's module. */
@@ -55,33 +50,25 @@ export function RailViewport({ railClassName, rowClassName, children }: Props) {
 
   return (
     <div className={railClassName}>
-      <button
-        type="button"
-        className={`${ARROW} left-2`}
+      <CarouselArrow
+        direction="left"
         onClick={() => scroll(-1)}
         disabled={atStart}
-        aria-label="Scroll left"
-      >
-        <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+        label="Scroll left"
+        positionClassName="left-2"
+      />
 
       <div ref={ref} className={rowClassName}>
         {children}
       </div>
 
-      <button
-        type="button"
-        className={`${ARROW} right-2`}
+      <CarouselArrow
+        direction="right"
         onClick={() => scroll(1)}
         disabled={atEnd}
-        aria-label="Scroll right"
-      >
-        <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-          <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+        label="Scroll right"
+        positionClassName="right-2"
+      />
     </div>
   );
 }

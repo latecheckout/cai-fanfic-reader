@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { SignalStrip, Views, Kudos, Avatar } from './WorkCardCover';
+import { TagChip } from './TagChip';
 
 interface Props {
   work: WorkSummary;
@@ -84,15 +85,16 @@ export function WorkCardGrid({ work, priority = false }: Props) {
         )}
 
         {tags.length > 0 && (
-          <div className="flex flex-wrap gap-[6px]">
+          <div className="pointer-events-auto flex flex-wrap gap-[6px]">
             {tags.map((t) => (
-              <Link
+              <TagChip
                 key={t}
+                tag={t}
+                category="additional"
+                clickable
                 href={`/?tag=${encodeURIComponent(t)}`}
-                className="pointer-events-auto rounded-[3px] bg-white/[0.16] px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-white no-underline transition-colors duration-150 ease-in-out hover:bg-white/[0.28]"
-              >
-                {t}
-              </Link>
+                onImage
+              />
             ))}
           </div>
         )}
