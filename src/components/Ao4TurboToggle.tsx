@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
 import { useGlimm } from 'glimm/next';
-import styles from '@/styles/components/Ao4TurboToggle.module.css';
 
 export type SiteMode = 'visual' | 'text';
 export const SITE_MODE_KEY = 'cai_site_mode';
@@ -11,6 +10,24 @@ export const SITE_MODE_EVENT = 'cai-mode-change';
 
 const TRAVEL = 48; // px the thumb slides between off (left) and on (right)
 const SNAP = { type: 'spring' as const, duration: 0.42, bounce: 0.3 };
+
+// Full-width fade-to-bg bar across the bottom of the site — solid page colour at
+// the very bottom, easing up to transparent (multi-stop so there's no banding).
+const AURA_BG =
+  'bg-[linear-gradient(to_top,var(--bg)_0%,var(--bg)_7%,' +
+  'color-mix(in_srgb,var(--bg),transparent_14%)_20%,' +
+  'color-mix(in_srgb,var(--bg),transparent_30%)_34%,' +
+  'color-mix(in_srgb,var(--bg),transparent_48%)_48%,' +
+  'color-mix(in_srgb,var(--bg),transparent_66%)_62%,' +
+  'color-mix(in_srgb,var(--bg),transparent_82%)_78%,' +
+  'color-mix(in_srgb,var(--bg),transparent_93%)_90%,transparent_100%)]';
+
+// Mouse-tracked dual-radial oklch glow (the ActionButton signature).
+const GLOW_BG =
+  'bg-[radial-gradient(120px_circle_at_var(--mx)_var(--my),' +
+  'color-mix(in_oklch,var(--ab-hot-pink)_85%,transparent),transparent_60%),' +
+  'radial-gradient(200px_circle_at_calc(100%_-_var(--mx))_calc(100%_-_var(--my)),' +
+  'color-mix(in_oklch,var(--ab-alt-violet)_85%,transparent),transparent_65%)]';
 
 const BoltIcon = () => (
   <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
@@ -69,18 +86,22 @@ export function Ao4TurboToggle() {
 
   return (
     <>
-      <span className={styles.aura} aria-hidden="true" />
+      {/* Full-width fade band pinned to the very bottom (sits just under the toggle). */}
+      <span
+        className={`fixed bottom-0 left-0 right-0 z-[calc(var(--z-sticky)_-_1)] h-[220px] max-md:h-[180px] pointer-events-none ${AURA_BG}`}
+        aria-hidden="true"
+      />
 
-      <div className={styles.root}>
-        <div className={styles.track}>
+      <div className="fixed right-7 bottom-[calc(24px+var(--safe-bottom))] z-[var(--z-sticky)] max-md:right-4 max-md:bottom-[calc(18px+var(--safe-bottom))]">
+        <div className="relative h-[50px] w-[194px] max-md:h-[54px] max-md:w-[206px] rounded-full p-[3px] touch-none bg-bg [background-image:linear-gradient(color-mix(in_srgb,var(--text)_8%,transparent),color-mix(in_srgb,var(--text)_8%,transparent))] backdrop-blur-[12px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]">
           {/* On/off marks in the negative space (off = ring on the left, on = bar
               on the right); the thumb covers the active side. */}
-          <span className={`${styles.sym} ${styles.symLeft}`} aria-hidden="true">
+          <span className="absolute left-[26px] top-1/2 flex -translate-y-1/2 pointer-events-none text-secondary opacity-50" aria-hidden="true">
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
               <circle cx="7" cy="7" r="4.5" />
             </svg>
           </span>
-          <span className={`${styles.sym} ${styles.symRight}`} aria-hidden="true">
+          <span className="absolute right-[26px] top-1/2 flex -translate-y-1/2 pointer-events-none text-secondary opacity-50" aria-hidden="true">
             <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
               <line x1="7" y1="2.5" x2="7" y2="9.5" />
             </svg>
@@ -105,12 +126,23 @@ export function Ao4TurboToggle() {
               if (dragged.current) { dragged.current = false; return; } // ignore the click that trails a drag
               commit(!on);
             }}
-            className={`${styles.thumb} ${on ? '' : styles.off}`}
+            className={
+              'group/thumb absolute left-[3px] top-[3px] flex h-11 w-[140px] max-md:h-12 max-md:w-[152px] items-center justify-center gap-2 overflow-hidden rounded-full border-none p-0 ' +
+              'font-sans text-sm max-md:text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-white cursor-grab will-change-transform active:cursor-grabbing ' +
+              'shadow-[0_2px_5px_-1px_rgba(0,0,0,0.26),0_9px_20px_-9px_rgba(0,0,0,0.38)] ' +
+              '[--ab-magenta:#652E1F] [--ab-hot-pink:#AE00D9] [--ab-alt-violet:#6B2E63] [--mx:50%] [--my:50%] ' +
+              (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary')
+            }
           >
-            <span className={styles.glow} aria-hidden="true" />
-            <span className={styles.plush} aria-hidden="true" />
-            <span className={styles.icon}><BoltIcon /></span>
-            <span className={styles.label}>AO4 turbo</span>
+            {/* Mouse-tracked dual-radial oklch glow — only on real pointers (hover:hover). */}
+            <span className={`absolute inset-0 rounded-[inherit] pointer-events-none opacity-0 transition-opacity duration-300 ease-out group-hover/thumb:opacity-100 ${GLOW_BG}`} aria-hidden="true" />
+            {/* Plush inner drop-shadow + glass stroke; dark mode dials the white insets back. */}
+            <span
+              className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.44),inset_0_2.5px_5px_0_rgba(255,255,255,0.44)] theme-dark:shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.24),inset_0_2.5px_5px_0_rgba(255,255,255,0.24)] [outline:1.25px_solid_rgba(255,255,255,0.22)] [outline-offset:-1.25px]"
+              aria-hidden="true"
+            />
+            <span className="relative z-[1] flex"><BoltIcon /></span>
+            <span className="relative z-[1]">AO4 turbo</span>
           </motion.button>
         </div>
       </div>

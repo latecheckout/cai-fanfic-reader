@@ -1,7 +1,6 @@
 import { getWorkSummaries } from '@/lib/works';
 import { buildSearchOptions } from '@/lib/filters';
 import { BrowseHeader } from '@/components/BrowseHeader';
-import styles from './fandoms.module.css';
 
 export const metadata = {
   title: 'Fandoms — Archive of Our Stories',
@@ -27,24 +26,24 @@ export default function FandomsPage() {
   return (
     <div>
       <BrowseHeader />
-      <main className={styles.main}>
-        <div className={styles.titleRow}>
-          <h2 className={styles.heading}>Fandoms</h2>
-          <span className={styles.count}>{fandoms.length} fandoms</span>
+      <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12">
+        <div className="mb-8 flex items-baseline gap-4">
+          <h2 className="font-sans text-2xl font-medium tracking-[-0.015em] text-text">Fandoms</h2>
+          <span className="font-mono text-xs text-secondary">{fandoms.length} fandoms</span>
         </div>
 
         {fandoms.length === 0 ? (
-          <p className={styles.empty}>No fandoms found.</p>
+          <p className="font-sans text-sm text-secondary">No fandoms found.</p>
         ) : (
-          <ul className={styles.list}>
+          <ul className="m-0 list-none p-0">
             {fandoms.map(([fandom, count]) => (
-              <li key={fandom} className={styles.item}>
+              <li key={fandom} className="border-b border-border last:border-b-0">
                 <a
                   href={`/?fandom=${encodeURIComponent(fandom)}`}
-                  className={styles.fandomLink}
+                  className="flex items-baseline justify-between gap-6 py-4 text-inherit no-underline transition-opacity duration-[var(--transition-micro)] hover:opacity-65"
                 >
-                  <span className={styles.fandomName}>{fandom}</span>
-                  <span className={styles.fandomCount}>
+                  <span className="font-sans text-lg font-normal text-text">{fandom}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-secondary">
                     {count} {count === 1 ? 'work' : 'works'}
                   </span>
                 </a>

@@ -4,7 +4,6 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
 import { RailViewport } from './RailViewport';
 import { BOOKMARKS_KEY } from '@/lib/constants';
-import styles from '@/styles/components/ContinueReadingSection.module.css';
 
 interface Props {
   /** slug → cover path, passed from the page (localStorage bookmarks lack meta.cover). */
@@ -69,14 +68,19 @@ export function ContinueReadingSection({ covers }: Props) {
   const pending = !loaded;
 
   return (
-    <section className={`${styles.section} ${pending ? styles.pending : ''}`}>
+    // Pre-hydration placeholder: reserve the rail's space only for users who
+    // actually have a reading list (data-has-reading set by ThemeScript before
+    // paint). Everyone else sees nothing — no flash, no late push-down.
+    <section
+      className={`mb-10 border-b border-border${pending ? ' hidden [html[data-has-reading]_&]:block' : ''}`}
+    >
       {/* Section header band */}
-      <div className={styles.band}>
-        <span className={styles.bandLabel}>Continue Reading</span>
+      <div className="flex justify-between items-baseline py-3 border-b border-border">
+        <span className="font-mono text-[12px] font-medium tracking-[0.1em] uppercase text-secondary">Continue Reading</span>
         {!pending && (
-          <span className={styles.bandMeta}>
+          <span className="hidden md:inline font-mono text-[12px] text-secondary">
             {bookmarks.length} in progress{' · '}
-            <a href="/reading" className={styles.bandLink}>
+            <a href="/reading" className="inline-flex items-center gap-1 text-inherit no-underline hover:underline hover:underline-offset-2 max-md:text-secondary max-md:opacity-70 max-md:hover:opacity-100">
               view reading list
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
                 strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -88,9 +92,10 @@ export function ContinueReadingSection({ covers }: Props) {
       </div>
 
       {/* Card rail — visual covers or text cards, by the global mode.
-          .rail frames the scroller and carries the directional edge fades;
-          RailViewport adds prev/next scroll arrows (in addition to swipe). */}
-      <RailViewport railClassName={styles.rail} rowClassName={styles.cards}>
+          cai-rail frames the scroller and carries the directional edge fades;
+          RailViewport adds prev/next scroll arrows (in addition to swipe). The
+          continue rail overrides the shared row's gap/padding/alignment. */}
+      <RailViewport railClassName="cai-rail" rowClassName="cai-rail-row items-start! gap-[10px]! py-4!">
         {pending
           ? Array.from({ length: PENDING_SKELETONS }, (_, i) => (
               <ContinueCardSkeleton key={i} />

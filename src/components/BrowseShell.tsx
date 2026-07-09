@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { WorkSummary, LayoutView } from '@/types';
 
 const VIEW_PREF_KEY = 'cai_view_pref';
-import { FilterOptions, SearchOptions } from '@/lib/filters';
+import { SearchOptions } from '@/lib/filters';
 import { FilterPanel } from './FilterPanel';
 import { WorkCardCover } from './WorkCardCover';
 import { WorkCardGrid } from './WorkCardGrid';
@@ -14,7 +14,6 @@ import { SkeletonCard } from './SkeletonCard';
 
 interface Props {
   works: WorkSummary[];
-  options: FilterOptions;
   searchOptions: SearchOptions;
   currentFilters: {
     fandom?: string;
@@ -44,7 +43,6 @@ interface Props {
     date_to?: string;
     preset?: string;
   };
-  totalCount: number;
   filteredCount: number;
   /** Navigation source — shows a back link when set (e.g. 'characters') */
   from?: string;
@@ -60,10 +58,8 @@ const FROM_LABELS: Record<string, { href: string; label: string }> = {
 
 export function BrowseShell({
   works,
-  options,
   searchOptions,
   currentFilters,
-  totalCount,
   filteredCount,
   from,
 }: Props) {
@@ -131,10 +127,8 @@ export function BrowseShell({
   return (
     <>
       <FilterPanel
-        options={options}
         searchOptions={searchOptions}
         currentFilters={currentFilters}
-        totalCount={totalCount}
         filteredCount={filteredCount}
       />
 

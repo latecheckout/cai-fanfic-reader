@@ -3,13 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FilterOptions, SearchOptions } from '@/lib/filters';
+import { SearchOptions } from '@/lib/filters';
 import { BrowseSearchBar } from './BrowseSearchBar';
 import styles from '@/styles/components/FilterPanel.module.css';
 import { PRESETS_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 
 interface Props {
-  options: FilterOptions;
   searchOptions?: SearchOptions;
   currentFilters: {
     fandom?: string;
@@ -39,7 +38,6 @@ interface Props {
     date_to?: string;
     preset?: string;
   };
-  totalCount: number;
   filteredCount: number;
   /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
   basePath?: string;
@@ -196,10 +194,8 @@ function getPillState(
 }
 
 export function FilterPanel({
-  options: _options,
   searchOptions: _searchOptions,
   currentFilters,
-  totalCount: _totalCount,
   filteredCount,
   basePath = '/',
 }: Props) {

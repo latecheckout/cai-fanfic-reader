@@ -1,16 +1,11 @@
 import { Suspense } from 'react';
 import { getWorkSummaries } from '@/lib/works';
-import {
-  applyFilters,
-  buildFilterOptions,
-  buildSearchOptions,
-} from '@/lib/filters';
+import { applyFilters, buildSearchOptions } from '@/lib/filters';
 import { FilterState } from '@/types';
 import { buildShelves, buildCreators } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
-import styles from './browse.module.css';
 
 interface PageProps {
   searchParams: Promise<{
@@ -78,7 +73,6 @@ export default async function BrowsePage({ searchParams }: PageProps) {
 
   const allWorks = getWorkSummaries();
   const filteredWorks = applyFilters(allWorks, filters);
-  const filterOptions = buildFilterOptions(allWorks);
   const searchOptions = buildSearchOptions(allWorks);
 
   // Layer split: any filter, search, or sort param means the visitor has
@@ -97,10 +91,10 @@ export default async function BrowsePage({ searchParams }: PageProps) {
   );
 
   return (
-    <div className={styles.page}>
+    <div className="min-h-screen">
       <BrowseHeader />
 
-      <main className={styles.main}>
+      <main className="relative mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-[calc(128px+var(--safe-bottom))] max-md:px-4 max-md:pt-5">
         {/* Visually-hidden h1 for screen reader landmark — page title in nav serves as visible heading */}
         <h1 className="visually-hidden">Browse Works</h1>
 
@@ -114,9 +108,9 @@ export default async function BrowsePage({ searchParams }: PageProps) {
               creators={buildCreators(allWorks)}
               covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
             />
-            <div className={styles.forYouHeader}>
-              <h2 className={styles.forYouTitle}>Stories for you 📚</h2>
-              <p className={styles.forYouSubtitle}>The whole archive, ready to filter</p>
+            <div className="mb-2">
+              <h2 className="m-0 font-serif text-2xl font-medium tracking-[-0.01em] text-text max-md:text-[21px]">Stories for you 📚</h2>
+              <p className="mt-[2px] font-sans text-[15px] text-secondary">The whole archive, ready to filter</p>
             </div>
           </>
         )}
@@ -126,10 +120,8 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         <Suspense>
           <BrowseShell
             works={filteredWorks}
-            options={filterOptions}
             searchOptions={searchOptions}
             currentFilters={params}
-            totalCount={allWorks.length}
             filteredCount={filteredWorks.length}
             from={params.from}
           />

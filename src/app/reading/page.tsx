@@ -1,11 +1,10 @@
 import { Suspense } from 'react';
 import { getWorkSummaries } from '@/lib/works';
-import { applyFilters, buildFilterOptions, buildSearchOptions } from '@/lib/filters';
+import { applyFilters, buildSearchOptions } from '@/lib/filters';
 import { FilterState } from '@/types';
 import { MOCK_LIBRARY, getTabSlugs, type LibraryTab } from '@/lib/library';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { LibraryShell } from '@/components/LibraryShell';
-import styles from '../browse.module.css';
 
 interface PageProps {
   searchParams: Promise<{
@@ -90,22 +89,19 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   };
 
   const filteredWorks = applyFilters(tabWorks, filters);
-  const filterOptions = buildFilterOptions(tabWorks);
   const searchOptions = buildSearchOptions(tabWorks);
 
   return (
-    <div className={styles.page}>
+    <div className="min-h-screen">
       <BrowseHeader />
-      <main className={styles.main}>
+      <main className="relative mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-[calc(128px+var(--safe-bottom))] max-md:px-4 max-md:pt-5">
         <Suspense>
           <LibraryShell
             works={filteredWorks}
             tabCounts={tabCounts}
             activeTab={activeTab}
-            options={filterOptions}
             searchOptions={searchOptions}
             currentFilters={params}
-            totalCount={tabWorks.length}
             filteredCount={filteredWorks.length}
           />
         </Suspense>

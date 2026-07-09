@@ -1,7 +1,12 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback, type ReactNode } from 'react';
-import styles from '@/styles/components/RailViewport.module.css';
+
+const ARROW =
+  'absolute top-1/2 -translate-y-1/2 z-[4] flex items-center justify-center w-10 h-10 ' +
+  'rounded-full border border-border-strong text-text bg-bg shadow-[0_2px_10px_rgba(26,24,22,0.14)] ' +
+  'transition-[opacity,background-color,border-color] duration-150 ease-in-out ' +
+  'hover:bg-card hover:border-border-active disabled:opacity-0 disabled:pointer-events-none';
 
 interface Props {
   /** The rail frame class (position:relative + edge fades) from the caller's module. */
@@ -49,10 +54,10 @@ export function RailViewport({ railClassName, rowClassName, children }: Props) {
   };
 
   return (
-    <div className={`${styles.viewport} ${railClassName}`}>
+    <div className={railClassName}>
       <button
         type="button"
-        className={`${styles.arrow} ${styles.prev}`}
+        className={`${ARROW} left-2`}
         onClick={() => scroll(-1)}
         disabled={atStart}
         aria-label="Scroll left"
@@ -68,7 +73,7 @@ export function RailViewport({ railClassName, rowClassName, children }: Props) {
 
       <button
         type="button"
-        className={`${styles.arrow} ${styles.next}`}
+        className={`${ARROW} right-2`}
         onClick={() => scroll(1)}
         disabled={atEnd}
         aria-label="Scroll right"

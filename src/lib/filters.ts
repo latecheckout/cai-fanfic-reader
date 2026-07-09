@@ -223,92 +223,9 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
   return result;
 }
 
-export interface FilterOptions {
-  fandoms: string[];
-  ratings: string[];
-  statuses: string[];
-}
-
-export function buildFilterOptions(works: WorkSummary[]): FilterOptions {
-  const fandoms = new Set<string>();
-  const ratings = new Set<string>();
-  const statuses = new Set<string>();
-
-  for (const w of works) {
-    w.meta.fandom.forEach((f) => fandoms.add(f));
-    ratings.add(w.meta.rating);
-    statuses.add(w.meta.status);
-  }
-
-  return {
-    fandoms: Array.from(fandoms).sort(),
-    ratings: Array.from(ratings).sort(),
-    statuses: Array.from(statuses).sort(),
-  };
-}
-
 export interface SearchOption {
   name: string;
   count: number;
-}
-
-export interface FeelingData {
-  topTrope: { name: string; count: number; relatedTags: string[] } | null;
-  activeFandom: { name: string; count: number } | null;
-  shortCount: number;
-}
-
-export function buildFeelingData(works: WorkSummary[]): FeelingData {
-  const tagMap = new Map<string, number>();
-  for (const w of works) {
-    w.meta.tags.forEach((t) => tagMap.set(t, (tagMap.get(t) ?? 0) + 1));
-  }
-  const sortedTags = Array.from(tagMap.entries()).sort(([, a], [, b]) => b - a);
-
-  let topTrope: FeelingData['topTrope'] = null;
-  if (sortedTags.length > 0) {
-    const [name, count] = sortedTags[0];
-    const relatedMap = new Map<string, number>();
-    works
-      .filter((w) => w.meta.tags.includes(name))
-      .forEach((w) =>
-        w.meta.tags
-          .filter((t) => t !== name)
-          .forEach((t) => relatedMap.set(t, (relatedMap.get(t) ?? 0) + 1))
-      );
-    const relatedTags = Array.from(relatedMap.entries())
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 6)
-      .map(([t]) => t);
-    topTrope = { name, count, relatedTags };
-  }
-
-  const fandomLastUpdate = new Map<string, string>();
-  const fandomCount = new Map<string, number>();
-  for (const w of works) {
-    const date = w.meta.updated || w.meta.published;
-    w.meta.fandom.forEach((f) => {
-      const cur = fandomLastUpdate.get(f);
-      if (!cur || date > cur) fandomLastUpdate.set(f, date);
-      fandomCount.set(f, (fandomCount.get(f) ?? 0) + 1);
-    });
-  }
-  const activeFandomEntry = Array.from(fandomLastUpdate.entries()).sort(([, a], [, b]) =>
-    a > b ? -1 : 1
-  )[0];
-  const activeFandom = activeFandomEntry
-    ? { name: activeFandomEntry[0], count: fandomCount.get(activeFandomEntry[0]) ?? 0 }
-    : null;
-
-  const shortCount = works.filter(
-    (w) =>
-      w.meta.words > 0 &&
-      w.meta.words <= 15000 &&
-      !w.meta.status.toLowerCase().includes('progress') &&
-      w.meta.status.toLowerCase() !== 'wip'
-  ).length;
-
-  return { topTrope, activeFandom, shortCount };
 }
 
 export interface SearchOptions {

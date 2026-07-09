@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import styles from '@/styles/components/BrowseHeader.module.css';
 import { MobileNav } from './MobileNav';
 import { Ao4TurboToggle } from './Ao4TurboToggle';
 
@@ -25,17 +24,21 @@ export function BrowseHeader({ search }: Props = {}) {
 
   return (
     <>
-      <header className={styles.header}>
-        <div className={styles.inner}>
+      <header className="sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
+        <div className="mx-auto flex h-14 max-w-[var(--browse-max-width)] items-stretch px-6 max-md:items-center max-md:justify-between max-md:px-4">
           {/* ── Left zone: logo ── */}
-          <div className={styles.zoneLeft}>
-            <a href="/" className={styles.wordmark} aria-label="fanfic — home">
+          <div className="flex min-w-0 flex-1 items-center">
+            <a
+              href="/"
+              className="flex items-center text-text no-underline opacity-[0.88] transition-opacity duration-150 ease-in-out hover:opacity-100"
+              aria-label="fanfic — home"
+            >
             <svg
               width="104"
               height="17"
               viewBox="0 0 130 21"
               fill="none"
-              className={styles.logoSvg}
+              className="block"
               aria-hidden="true"
             >
               <path d="M11.5673 15.1534C9.68229 15.1534 8.55276 13.8702 8.55276 11.6894C8.55276 9.5085 9.66307 8.18502 11.5673 8.18502C13.0117 8.18502 13.8707 8.79641 14.1013 10.1415H16.3634C16.1534 7.88005 14.2699 6.35229 11.5688 6.35229C8.365 6.35229 6.18726 8.51158 6.18726 11.6908C6.18726 14.87 8.30291 16.9876 11.5688 16.9876C14.3749 16.9876 16.1963 15.4598 16.4683 13.1984H14.2063C13.8929 14.6039 13.0753 15.1549 11.5673 15.1549V15.1534Z" fill="currentColor"/>
@@ -55,12 +58,16 @@ export function BrowseHeader({ search }: Props = {}) {
         </div>
 
         {/* ── Center zone: nav links ── */}
-        <nav className={styles.zoneCenter} aria-label="Site navigation">
+        <nav className="flex items-stretch justify-center max-md:hidden" aria-label="Site navigation">
           {NAV_LINKS.map(({ href, label }) => (
             <a
               key={href}
               href={href}
-              className={`${styles.navLink} ${pathname === href ? styles.navActive : ''}`}
+              className={`flex items-center whitespace-nowrap border-b-2 px-4 font-sans text-sm tracking-[0.01em] no-underline -mb-px transition-[color,border-color] duration-150 ease-in-out ${
+                pathname === href
+                  ? 'border-b-text text-text'
+                  : 'border-b-transparent text-secondary hover:text-text'
+              }`}
             >
               {label}
             </a>
@@ -68,13 +75,16 @@ export function BrowseHeader({ search }: Props = {}) {
         </nav>
 
         {/* ── Right zone: search slot + avatar (desktop) + hamburger (mobile) ── */}
-        <div className={styles.zoneRight}>
-          {search && <div className={styles.zoneSearch}>{search}</div>}
-          <div className={styles.avatar} aria-hidden="true">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-3 max-md:ml-3 max-md:gap-2">
+          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:max-w-none">{search}</div>}
+          <div
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-text font-sans text-[13px] font-semibold text-bg opacity-80 max-md:hidden"
+            aria-hidden="true"
+          >
             P
           </div>
           <button
-            className={styles.hamburgerBtn}
+            className="hidden h-11 w-11 shrink-0 items-center justify-center text-text max-md:flex"
             onClick={() => setNavOpen(true)}
             aria-label="Open navigation"
             aria-expanded={navOpen}

@@ -3,9 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from '@/styles/components/HeroCarousel.module.css';
+import { heroSlide } from './heroChrome';
 
 const AUTOPLAY_MS = 6000;
+
+const ARROW =
+  'absolute top-1/2 z-[3] flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/55 bg-transparent text-white opacity-0 ' +
+  'transition-[opacity,background-color,border-color] duration-150 ease-in-out group-hover/hero:opacity-100 hover:border-white hover:bg-white/[0.14] max-sm:hidden';
 
 interface Slide {
   image: string;
@@ -125,17 +129,21 @@ export function HeroCarousel() {
 
   return (
     <section
-      className={styles.hero}
+      className="group/hero relative mb-8"
       aria-label="Featured"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className={styles.viewport} ref={viewportRef} onScroll={onScroll}>
+      <div
+        className="flex overflow-x-auto snap-x snap-mandatory rounded-card [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        ref={viewportRef}
+        onScroll={onScroll}
+      >
         {[...SLIDES, SLIDES[0]].map((s, i) => (
           <Link
             key={i}
             href={s.href}
-            className={styles.slide}
+            className={heroSlide.slide}
             aria-label={s.headline}
             aria-hidden={i >= realCount || undefined}
             tabIndex={i >= realCount ? -1 : undefined}
@@ -149,52 +157,44 @@ export function HeroCarousel() {
                  load eagerly (decoded before they animate in) but without a
                  competing preload, so LCP isn't penalised. */
               {...(i === 0 ? { priority: true } : { loading: 'eager' as const })}
-              className={styles.bg}
+              className={heroSlide.bg}
             />
-            <span className={styles.scrim} aria-hidden="true" />
-            <span className={styles.overlay}>
+            <span className={heroSlide.scrim} aria-hidden="true" />
+            <span className={heroSlide.overlay}>
               {s.cover && (
-                <span className={styles.coverWrap} aria-hidden="true">
-                  <Image src={s.cover} alt="" fill sizes="120px" priority={i === 0} className={styles.cover} />
+                <span className={heroSlide.coverWrap} aria-hidden="true">
+                  <Image src={s.cover} alt="" fill sizes="120px" priority={i === 0} className={heroSlide.cover} />
                 </span>
               )}
-              <span className={`${styles.content} ${s.cover ? '' : styles.contentCentered}`}>
-                <span className={styles.kicker}>{s.kicker}</span>
-                <span className={styles.headline}>{s.headline}</span>
-                <span className={styles.cta}>{s.cta}</span>
+              <span className={`${heroSlide.content} ${s.cover ? 'items-start text-left' : 'items-center text-center'}`}>
+                <span className={heroSlide.kicker}>{s.kicker}</span>
+                <span className={heroSlide.headline}>{s.headline}</span>
+                <span className={heroSlide.cta}>{s.cta}</span>
               </span>
             </span>
           </Link>
         ))}
       </div>
 
-      <button
-        type="button"
-        className={`${styles.arrow} ${styles.arrowPrev}`}
-        onClick={retreat}
-        aria-label="Previous"
-      >
+      <button type="button" className={`${ARROW} left-[14px]`} onClick={retreat} aria-label="Previous">
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
           <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
-      <button
-        type="button"
-        className={`${styles.arrow} ${styles.arrowNext}`}
-        onClick={advance}
-        aria-label="Next"
-      >
+      <button type="button" className={`${ARROW} right-[14px]`} onClick={advance} aria-label="Next">
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
           <path d="M5 2L10 7L5 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
-      <div className={styles.dots}>
+      <div className="absolute bottom-[14px] left-1/2 z-[3] flex -translate-x-1/2 gap-[7px]">
         {SLIDES.map((s, i) => (
           <button
             key={s.href}
             type="button"
-            className={`${styles.dot} ${i === index ? styles.dotActive : ''}`}
+            className={`h-[7px] cursor-pointer rounded-full border-none p-0 transition-[background-color,width] duration-150 ease-in-out ${
+              i === index ? 'w-5 bg-white' : 'w-[7px] bg-white/45'
+            }`}
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === index}

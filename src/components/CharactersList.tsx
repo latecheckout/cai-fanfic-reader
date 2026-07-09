@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import styles from '@/styles/components/CharactersList.module.css';
 
 interface CharacterGroup {
   letter: string;
@@ -33,10 +32,10 @@ export function CharactersList({ grouped }: Props) {
   return (
     <>
       {/* Search input */}
-      <div className={styles.searchRow}>
-        <div className={styles.inputWrap}>
+      <div className="mb-8 flex items-center gap-4">
+        <div className="relative max-w-[360px] flex-1">
           <svg
-            className={styles.searchIcon}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-secondary"
             width="13"
             height="13"
             viewBox="0 0 16 16"
@@ -51,7 +50,7 @@ export function CharactersList({ grouped }: Props) {
           </svg>
           <input
             type="text"
-            className={styles.input}
+            className="h-9 w-full rounded-full border border-border-chip bg-transparent pl-[34px] pr-9 font-sans text-[15px] text-text outline-none transition-colors duration-150 placeholder:text-secondary placeholder:opacity-60 focus:border-text"
             placeholder="Search characters…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -59,7 +58,7 @@ export function CharactersList({ grouped }: Props) {
           />
           {query && (
             <button
-              className={styles.clearBtn}
+              className="absolute right-[10px] top-1/2 flex h-[18px] w-[18px] -translate-y-1/2 items-center justify-center p-0 text-base leading-none text-secondary transition-colors duration-[120ms] hover:text-text"
               onClick={() => setQuery('')}
               aria-label="Clear search"
             >
@@ -68,7 +67,7 @@ export function CharactersList({ grouped }: Props) {
           )}
         </div>
         {q && (
-          <span className={styles.resultCount}>
+          <span className="shrink-0 font-mono text-[13px] text-secondary">
             {totalVisible} {totalVisible === 1 ? 'character' : 'characters'}
           </span>
         )}
@@ -76,21 +75,26 @@ export function CharactersList({ grouped }: Props) {
 
       {/* Grouped list */}
       {filtered.length === 0 ? (
-        <p className={styles.empty}>No characters match &ldquo;{query}&rdquo;.</p>
+        <p className="py-8 font-sans text-base text-secondary">No characters match &ldquo;{query}&rdquo;.</p>
       ) : (
-        <div className={styles.groups}>
+        <div className="flex flex-col">
           {filtered.map((group) => (
-            <div key={group.letter} className={styles.group}>
-              <div className={styles.groupLetter}>{group.letter}</div>
-              <ul className={styles.list}>
+            <div
+              key={group.letter}
+              className="flex gap-6 border-t border-border py-5 last:border-b"
+            >
+              <div className="w-6 shrink-0 pt-[3px] font-mono text-[13px] font-semibold tracking-[0.06em] text-secondary opacity-50">
+                {group.letter}
+              </div>
+              <ul className="m-0 min-w-0 flex-1 list-none p-0">
                 {group.items.map(({ name, count }) => (
-                  <li key={name} className={styles.item}>
+                  <li key={name} className="block">
                     <Link
                       href={`/?character=${encodeURIComponent(name)}&from=characters`}
-                      className={styles.charLink}
+                      className="flex items-baseline justify-between gap-6 py-2 text-inherit no-underline transition-opacity duration-[var(--transition-micro)] hover:opacity-65"
                     >
-                      <span className={styles.charName}>{name}</span>
-                      <span className={styles.charCount}>
+                      <span className="min-w-0 font-sans text-[17px] font-normal text-text">{name}</span>
+                      <span className="shrink-0 font-mono text-[13px] text-secondary">
                         {count} {count === 1 ? 'work' : 'works'}
                       </span>
                     </Link>

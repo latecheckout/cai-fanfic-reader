@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkSummary, LayoutView } from '@/types';
-import { FilterOptions, SearchOptions } from '@/lib/filters';
+import { SearchOptions } from '@/lib/filters';
 import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
 import { FilterPanel } from './FilterPanel';
 // (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
@@ -24,7 +24,6 @@ interface Props {
   works: WorkSummary[];
   tabCounts: Record<LibraryTab, number>;
   activeTab: LibraryTab;
-  options: FilterOptions;
   searchOptions: SearchOptions;
   currentFilters: {
     tab?: string;
@@ -54,7 +53,6 @@ interface Props {
     date_from?: string;
     date_to?: string;
   };
-  totalCount: number;
   filteredCount: number;
 }
 
@@ -64,10 +62,8 @@ export function LibraryShell({
   works,
   tabCounts,
   activeTab,
-  options,
   searchOptions,
   currentFilters,
-  totalCount,
   filteredCount,
 }: Props) {
   const router = useRouter();
@@ -186,10 +182,8 @@ export function LibraryShell({
 
       {/* ── Toolbar + drawer (reuses FilterPanel with library's basePath) ── */}
       <FilterPanel
-        options={options}
         searchOptions={searchOptions}
         currentFilters={currentFilters}
-        totalCount={totalCount}
         filteredCount={displayedWorks.length}
         basePath="/reading"
       />

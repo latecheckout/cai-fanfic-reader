@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { GENERIC_COVER } from '@/lib/covers';
-import styles from '@/styles/components/ContinueCard.module.css';
+
+/* Shared bits reused across the visual, text, and skeleton presentations. */
+const HEAD = 'absolute top-3 left-3 right-3 flex flex-col gap-[2px]';
+const TITLE = 'font-serif text-[14px] font-medium leading-[1.25] line-clamp-2';
+const META = 'font-mono text-[12px]';
+const TRACK = 'absolute bottom-0 left-0 right-0 h-1';
+const FILL = 'block h-full rounded-[0_2px_2px_0]';
 
 export interface ContinueItem {
   slug: string;
@@ -30,33 +36,33 @@ export function ContinueCard({ item, cover }: Props) {
   return (
     <Link
       href={`/works/${item.slug}`}
-      className={styles.card}
+      className="group flex-shrink-0 block w-[150px] no-underline text-inherit"
       title={`${item.title} · Ch. ${item.chapterIndex + 1} of ${item.totalChapters}`}
       aria-label={`Continue reading ${item.title}, chapter ${item.chapterIndex + 1} of ${item.totalChapters}`}
     >
       {/* Visual: cover + title/chapter at the top + progress at the bottom */}
-      <span className={styles.slot}>
-        <span className={styles.media}>
-          <Image src={cover ?? GENERIC_COVER} alt="" fill sizes="150px" className={styles.coverImg} />
-          <span className={styles.scrim} aria-hidden="true" />
-          <span className={styles.head}>
-            <span className={styles.title}>{item.title}</span>
-            <span className={styles.meta}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
+      <span className="block transition-transform duration-150 ease-in-out group-hover:-translate-y-[2px] [html[data-mode=text]_&]:hidden">
+        <span className="relative block aspect-[2/3] rounded-card [clip-path:inset(0_round_14px)] bg-border after:content-[''] after:absolute after:inset-0 after:border after:border-white/20 after:rounded-card after:pointer-events-none">
+          <Image src={cover ?? GENERIC_COVER} alt="" fill sizes="150px" className="object-cover" />
+          <span className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.55)_30%,rgba(0,0,0,0.12)_52%,transparent_64%)]" aria-hidden="true" />
+          <span className={HEAD}>
+            <span className={`${TITLE} text-white`}>{item.title}</span>
+            <span className={`${META} text-white/80`}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
           </span>
-          <span className={styles.progressTrack}>
-            <span className={styles.progressFill} style={{ width: pctLabel }} />
+          <span className={`${TRACK} bg-black/45`}>
+            <span className={`${FILL} bg-rating-t`} style={{ width: pctLabel }} />
           </span>
         </span>
       </span>
 
       {/* Text: same 2:3 box, solid fill — same top header + bottom progress */}
-      <span className={styles.slotText}>
-        <span className={styles.head}>
-          <span className={styles.title}>{item.title}</span>
-          <span className={styles.meta}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
+      <span className="hidden [html[data-mode=text]_&]:block [html[data-mode=text]_&]:relative [html[data-mode=text]_&]:aspect-[2/3] [html[data-mode=text]_&]:rounded-card [html[data-mode=text]_&]:[clip-path:inset(0_round_14px)] [html[data-mode=text]_&]:bg-card after:content-[''] after:absolute after:inset-0 after:border after:border-card-border after:rounded-card after:pointer-events-none after:transition-colors after:duration-150 group-hover:after:border-border-strong">
+        <span className={HEAD}>
+          <span className={`${TITLE} text-text`}>{item.title}</span>
+          <span className={`${META} text-secondary`}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
         </span>
-        <span className={styles.progressTrack}>
-          <span className={styles.progressFill} style={{ width: pctLabel }} />
+        <span className={`${TRACK} bg-border`}>
+          <span className={`${FILL} bg-rating-t`} style={{ width: pctLabel }} />
         </span>
       </span>
     </Link>
@@ -66,15 +72,16 @@ export function ContinueCard({ item, cover }: Props) {
 /** Loading placeholder — the 2:3 card with the same UI elements as placeholders:
  *  title + chapter at the top, progress bar at the bottom. */
 export function ContinueCardSkeleton() {
+  const skelLine = 'rounded-[4px] bg-border-strong animate-[caiSkeletonPulse_1.4s_ease-in-out_infinite]';
   return (
-    <div className={styles.card} aria-hidden="true">
-      <span className={styles.skelBox}>
-        <span className={styles.head}>
-          <span className={`${styles.skelLine} ${styles.skelTitle}`} />
-          <span className={`${styles.skelLine} ${styles.skelMeta}`} />
+    <div className="flex-shrink-0 block w-[150px]" aria-hidden="true">
+      <span className="relative block aspect-[2/3] rounded-card border border-card-border bg-card overflow-hidden">
+        <span className={HEAD}>
+          <span className={`${skelLine} w-[80%] h-[13px]`} />
+          <span className={`${skelLine} w-[45%] h-[11px]`} />
         </span>
-        <span className={styles.progressTrack}>
-          <span className={styles.progressFill} style={{ width: '40%' }} />
+        <span className={`${TRACK} bg-border`}>
+          <span className={`${FILL} bg-border-strong animate-[caiSkeletonPulse_1.4s_ease-in-out_infinite]`} style={{ width: '40%' }} />
         </span>
       </span>
     </div>

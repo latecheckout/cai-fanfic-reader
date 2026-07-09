@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { HeartIcon, FlagIcon } from './icons';
-import styles from '@/styles/components/WorkCardCover.module.css';
 
 interface Props {
   work: WorkSummary;
@@ -21,6 +20,15 @@ const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
 
 const RATING_LETTER: Record<string, string> = {
   G: 'G', T: 'T', M: 'M', E: 'E', 'Not Rated': 'NR', NR: 'NR',
+};
+
+// rClass from ratingClass() → filled badge background utility.
+const RATING_BG: Record<string, string> = {
+  ratingG: 'bg-rating-g',
+  ratingT: 'bg-rating-t',
+  ratingM: 'bg-rating-m',
+  ratingE: 'bg-rating-e',
+  ratingNR: 'bg-rating-nr',
 };
 
 const RATING_TOOLTIPS: Record<string, { title: string; desc: string }> = {
@@ -47,13 +55,19 @@ const STATUS_TOOLTIPS = {
 };
 
 
-/** Two-tier badge tooltip — bold title over a lighter description.
- *  Shared by all three SignalStrip badges so the styling is identical. */
-function BadgeTooltip({ title, desc }: { title: string; desc: string }) {
+/** Two-tier badge tooltip — bold title over a lighter description. Shared by all
+ *  three SignalStrip badges so the styling is identical. Anchored to the strip's
+ *  bottom-left (the strip is the positioned ancestor). `onImage` inverts the
+ *  surface (light bubble, dark text) so it reads over a dark cover overlay. */
+function BadgeTooltip({ title, desc, onImage }: { title: string; desc: string; onImage?: boolean }) {
   return (
-    <span className={styles.tooltip}>
-      <span className={styles.tooltipTitle}>{title}</span>
-      <span className={styles.tooltipDesc}>{desc}</span>
+    <span
+      className={`absolute left-0 top-[calc(100%+8px)] z-20 flex flex-col gap-[3px] whitespace-nowrap rounded-[4px] px-[10px] py-[6px] font-mono opacity-0 shadow-[0_4px_14px_rgba(0,0,0,0.28),0_1px_4px_rgba(0,0,0,0.2)] transition-opacity duration-150 pointer-events-none group-hover/badge:opacity-100 ${
+        onImage ? 'bg-bg text-text' : 'bg-text text-bg'
+      }`}
+    >
+      <span className="text-[11px] font-bold leading-[1.3] tracking-[0.04em]">{title}</span>
+      <span className="text-[10px] font-normal leading-[1.3] tracking-[0.02em] opacity-[0.65]">{desc}</span>
     </span>
   );
 }
@@ -78,16 +92,19 @@ function EyeIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
       strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-      className={styles.statIcon}>
+      className="shrink-0">
       <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" />
       <circle cx="8" cy="8" r="2" />
     </svg>
   );
 }
 
+// Inline stat (icon + count) — vertical-align nudge keeps it centred in a text line.
+const STAT_VIEWS = 'inline-flex items-center gap-[3px] align-[-2px]';
+
 export function Views({ hits }: { hits: number }) {
   return (
-    <span className={styles.statViews}>
+    <span className={STAT_VIEWS}>
       <EyeIcon />
       {formatCount(hits)}
     </span>
@@ -98,8 +115,8 @@ export function Views({ hits }: { hits: number }) {
  *  icon/number treatment matches the views stat exactly. */
 export function Kudos({ count }: { count: number }) {
   return (
-    <span className={styles.statViews}>
-      <HeartIcon width={12} height={12} className={styles.statIcon} />
+    <span className={STAT_VIEWS}>
+      <HeartIcon width={12} height={12} className="shrink-0" />
       {formatCount(count)}
     </span>
   );
@@ -108,8 +125,8 @@ export function Kudos({ count }: { count: number }) {
 /** Bookmark count with the flag icon. */
 export function Bookmarks({ count }: { count: number }) {
   return (
-    <span className={styles.statViews}>
-      <FlagIcon width={12} height={12} className={styles.statIcon} />
+    <span className={STAT_VIEWS}>
+      <FlagIcon width={12} height={12} className="shrink-0" />
       {formatCount(count)}
     </span>
   );
@@ -119,9 +136,9 @@ export function Bookmarks({ count }: { count: number }) {
  *  Shared by the list and grid bylines so the photo treatment is identical. */
 export function Avatar() {
   return (
-    <span className={styles.avatar} aria-hidden="true">
-      <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="20px" className={styles.avatarImg} />
-      <span className={styles.avatarRing} />
+    <span className="relative mr-[7px] inline-block h-5 w-5 shrink-0 overflow-hidden rounded-full bg-border" aria-hidden="true">
+      <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="20px" className="object-cover" />
+      <span className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]" />
     </span>
   );
 }
@@ -140,6 +157,11 @@ export function StatsLine({ items, className }: { items: ReactNode[]; className:
   );
 }
 
+// Shared badge chrome — square, mono, non-interactive whitespace but hoverable
+// for the tooltip (group/badge scopes each tooltip to its own badge).
+const BADGE_BASE =
+  'group/badge flex h-5 items-center justify-center rounded-[2px] shrink-0 font-mono pointer-events-auto cursor-default';
+
 /** Signal row — rating · category · status, with single-line tooltips.
  *  Exported so the AO4 text cards reuse the exact same badge components. */
 export function SignalStrip({
@@ -154,29 +176,75 @@ export function SignalStrip({
   onImage?: boolean;
 }) {
   return (
-    <div className={`${styles.strip} ${onImage ? styles.stripOnImage : ''}`}>
-      <span className={`${styles.ratingLetter} ${styles[rClass as keyof typeof styles]}`}>
+    <div className="pointer-events-none relative z-[2] flex flex-row items-center gap-[7px]">
+      <span
+        className={`${BADGE_BASE} w-5 text-[10px] font-bold tracking-[0.02em] text-white ${RATING_BG[rClass] ?? RATING_BG.ratingNR}`}
+      >
         {RATING_LETTER[rating] ?? rating.charAt(0)}
         <BadgeTooltip
           title={RATING_TOOLTIPS[rating]?.title ?? rating}
           desc={RATING_TOOLTIPS[rating]?.desc ?? ''}
+          onImage={onImage}
         />
       </span>
       {catLabel && (
-        <div className={styles.catLabel}>
+        <div
+          className={`${BADGE_BASE} min-w-5 bg-secondary px-[6px] text-[11px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white`}
+        >
           {catLabel}
           <BadgeTooltip
             title={CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel}
             desc={CATEGORY_TOOLTIPS[category[0]]?.desc ?? ''}
+            onImage={onImage}
           />
         </div>
       )}
       <div
-        className={`${styles.statusPill} ${isWip ? styles.statusWip : styles.statusDone} ${onImage ? styles.statusPillOnImage : ''}`}
+        className={`${BADGE_BASE} w-5 border border-dashed ${
+          onImage
+            ? 'border-white/45 text-white/70'
+            : 'border-border-active text-secondary theme-dark:text-[color-mix(in_srgb,var(--text)_70%,transparent)]'
+        }`}
       >
         {isWip ? <ProgressGlyph /> : <CheckGlyph />}
-        <BadgeTooltip {...(isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done)} />
+        <BadgeTooltip {...(isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done)} onImage={onImage} />
       </div>
+    </div>
+  );
+}
+
+// ── List-card discovery rows (fandom / relationships / characters) ──
+// Three near-identical comma-linked lists, collapsed into one helper. Each row
+// is `interactive`: pointer-events fall through to the stretched card link, and
+// each individual link re-enables clicks.
+const FANDOM_CLS =
+  'relative z-[1] pointer-events-none font-mono text-[12px] uppercase tracking-[0.08em] text-secondary';
+const FANDOM_LINK =
+  'pointer-events-auto text-inherit no-underline hover:text-text hover:underline hover:decoration-1 hover:underline-offset-2';
+const SHIPS_CLS = 'relative z-[1] pointer-events-none text-[16px] font-medium text-text';
+const SHIP_LINK =
+  'pointer-events-auto text-inherit underline decoration-[rgba(26,24,22,0.3)] decoration-1 underline-offset-[3px] transition-[text-decoration-color] duration-150 ease-in-out hover:decoration-text theme-dark:decoration-[rgba(229,225,216,0.3)] theme-dark:hover:decoration-text';
+const CHARS_CLS = 'relative z-[1] pointer-events-none font-sans text-[13px] leading-[1.5] text-secondary';
+const CHAR_LINK =
+  'pointer-events-auto text-inherit no-underline transition-colors duration-150 ease-in-out hover:text-text hover:underline hover:decoration-1 hover:underline-offset-2';
+
+function LinkList({
+  items, param, separator, className, linkClassName,
+}: {
+  items: string[];
+  param: string;
+  separator: ReactNode;
+  className: string;
+  linkClassName: string;
+}) {
+  return (
+    <div className={className}>
+      {items.map((item, i) => (
+        <span key={`${param}-${i}`}>
+          {i > 0 && separator}
+          <Link href={`/?${param}=${encodeURIComponent(item)}`} className={linkClassName}>{item}</Link>
+        </span>
+      ))}
     </div>
   );
 }
@@ -203,42 +271,43 @@ export function WorkCardCover({ work }: Props) {
   const warnings = meta.warnings.filter((w) => w !== 'No Archive Warnings Apply');
 
   return (
-    <article className={`${styles.card} ${styles.list}`}>
-      {/* List view is imageless: all metadata, no cover bias. */}
-
+    // List view is imageless: all metadata, no cover bias. Each row is its own
+    // shelf-style card; hover lifts the border + fades stats to full contrast.
+    // Entrance: fade-in with an nth-child stagger (motion-safe only).
+    <article className="group relative flex min-w-0 items-start gap-5 rounded-card border border-card-border bg-[color-mix(in_srgb,var(--card-bg),#fff_35%)] p-3 transition-[background,border-color] duration-150 ease-in-out hover:z-[5] hover:border-border-strong max-md:gap-4 theme-dark:bg-card motion-safe:animate-[fadeIn_600ms_var(--ease-out-expo)_both] motion-safe:[&:nth-child(2)]:animate-[fadeIn_600ms_var(--ease-out-expo)_30ms_both] motion-safe:[&:nth-child(3)]:animate-[fadeIn_600ms_var(--ease-out-expo)_60ms_both] motion-safe:[&:nth-child(4)]:animate-[fadeIn_600ms_var(--ease-out-expo)_90ms_both] motion-safe:[&:nth-child(5)]:animate-[fadeIn_600ms_var(--ease-out-expo)_120ms_both] motion-safe:[&:nth-child(6)]:animate-[fadeIn_600ms_var(--ease-out-expo)_150ms_both] motion-safe:[&:nth-child(7)]:animate-[fadeIn_600ms_var(--ease-out-expo)_180ms_both] motion-safe:[&:nth-child(8)]:animate-[fadeIn_600ms_var(--ease-out-expo)_210ms_both] motion-safe:[&:nth-child(9)]:animate-[fadeIn_600ms_var(--ease-out-expo)_240ms_both] motion-safe:[&:nth-child(10)]:animate-[fadeIn_600ms_var(--ease-out-expo)_270ms_both] motion-safe:[&:nth-child(n+11)]:animate-[fadeIn_600ms_var(--ease-out-expo)_300ms_both]">
       {/* Content — identity-first: strip → title → author → summary → tags → fandom → ships → characters → stats */}
-      <div className={styles.content}>
+      <div className="flex min-w-0 flex-1 flex-col gap-[10px]">
         <SignalStrip rating={meta.rating} rClass={rClass} catLabel={catLabel} category={meta.category} isWip={isWip} />
 
-        <div className={styles.titleRow}>
-          <h3 className={styles.titleWrap}>
-            <Link href={`/works/${slug}`} className={styles.titleLink}>
-              <span className={styles.title}>{meta.title}</span>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <h3 className="m-0 w-fit min-w-0 max-w-full font-normal">
+            <Link href={`/works/${slug}`} className="text-inherit no-underline after:absolute after:inset-0 after:z-0 after:content-['']">
+              <span className="inline w-auto font-serif text-[16px] font-medium leading-[1.4] text-text group-hover:underline group-hover:decoration-1 group-hover:underline-offset-[3px]">{meta.title}</span>
             </Link>
           </h3>
           {meta.author && (
-            <span className={`${styles.author} ${styles.bylineAvatar}`}>
-              <span className={styles.bylineBy}>by</span>
+            <span className="relative z-[1] inline-flex items-center overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[14px] text-secondary pointer-events-none">
+              <span className="mr-[5px]">by</span>
               <Avatar />
-              <Link href={`/?q=${encodeURIComponent(meta.author)}`} className={styles.authorLink}>
+              <Link href={`/?q=${encodeURIComponent(meta.author)}`} className="relative z-[2] text-inherit no-underline pointer-events-auto hover:text-text hover:underline hover:underline-offset-2">
                 {meta.author}
               </Link>
             </span>
           )}
         </div>
 
-        {meta.summary && <p className={styles.summary}>{meta.summary}</p>}
+        {meta.summary && <p className="m-0 line-clamp-2 font-serif text-[15px] italic leading-[1.55] text-secondary">{meta.summary}</p>}
 
         {(warnings.length > 0 || meta.tags.length > 0) && (
-          <div className={`${styles.tags} ${styles.interactive}`}>
+          <div className="relative z-[1] flex flex-wrap gap-[6px] pointer-events-none">
             {warnings.map((w) => (
-              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className={styles.warnChip}>{w}</Link>
+              <Link key={`warn-${w}`} href={`/?warning=${encodeURIComponent(w)}`} className="pointer-events-auto inline-block rounded-[3px] bg-text px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-bg no-underline transition-opacity duration-150 ease-in-out hover:opacity-75">{w}</Link>
             ))}
             {visibleTags.map((t) => (
-              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className={styles.tagChip}>{t}</Link>
+              <Link key={`tag-${t}`} href={`/?tag=${encodeURIComponent(t)}`} className="pointer-events-auto inline-block rounded-[3px] bg-border px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-secondary no-underline transition-colors duration-150 ease-in-out hover:bg-border-strong hover:text-text">{t}</Link>
             ))}
             {hiddenTagCount > 0 && (
-              <button type="button" className={styles.tagsMore} onClick={() => setTagsExpanded(!tagsExpanded)}>
+              <button type="button" className="pointer-events-auto inline-flex items-center rounded-[3px] border border-dashed border-border-chip px-[7px] py-[2px] font-sans text-[13px] leading-[1.4] text-secondary transition-colors duration-150 ease-in-out cursor-pointer hover:text-text" onClick={() => setTagsExpanded(!tagsExpanded)}>
                 {tagsExpanded ? 'show less' : `+${hiddenTagCount}`}
               </button>
             )}
@@ -246,42 +315,33 @@ export function WorkCardCover({ work }: Props) {
         )}
 
         {/* Social metrics — under the tags, closing the top section */}
-        <StatsLine items={statNodes} className={styles.statsBottom} />
+        <StatsLine items={statNodes} className="font-mono text-[13px] leading-[1.7] text-secondary transition-colors duration-150 ease-in-out group-hover:text-text" />
 
         {/* Bottom section — fandom / ships / characters, visually separated */}
         {(meta.fandom.length > 0 || meta.relationships.length > 0 || meta.characters.length > 0) && (
-          <div className={styles.discovery}>
+          <div className="mt-[9px] flex flex-col gap-2">
             {meta.fandom.length > 0 && (
-              <div className={`${styles.fandom} ${styles.interactive}`}>
-                {meta.fandom.map((f, i) => (
-                  <span key={f}>
-                    {i > 0 && ', '}
-                    <Link href={`/?fandom=${encodeURIComponent(f)}`} className={styles.fandomLink}>{f}</Link>
-                  </span>
-                ))}
-              </div>
+              <LinkList items={meta.fandom} param="fandom" separator=", " className={FANDOM_CLS} linkClassName={FANDOM_LINK} />
             )}
 
             {meta.relationships.length > 0 && (
-              <div className={`${styles.ships} ${styles.interactive}`}>
-                {meta.relationships.map((r, i) => (
-                  <span key={r}>
-                    {i > 0 && <span className={styles.shipSeparator}> / </span>}
-                    <Link href={`/?relationship=${encodeURIComponent(r)}`} className={styles.shipLink}>{r}</Link>
-                  </span>
-                ))}
-              </div>
+              <LinkList
+                items={meta.relationships}
+                param="relationship"
+                separator={<span className="font-normal text-secondary opacity-60"> / </span>}
+                className={SHIPS_CLS}
+                linkClassName={SHIP_LINK}
+              />
             )}
 
             {meta.characters.length > 0 && (
-              <div className={`${styles.characters} ${styles.interactive}`}>
-                {meta.characters.map((c, i) => (
-                  <span key={`char-${i}`}>
-                    {i > 0 && <span className={styles.charSeparator}>, </span>}
-                    <Link href={`/?character=${encodeURIComponent(c)}`} className={styles.charLink}>{c}</Link>
-                  </span>
-                ))}
-              </div>
+              <LinkList
+                items={meta.characters}
+                param="character"
+                separator={<span className="opacity-40">, </span>}
+                className={CHARS_CLS}
+                linkClassName={CHAR_LINK}
+              />
             )}
           </div>
         )}

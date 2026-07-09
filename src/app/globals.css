@@ -299,6 +299,93 @@ body.filter-open {
 }
 
 /* ============================================================
+   HORIZONTAL RAIL — shared scroller frame + scroll-driven edge fades.
+   Consolidated from ShelfRail / CreatorRail / ContinueReadingSection
+   (the mechanism was identical in all three). .cai-rail frames the
+   scroller; its ::before/::after are the directional gradient fades whose
+   opacity tracks the row's scroll position via a scroll-driven animation
+   (no JS). Fallback with no scroll-timeline support: right fade shown,
+   left hidden. Per-instance widths/mode-swaps stay on-element (Tailwind).
+   ============================================================ */
+.cai-rail {
+  position: relative;
+}
+
+.cai-rail::before,
+.cai-rail::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cai-rail::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+  opacity: 0;
+}
+
+.cai-rail::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+  opacity: 1;
+}
+
+.cai-rail-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cai-rail-row::-webkit-scrollbar {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  /* timeline-scope hoists the row's named timeline so the rail's
+     ::before/::after (siblings of .cai-rail-row) can reference it. Each
+     .cai-rail establishes its own scope, so the shared name is safe across
+     multiple rails on one page. */
+  .cai-rail {
+    timeline-scope: --cai-rail-x;
+  }
+
+  .cai-rail-row {
+    scroll-timeline: --cai-rail-x inline;
+  }
+
+  .cai-rail::before,
+  .cai-rail::after {
+    animation-duration: 1ms; /* placeholder; the scroll timeline owns progress */
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --cai-rail-x;
+  }
+
+  .cai-rail::before {
+    animation-name: caiRailFadeLeft;
+  }
+
+  .cai-rail::after {
+    animation-name: caiRailFadeRight;
+  }
+}
+
+@media (max-width: 768px) {
+  .cai-rail::before,
+  .cai-rail::after {
+    width: 40px;
+  }
+}
+
+/* ============================================================
    FOCUS EFFECT — peripheral dim after 4s inactivity
    .prose-outer class on ChapterList root div.
    html.focus-active triggers gradient overlay fade.
@@ -345,6 +432,31 @@ html.focus-active .prose-outer::after {
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* Rail edge fades — opacity driven by the row's scroll position (see .cai-rail).
+   Left rises fast as scroll begins; right clears only at the very end. */
+@keyframes caiRailFadeLeft {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes caiRailFadeRight {
+  0%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Card entrance reveal — staggered per-item via inline animation-delay. */
+@keyframes caiRevealUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Skeleton shimmer — a light band swept across via background-position. */
+@keyframes caiSkeletonShimmer {
+  0%   { background-position: 150% 0; }
+  100% { background-position: -150% 0; }
 }
 
 /* ============================================================
