@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
 import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
@@ -9,6 +8,7 @@ import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
 import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
 import { POPOVER_PANEL, MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
 import { ClockIcon, CloseIcon, UpDownArrowIcon } from './icons';
+import { usePendingParams } from '@/hooks/usePendingParams';
 
 const HISTORY_LIMIT = 5;
 
@@ -74,8 +74,9 @@ interface Props {
 }
 
 export function BrowseSearchBar({ options, basePath = '/' }: Props) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  // Shared with FilterPanel via module-level pending state so a search
+  // submit racing a pill click composes instead of last-write-winning.
+  const { readParams, pushParams } = usePendingParams(basePath);
   const reduceMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -265,7 +266,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
 
   // Accumulative: merges new filter into existing URL params
   const applyACItem = useCallback((item: SearchItem) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = readParams();
     const { filterKey, filterValue } = item;
     if (MULTI_FILTER_KEYS.includes(filterKey)) {
       params.set(filterKey, addToCommaList(params.get(filterKey) ?? undefined, filterValue));
@@ -273,13 +274,13 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
       params.set(filterKey, filterValue);
     }
     if (filterKey === 'q') addToHistory(filterValue);
-    router.push(`${basePath}?${params.toString()}`);
+    pushParams(params);
     close();
-  }, [router, searchParams, close]);
+  }, [readParams, pushParams, close]);
 
   // Accumulative: merges vibe filters into existing URL params
   const applyVibeItem = useCallback((result: VibeResult) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = readParams();
     const f = result.filters;
     if (f.q) { params.set('q', f.q); addToHistory(f.q); }
     if (f.tag) params.set('tag', addToCommaList(params.get('tag') ?? undefined, f.tag));
@@ -287,26 +288,27 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
     if (f.exWarning) params.set('ex_warning', addToCommaList(params.get('ex_warning') ?? undefined, f.exWarning));
     if (f.rating) params.set('rating', addToCommaList(params.get('rating') ?? undefined, f.rating));
     if (f.maxWords != null) params.set('max_words', String(f.maxWords));
-    router.push(`${basePath}?${params.toString()}`);
+    pushParams(params);
     close();
-  }, [router, searchParams, close]);
+  }, [readParams, pushParams, close]);
 
   const applyPreset = useCallback((preset: Preset) => {
     const p = new URLSearchParams(preset.params);
-    const tab = searchParams.get('tab');
+    const tab = readParams().get('tab');
     if (tab) p.set('tab', tab);
-    router.push(`${basePath}?preset=${encodeURIComponent(preset.name)}&${p.toString()}`);
+    p.set('preset', preset.name);
+    pushParams(p);
     close();
-  }, [router, searchParams, basePath, close]);
+  }, [readParams, pushParams, close]);
 
   const applyHistoryItem = useCallback((q: string) => {
     addToHistory(q);
     setHistory(loadHistory());
-    const params = new URLSearchParams(searchParams.toString());
+    const params = readParams();
     params.set('q', q);
-    router.push(`${basePath}?${params.toString()}`);
+    pushParams(params);
     close();
-  }, [router, searchParams, close]);
+  }, [readParams, pushParams, close]);
 
   const handleRemoveHistory = useCallback((q: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -319,11 +321,11 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
     const q = query.trim();
     if (!q) return;
     addToHistory(q);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = readParams();
     params.set('q', q);
-    router.push(`${basePath}?${params.toString()}`);
+    pushParams(params);
     close();
-  }, [query, router, searchParams, basePath, close]);
+  }, [query, readParams, pushParams, close]);
 
   const handleSubmit = useCallback(() => {
     if (selectedIndex >= 0 && selectedIndex < items.length) {

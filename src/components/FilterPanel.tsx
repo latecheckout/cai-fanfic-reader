@@ -2,7 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions } from '@/lib/filters';
 import { BrowseSearchBar } from './BrowseSearchBar';
@@ -20,6 +20,7 @@ import { GhostButton, PILL_METRICS, PILL_SHAPE } from './GhostButton';
 import { SortDropdown, SORT_OPTIONS } from './SortDropdown';
 import { useDrawer } from '@/hooks/useDrawer';
 import { usePresets } from '@/hooks/usePresets';
+import { usePendingParams } from '@/hooks/usePendingParams';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 
 type PillState = 'neutral' | 'include' | 'exclude';
@@ -414,7 +415,6 @@ export function FilterPanel({
   filteredCount,
   basePath = '/',
 }: Props) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const reduce = useReducedMotion();
   const [isMobile, setIsMobile] = useState(false);
@@ -540,36 +540,12 @@ export function FilterPanel({
     return () => { clearTimeout(t); document.removeEventListener('mousedown', handler); };
   }, [saveFormOpen]);
 
-  // use-latest ref so the mutators below stay referentially stable (cyclePill
-  // is passed to the memoized FilterPill ~20×). Reads happen at click time.
-  const searchParamsRef = useRef(searchParams);
-  searchParamsRef.current = searchParams;
-
-  // Every URL mutation goes through readParams/pushParams. router.push is
-  // async, so searchParams stays stale until the next render — mutators that
-  // each rebuilt from searchParams would last-write-win when fired in the same
-  // tick (e.g. rapid pill clicks dropping earlier selections). pendingParams
-  // carries the in-flight value; it resets only when ITS OWN URL lands — an
-  // earlier queued navigation committing must not clear a newer pending value,
-  // or the next mutation rebuilds from that intermediate URL and drops it.
-  const pendingParams = useRef<URLSearchParams | null>(null);
-  useEffect(() => {
-    if (pendingParams.current?.toString() === searchParams.toString()) {
-      pendingParams.current = null;
-    }
-  }, [searchParams]);
-  const readParams = useCallback(
-    () => new URLSearchParams((pendingParams.current ?? searchParamsRef.current).toString()),
-    []
-  );
-  const pushParams = useCallback(
-    (params: URLSearchParams) => {
-      pendingParams.current = params;
-      const qs = params.toString();
-      router.push(qs ? `${basePath}?${qs}` : basePath);
-    },
-    [router, basePath]
-  );
+  // Every URL mutation goes through readParams/pushParams (shared with
+  // BrowseSearchBar via module-level pending state) so mutations fired close
+  // together compose instead of last-write-winning — see usePendingParams.
+  // Both are stable, keeping cyclePill referentially stable for the memoized
+  // FilterPill (~20 instances).
+  const { readParams, pushParams } = usePendingParams(basePath);
 
   const handleSortChange = useCallback(
     (v: string) => {
