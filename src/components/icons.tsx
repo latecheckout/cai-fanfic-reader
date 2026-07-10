@@ -75,11 +75,85 @@ export function CheckIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
       <path
-        d="M3 15L9.29412 20L21 4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M21.5905 3.193C22.0362 3.51911 22.1332 4.1448 21.8071 4.59053L10.1012 20.5905C9.94056 20.8101 9.69734 20.9548 9.42768 20.9911C9.15802 21.0274 8.8852 20.9523 8.67214 20.7831L2.37802 15.7831C1.94558 15.4395 1.8735 14.8105 2.21703 14.3781C2.56056 13.9456 3.18961 13.8735 3.62205 14.2171L9.10146 18.5699L20.193 3.40961C20.5191 2.96388 21.1448 2.8669 21.5905 3.193Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 6C12.5523 6 13 6.44772 13 7V11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H13V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V13H7C6.44772 13 6 12.5523 6 12C6 11.4477 6.44772 11 7 11H11V7C11 6.44772 11.4477 6 12 6Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function MinusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M6 12C6 11.4477 6.44772 11 7 11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function LightningIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M14.0019 2.40144C14.0019 0.917322 12.077 0.334547 11.2538 1.5694L3.18804 13.668C2.52349 14.6648 3.23807 16.0001 4.43612 16.0001H10.0019V21.5987C10.0019 23.0828 11.9267 23.6656 12.7499 22.4307L20.8157 10.3321C21.4802 9.33528 20.7656 8.00006 19.5676 8.00006H14.0019V2.40144Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function ViewsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4C15.9517 3.99997 19.7906 6.27233 22.3567 10.5831C22.8762 11.4558 22.8762 12.5441 22.3567 13.4168C19.7906 17.7276 15.9517 20 12 20C8.04829 20 4.20943 17.7277 1.64329 13.4169C1.12379 12.5442 1.12379 11.4559 1.64329 10.5832C4.20943 6.27243 8.04828 4.00003 12 4ZM8.5 12C8.5 10.067 10.067 8.5 12 8.5C13.933 8.5 15.5 10.067 15.5 12C15.5 13.933 13.933 15.5 12 15.5C10.067 15.5 8.5 13.933 8.5 12Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function CalendarIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M8 2C8.55228 2 9 2.44772 9 3V4H15V3C15 2.44772 15.4477 2 16 2C16.5523 2 17 2.44772 17 3V4H18C19.6569 4 21 5.34315 21 7V9H3V7C3 5.34315 4.34315 4 6 4H7V3C7 2.44772 7.44772 2 8 2Z"
+        fill="currentColor"
+      />
+      <path d="M3 18V11H21V18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function ProgressIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20V4ZM2 12C2 6.47715 6.47715 2 12 2C12.3748 2 12.7451 2.02066 13.1099 2.06098C18.1109 2.61382 22 6.85205 22 12C22 17.148 18.1109 21.3862 13.1099 21.939C12.7451 21.9793 12.3748 22 12 22C6.47715 22 2 17.5228 2 12Z"
+        fill="currentColor"
       />
     </svg>
   );
@@ -105,6 +179,47 @@ export function ChevronDownIcon(props: SVGProps<SVGSVGElement>) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M10.5858 13.9999C11.3668 14.781 12.6332 14.781 13.4142 13.9999L16.7071 10.707C17.0976 10.3165 17.0976 9.68332 16.7071 9.2928C16.3166 8.90228 15.6834 8.90228 15.2929 9.2928L12 12.5857L8.70711 9.2928C8.31658 8.90228 7.68342 8.90228 7.29289 9.2928C6.90237 9.68332 6.90237 10.3165 7.29289 10.707L10.5858 13.9999Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function UpDownArrowIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M15.5858 3.49985C16.3668 2.7188 17.6332 2.7188 18.4142 3.49985L21.7071 6.79274C22.0976 7.18327 22.0976 7.81643 21.7071 8.20696C21.3166 8.59748 20.6834 8.59748 20.2929 8.20696L18 5.91406V19.9998C18 20.5521 17.5523 20.9998 17 20.9998C16.4477 20.9998 16 20.5521 16 19.9998V5.91406L13.7071 8.20696C13.3166 8.59748 12.6834 8.59748 12.2929 8.20696C11.9024 7.81643 11.9024 7.18327 12.2929 6.79274L15.5858 3.49985Z"
+        fill="currentColor"
+      />
+      <path
+        d="M7 2.99985C7.55228 2.99985 8 3.44756 8 3.99985V18.0856L10.2929 15.7927C10.6834 15.4022 11.3166 15.4022 11.7071 15.7927C12.0976 16.1833 12.0976 16.8164 11.7071 17.207L8.41421 20.4999C7.63316 21.2809 6.36683 21.2809 5.58579 20.4998L2.29289 17.207C1.90237 16.8164 1.90237 16.1833 2.29289 15.7927C2.68342 15.4022 3.31658 15.4022 3.70711 15.7927L6 18.0856V3.99985C6 3.44756 6.44772 2.99985 7 2.99985Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function ClockIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM13 8C13 7.44772 12.5523 7 12 7C11.4477 7 11 7.44772 11 8V12C11 12.2652 11.1054 12.5196 11.2929 12.7071L13.7929 15.2071C14.1834 15.5976 14.8166 15.5976 15.2071 15.2071C15.5976 14.8166 15.5976 14.1834 15.2071 13.7929L13 11.5858V8Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function CloseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M7.29289 7.29289C7.68342 6.90237 8.31658 6.90237 8.70711 7.29289L12 10.5858L15.2929 7.29289C15.6834 6.90237 16.3166 6.90237 16.7071 7.29289C17.0976 7.68342 17.0976 8.31658 16.7071 8.70711L13.4142 12L16.7071 15.2929C17.0976 15.6834 17.0976 16.3166 16.7071 16.7071C16.3166 17.0976 15.6834 17.0976 15.2929 16.7071L12 13.4142L8.70711 16.7071C8.31658 17.0976 7.68342 17.0976 7.29289 16.7071C6.90237 16.3166 6.90237 15.6834 7.29289 15.2929L10.5858 12L7.29289 8.70711C6.90237 8.31658 6.90237 7.68342 7.29289 7.29289Z"
         fill="currentColor"
       />
     </svg>

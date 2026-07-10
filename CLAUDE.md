@@ -75,7 +75,8 @@ npm run build     # Production build
 - **Spacing** uses the default Tailwind scale (4px step) — it already equals the `--space-*` tokens, so it's intentionally not mapped.
 - **Theming**: `data-theme` (`light`/`paper`/`dark`) on `<html>` overrides only the changed vars; utilities re-resolve live. Dark-only overrides use the `theme-dark:` variant. Global-attribute descendant styles use arbitrary variants, e.g. `[html[data-mode=text]_&]:hidden`.
 - **Animation**: `motion` (`motion/react`) with easings from `src/lib/motion.ts`; guard entrances with `useReducedMotion()`; `initial={false}` when state is localStorage-seeded. Keyframes shared across components live top-level in `globals.css` (`fadeIn`, `caiRevealUp`, `caiRailFade*`, `caiSkeletonShimmer`, kudos set); reference via `animate-[name…]`.
-- **Shared chrome** as exported class-string constants co-located in a `*.ts` (e.g. `readingChrome.ts` `HUD_BUBBLE`/`BUBBLE_PILL`, `heroChrome.ts`).
+- **Shared chrome** as exported class-string constants co-located in a `*.ts` (e.g. `readingChrome.ts` `HUD_BUBBLE`/`BUBBLE_PILL`, `heroChrome.ts`, `popoverChrome.ts` `POPOVER_PANEL`/`MENU_ROW`).
+- **Dropdowns/popovers** use the shared `Popover` component (uncontrolled by default, `open`/`onOpenChange` for controlled) — its panel surface is `POPOVER_PANEL` and its open/close motion lives in `src/lib/motion.ts` (`POPOVER_ENTER`/`POPOVER_EXIT`/`POPOVER_TRANSITION`). Don't hand-roll new dropdown state machines; the one sanctioned exception is `BrowseSearchBar` (focus-driven + mobile fullscreen), which reuses the panel chrome + motion constants only.
 
 ---
 
@@ -284,7 +285,7 @@ Drop a `.md` file into `content/works/` with the frontmatter format. The slug co
 
 - **Node.js 24 is incompatible** — always use Node 22 LTS (`nvm use 22`)
 - **Git pushes fail from iCloud Drive** — `mmap failed: Operation timed out`. Workaround: `rsync` project to `/tmp`, push from there
-- **Filter panel is a push panel on desktop** — `body.filter-open` adds `margin-right: 380px` to shift content left; header is held at `width: 100vw` via a counterfix rule to prevent nav items shifting
+- **Filter panel is a floating push panel on desktop** — a 380px card inset 12px from the viewport edges; `body.filter-open` adds `padding-right: var(--filter-push)` (404px, defined in `tokens.css`) to shift content left. The navbar (`.site-header`) gets a `padding-right`/negative-`margin-right` counterfix so its bottom stroke spans the full viewport under the panel, and the AO4 FAB + aura band (`.ao4-fab`/`.ao4-aura`) ride the push via `translateX(calc(16px - var(--filter-push)))`. All of it derives from `--filter-push` — change the panel width there.
 - **"Show X works" footer button is hidden on desktop** — results update live; button only shown on mobile where an explicit Apply is needed
 - **`SearchOverlay` has been deleted** — do not recreate. ⌘K focuses `BrowseSearchBar` input. All search/vibe/preset logic lives in `BrowseSearchBar.tsx`.
 - **Preset and AC item handlers use `onMouseDown` not `onClick`** — prevents input blur before handler fires. In tests, dispatch `mousedown` events not `click`.

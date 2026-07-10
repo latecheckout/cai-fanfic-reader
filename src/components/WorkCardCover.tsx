@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { ratingTier } from '@/lib/ratings';
-import { HeartIcon, FlagIcon } from './icons';
+import { HeartIcon, FlagIcon, ViewsIcon } from './icons';
 import { TagChip } from './TagChip';
 
 interface Props {
@@ -68,25 +68,13 @@ const ProgressGlyph = () => (
   </svg>
 );
 
-/** Views/reads eye icon. */
-function EyeIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-      className="shrink-0">
-      <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" />
-      <circle cx="8" cy="8" r="2" />
-    </svg>
-  );
-}
-
 // Inline stat (icon + count) — vertical-align nudge keeps it centred in a text line.
 const STAT_VIEWS = 'inline-flex items-center gap-[3px] align-[-2px]';
 
 export function Views({ hits }: { hits: number }) {
   return (
     <span className={STAT_VIEWS}>
-      <EyeIcon />
+      <ViewsIcon width={13} height={13} className="shrink-0" />
       {formatCount(hits)}
     </span>
   );

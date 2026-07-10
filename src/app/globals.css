@@ -294,8 +294,38 @@
 }
 
 body.filter-open {
-  padding-right: 380px;
+  padding-right: var(--filter-push);
   box-sizing: border-box;
+}
+
+/* Counterfix: body padding shrinks the sticky navbar with the content, cutting
+   its bottom stroke short of the panel. Extend the header's box back to full
+   viewport width (padding offsets the margin so nav items don't move). Scoped
+   to .site-header so semantic <header> elements inside cards stay untouched. */
+body.filter-open .site-header {
+  padding-right: var(--filter-push);
+  margin-right: calc(-1 * var(--filter-push));
+}
+
+/* The AO4 FAB + its aura band are viewport-fixed, so body padding doesn't move
+   them — they ride the desktop push together or the drawer paints over them.
+   The FAB sits 28px from the edge; shifting by (push − 16px) lands its right
+   edge 24px left of the panel, matching its 24px bottom gap. Timings mirror
+   the drawer's enter/exit. */
+.ao4-fab,
+.ao4-aura {
+  transition: transform 0.2s var(--collapse);
+}
+body.filter-open .ao4-fab,
+body.filter-open .ao4-aura {
+  transform: translateX(calc(16px - var(--filter-push)));
+  transition: transform 0.22s var(--ease-out-expo);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ao4-fab,
+  .ao4-aura {
+    transition: none;
+  }
 }
 
 /* ============================================================

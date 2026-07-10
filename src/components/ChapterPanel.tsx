@@ -2,6 +2,7 @@
 
 import { useReading } from '@/context/ReadingContext';
 import { stripChapterPrefix } from '@/lib/utils';
+import { MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
 
 interface Props {
   chapters: string[];
@@ -28,7 +29,7 @@ export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
         return (
           <li key={i} role="option" aria-selected={active}>
             <button
-              className={`flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-overlay-soft ${active ? 'bg-overlay-medium' : ''}`}
+              className={`${MENU_ROW} ${active ? MENU_ROW_ACTIVE : ''}`}
               onClick={() => onSelect(i)}
             >
               {/* Mirror the main pill: mono number · divider line · sans title */}

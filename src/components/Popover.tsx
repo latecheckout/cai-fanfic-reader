@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { EASE_SPRING_OUT } from '@/lib/motion';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
+import { POPOVER_PANEL } from './popoverChrome';
 
 type Align = 'left' | 'center' | 'right';
 
@@ -29,24 +30,40 @@ interface TriggerArgs {
  * content springs open below it (no morph, no backdrop), and it closes on
  * click-outside or Escape. Centering for `align="center"` is baked into the
  * motion x so it never fights motion's scale/y transform.
+ *
+ * Open state is uncontrolled by default; pass `open` (+ `onOpenChange`) when a
+ * parent needs to own it (e.g. FilterPanel's Escape priority via useDrawer).
  */
 export function Popover({
   align = 'right',
   ariaLabel,
   contentClassName = '',
+  open: openProp,
+  onOpenChange,
   renderTrigger,
   children,
 }: {
   align?: Align;
   ariaLabel: string;
   contentClassName?: string;
+  /** Controlled open state — omit to let Popover manage it internally. */
+  open?: boolean;
+  /** Reports every open/close intent (toggle, click-outside, Escape). */
+  onOpenChange?: (open: boolean) => void;
   renderTrigger: (args: TriggerArgs) => ReactNode;
   children: ReactNode | ((args: { close: () => void }) => ReactNode);
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const reduce = useReducedMotion();
   const wrapRef = useRef<HTMLDivElement>(null);
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next);
+    onOpenChange?.(next);
+  };
   const close = () => setOpen(false);
-  const toggle = () => setOpen((v) => !v);
+  const toggle = () => setOpen(!open);
 
   // Click-outside + Escape close (only while open).
   useEffect(() => {
@@ -67,6 +84,7 @@ export function Popover({
       { signal: ctrl.signal }
     );
     return () => ctrl.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const centerX = align === 'center' ? { x: '-50%' } : {};
@@ -79,12 +97,12 @@ export function Popover({
           <motion.div
             role="dialog"
             aria-label={ariaLabel}
-            initial={{ opacity: 0, scale: 0.94, y: -6, ...centerX }}
-            animate={{ opacity: 1, scale: 1, y: 0, ...centerX }}
-            exit={{ opacity: 0, scale: 0.98, y: -4, ...centerX, transition: { duration: 0.16, ease: 'easeIn' } }}
-            transition={{ duration: 0.26, ease: EASE_SPRING_OUT }}
+            initial={reduce ? false : { ...POPOVER_ENTER, ...centerX }}
+            animate={{ ...POPOVER_VISIBLE, ...centerX }}
+            exit={{ ...POPOVER_EXIT, ...centerX }}
+            transition={POPOVER_TRANSITION}
             style={{ transformOrigin: ORIGIN[align] }}
-            className={`absolute top-full z-[var(--z-popover)] mt-2 rounded-[24px] border border-bubble-ring bg-bubble text-text shadow-float ${POS[align]} ${contentClassName}`}
+            className={`absolute top-full z-[var(--z-popover)] mt-2 ${POPOVER_PANEL} ${POS[align]} ${contentClassName}`}
           >
             {typeof children === 'function' ? children({ close }) : children}
           </motion.div>

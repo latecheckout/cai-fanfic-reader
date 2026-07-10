@@ -6,8 +6,15 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
 import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
+import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
+import { POPOVER_PANEL, MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
+import { ClockIcon, CloseIcon, UpDownArrowIcon } from './icons';
 
 const HISTORY_LIMIT = 5;
+
+// ── Shared utility strings (repeated across dropdown rows) ──
+const groupHeaderCls =
+  'font-mono text-[11.5px] font-medium tracking-[0.1em] uppercase text-secondary px-2.5 pt-3 pb-[6px] underline decoration-1 [text-underline-offset:4px] decoration-[var(--border-strong)]';
 
 function loadHistory(): string[] {
   if (typeof window === 'undefined') return [];
@@ -357,11 +364,6 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
   const hasACResults = items.length > 0;
   const showVibeHint = !isDefaultState && !vibeLoading && !vibeResult && hasACResults;
 
-  // ── Shared utility strings (repeated across dropdown rows) ──
-  const groupHeaderCls =
-    'font-mono text-[11.5px] font-medium tracking-[0.1em] uppercase text-secondary px-[18px] pt-3 pb-[6px] underline decoration-1 [text-underline-offset:4px] decoration-[var(--border-strong)]';
-  const rowHover = 'hover:bg-[color-mix(in_srgb,var(--text)_5%,transparent)]';
-
   return (
     <div
       ref={containerRef}
@@ -416,7 +418,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
           {query && (
             <>
               <button
-                className="absolute right-[38px] top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center p-0 text-[17px] leading-none text-secondary opacity-[0.45] transition-[opacity,color] duration-150 ease-in-out hover:text-text hover:opacity-100"
+                className="absolute right-[38px] top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center p-0 text-secondary opacity-[0.45] transition-[opacity,color] duration-150 ease-in-out hover:text-text hover:opacity-100"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   setQuery('');
@@ -425,7 +427,8 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                 }}
                 aria-label="Clear search"
               >
-                ×
+                {/* 24-grid glyph has baked-in padding — render large so the visible × reads at ~10px */}
+                <CloseIcon width={20} height={20} />
               </button>
               <button
                 className="absolute right-[6px] top-1/2 flex h-[26px] w-[26px] origin-center -translate-y-1/2 items-center justify-center rounded-full bg-text p-0 text-bg transition-[opacity,transform] duration-150 hover:scale-105 hover:opacity-80 active:scale-95"
@@ -445,13 +448,11 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
         {/* Close × — mobile fullscreen only, right of input */}
         {isMobileFS && (
           <button
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-secondary transition-[color,background] duration-150 ease-in-out hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)] hover:text-text"
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-secondary transition-[color,background] duration-150 ease-in-out hover:bg-overlay-soft hover:text-text"
             onMouseDown={(e) => { e.preventDefault(); close(); }}
             aria-label="Close search"
           >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M1.5 1.5L10.5 10.5M10.5 1.5L1.5 10.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
+            <CloseIcon width={20} height={20} />
           </button>
         )}
       </div>
@@ -460,13 +461,17 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
         {focused && (
           <motion.div
             role="listbox"
-            initial={reduceMotion ? false : { opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.13, ease: 'easeOut' }}
+            // Fullscreen sheet (mobile) keeps a plain fade — the desktop panel
+            // springs open like the reading-page popovers.
+            initial={reduceMotion ? false : isMobileFS ? { opacity: 0 } : POPOVER_ENTER}
+            animate={isMobileFS ? { opacity: 1 } : POPOVER_VISIBLE}
+            exit={isMobileFS ? { opacity: 0 } : POPOVER_EXIT}
+            transition={isMobileFS ? { duration: 0.13, ease: 'easeOut' } : POPOVER_TRANSITION}
+            style={isMobileFS ? undefined : { transformOrigin: 'top' }}
             className={
               isMobileFS
-                ? 'flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] mt-0 border-none bg-transparent py-[6px]'
-                : 'absolute left-0 right-0 top-[calc(100%+5px)] z-[var(--z-dropdown)] overflow-hidden rounded-[14px] border border-border-strong bg-card py-[6px] shadow-[0_4px_20px_rgba(26,24,22,0.10)]'
+                ? 'flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] mt-0 border-none bg-transparent p-2'
+                : `absolute left-0 right-0 top-[calc(100%+5px)] z-[var(--z-popover)] overflow-hidden p-2 ${POPOVER_PANEL}`
             }
           >
 
@@ -475,7 +480,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
               <div>
                 <div className={groupHeaderCls}>✦ Vibe</div>
                 {vibeLoading ? (
-                  <div className="flex items-center gap-[5px] px-[18px] pt-3 pb-[14px]">
+                  <div className="flex items-center gap-[5px] px-2.5 pt-3 pb-[14px]">
                     {[0, 0.15, 0.3].map((delay, i) => (
                       <motion.span
                         key={i}
@@ -491,7 +496,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                   </div>
                 ) : vibeResult ? (
                   <button
-                    className={`flex w-full cursor-pointer flex-col gap-[6px] border-none bg-[color-mix(in_srgb,var(--text)_3%,transparent)] px-[18px] py-[10px] text-left transition-colors duration-[80ms] hover:bg-[color-mix(in_srgb,var(--text)_6%,transparent)]`}
+                    className="flex w-full cursor-pointer flex-col gap-[6px] rounded-xl bg-overlay-soft px-2.5 py-2 text-left transition-colors hover:bg-overlay-medium"
                     onMouseDown={(e) => {
                       e.preventDefault();
                       applyVibeItem(vibeResult);
@@ -522,7 +527,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
             {/* Text search row — always available when typing; also what Enter submits */}
             {!isDefaultState && query.trim() && (
               <button
-                className={`flex w-full cursor-pointer items-baseline gap-[5px] border-b border-solid border-b-border bg-transparent px-[18px] py-[9px] text-left transition-colors duration-[80ms] ${rowHover}`}
+                className={`${MENU_ROW} gap-[5px]`}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   handleTextSearch();
@@ -546,9 +551,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                     return (
                       <button
                         key={`${item.group}-${item.name}`}
-                        className={`flex w-full cursor-pointer items-baseline justify-between gap-[10px] border-none bg-transparent px-[18px] py-[9px] text-left transition-colors duration-[80ms] ${rowHover} ${
-                          selected ? 'bg-[color-mix(in_srgb,var(--text)_5%,transparent)]' : ''
-                        }`}
+                        className={`${MENU_ROW} justify-between ${selected ? MENU_ROW_ACTIVE : ''}`}
                         onMouseDown={(e) => {
                           e.preventDefault();
                           applyACItem(item);
@@ -578,7 +581,7 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
 
             {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
             {showVibeHint && (
-              <div className="border-t border-border px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
+              <div className="mt-1 -mx-2 border-t border-bubble-ring px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
                 ✦ try: cozy · slow burn · found family · enemies to lovers
               </div>
             )}
@@ -590,26 +593,23 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                   <div className="pb-1">
                     <div className={groupHeaderCls}>Recent</div>
                     {history.map((h) => (
-                      <div key={h} className="group/hist flex items-center hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]">
+                      <div key={h} className="group/hist flex items-center rounded-xl transition-colors hover:bg-overlay-soft">
                         <button
-                          className="flex flex-1 cursor-pointer items-center gap-[7px] border-none bg-transparent px-[18px] py-[7px] text-left font-sans text-[15px] text-secondary transition-colors duration-[80ms] hover:text-text group-hover/hist:text-text"
+                          className="flex flex-1 cursor-pointer items-center gap-[7px] border-none bg-transparent px-2.5 py-2 text-left font-sans text-[15px] text-secondary transition-colors hover:text-text group-hover/hist:text-text"
                           onMouseDown={(e) => {
                             e.preventDefault();
                             applyHistoryItem(h);
                           }}
                         >
-                          <svg className="flex-shrink-0 text-secondary opacity-[0.55]" width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
-                            <circle cx="5.5" cy="5.5" r="4.2" stroke="currentColor" strokeWidth="1.2" />
-                            <path d="M5.5 3.2V5.5L7 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                          </svg>
+                          <ClockIcon width={13} height={13} className="flex-shrink-0 text-secondary opacity-[0.55]" />
                           <span>{h}</span>
                         </button>
                         <button
-                          className="cursor-pointer border-none bg-none pl-[6px] pr-3 py-[7px] font-mono text-[17px] leading-none text-secondary opacity-[0.35] transition-opacity duration-[80ms] hover:text-text hover:opacity-90"
+                          className="cursor-pointer border-none bg-none py-2 pl-[6px] pr-2.5 leading-none text-secondary opacity-[0.35] transition-opacity hover:text-text hover:opacity-90"
                           onMouseDown={(e) => handleRemoveHistory(h, e)}
                           aria-label={`Remove "${h}" from history`}
                         >
-                          ×
+                          <CloseIcon width={18} height={18} />
                         </button>
                       </div>
                     ))}
@@ -617,12 +617,12 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
                 )}
 
                 {savedPresets.length > 0 && (
-                  <div className="border-t border-border-strong">
+                  <div className="-mx-2 border-t border-bubble-ring px-2">
                     <div className={groupHeaderCls}>Saved filters</div>
                     {savedPresets.map((preset, i) => (
                       <button
                         key={i}
-                        className={`flex w-full cursor-pointer items-center gap-2 border-none bg-transparent px-[18px] py-2 text-left transition-colors duration-[80ms] ${rowHover}`}
+                        className={MENU_ROW}
                         onMouseDown={(e) => {
                           e.preventDefault();
                           applyPreset(preset);
@@ -636,12 +636,23 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
               </>
             )}
 
-            <div className="border-t border-border-strong px-[18px] py-2 font-mono text-[12px] text-secondary opacity-70">
-              {isDefaultState
-                ? 'type to search · ↑↓ navigate · esc to close'
-                : vibeLoading
-                ? 'analyzing vibe…'
-                : '↑↓ select · enter to search text · esc to close'}
+            {/* Full-bleed divider: -mx-2 cancels the panel's p-2; px-[18px] re-aligns
+                the text with the inset rows (8px panel + 10px row padding). */}
+            <div className="mt-1 -mx-2 -mb-2 flex items-center gap-[5px] border-t border-bubble-ring px-[18px] py-2 font-mono text-[12px] text-secondary opacity-70">
+              {isDefaultState ? (
+                <>
+                  <span>type to search ·</span>
+                  <UpDownArrowIcon width={13} height={13} className="shrink-0" />
+                  <span>navigate · esc to close</span>
+                </>
+              ) : vibeLoading ? (
+                'analyzing vibe…'
+              ) : (
+                <>
+                  <UpDownArrowIcon width={13} height={13} className="shrink-0" />
+                  <span>select · enter to search text · esc to close</span>
+                </>
+              )}
             </div>
           </motion.div>
         )}

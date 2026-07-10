@@ -122,11 +122,18 @@
   --z-tooltip:         320; /* hover tooltips (above popovers) */
 
   /* Filter pill state colors */
-  --color-include:    #1A5A24;
-  --color-include-bg: rgba(30, 100, 40, 0.10);
-  --color-exclude:    #7A1A1A;
-  --color-exclude-bg: rgba(140, 30, 30, 0.10);
-  --color-star:       #B8952A;
+  --color-include:        #1A5A24;
+  --color-include-bg:     rgba(30, 100, 40, 0.10);
+  --color-include-border: rgba(30, 100, 40, 0.3);
+  --color-exclude:        #7A1A1A;
+  --color-exclude-bg:     rgba(140, 30, 30, 0.10);
+  --color-exclude-border: rgba(140, 30, 30, 0.3);
+  --color-star:           #B8952A;
+
+  /* Filter drawer push geometry: 380px floating panel + 12px right inset +
+     12px gap left of the panel. Everything that rides the push (body padding,
+     header counterfix, FAB/aura shift, backdrop gradient) derives from this. */
+  --filter-push: 404px;
 
   /* ── Character brand palette (imported from character-brain) ──
      Fixed brand hues (theme-independent). Exposed as bg-/text-/border-

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
 import { useGlimm } from 'glimm/next';
 import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
+import { LightningIcon } from './icons';
 
 export type SiteMode = 'visual' | 'text';
 // Re-exported for back-compat; canonical definitions live in @/lib/constants.
@@ -14,14 +15,17 @@ const SNAP = { type: 'spring' as const, duration: 0.42, bounce: 0.3 };
 
 // Full-width fade-to-bg bar across the bottom of the site — solid page colour at
 // the very bottom, easing up to transparent (multi-stop so there's no banding).
-const AURA_BG =
-  'bg-[linear-gradient(to_top,var(--bg)_0%,var(--bg)_7%,' +
-  'color-mix(in_srgb,var(--bg),transparent_14%)_20%,' +
-  'color-mix(in_srgb,var(--bg),transparent_30%)_34%,' +
-  'color-mix(in_srgb,var(--bg),transparent_48%)_48%,' +
-  'color-mix(in_srgb,var(--bg),transparent_66%)_62%,' +
-  'color-mix(in_srgb,var(--bg),transparent_82%)_78%,' +
-  'color-mix(in_srgb,var(--bg),transparent_93%)_90%,transparent_100%)]';
+// Inline style, NOT a Tailwind arbitrary `bg-[…]` — the nested color-mix stops
+// are too complex for Tailwind to emit and the class gets silently dropped
+// (same failure as the thumb's GLOW_IMAGE below).
+const AURA_IMAGE =
+  'linear-gradient(to top, var(--bg) 0%, var(--bg) 7%, ' +
+  'color-mix(in srgb, var(--bg), transparent 14%) 20%, ' +
+  'color-mix(in srgb, var(--bg), transparent 30%) 34%, ' +
+  'color-mix(in srgb, var(--bg), transparent 48%) 48%, ' +
+  'color-mix(in srgb, var(--bg), transparent 66%) 62%, ' +
+  'color-mix(in srgb, var(--bg), transparent 82%) 78%, ' +
+  'color-mix(in srgb, var(--bg), transparent 93%) 90%, transparent 100%)';
 
 // Mouse-tracked dual-radial oklch glow (the ActionButton signature). Set as an
 // inline background-image, NOT a Tailwind arbitrary `bg-[…]` — the value is too
@@ -31,12 +35,7 @@ const GLOW_IMAGE =
   'radial-gradient(120px circle at var(--mx) var(--my), color-mix(in oklch, var(--ab-hot-pink) 85%, transparent), transparent 60%), ' +
   'radial-gradient(200px circle at calc(100% - var(--mx)) calc(100% - var(--my)), color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%)';
 
-const BoltIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
-    strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M7.8 1 3 8h3.4l-1 5L11 6H7.4l.4-5Z" />
-  </svg>
-);
+const BoltIcon = () => <LightningIcon width={14} height={14} />;
 
 /**
  * AO4 turbo toggle — the global mode switch. ON = text mode. Drag the "AO4
@@ -90,11 +89,12 @@ export function Ao4TurboToggle() {
     <>
       {/* Full-width fade band pinned to the very bottom (sits just under the toggle). */}
       <span
-        className={`fixed bottom-0 left-0 right-0 z-[calc(var(--z-sticky)_-_1)] h-[220px] max-md:h-[180px] pointer-events-none ${AURA_BG}`}
+        className="ao4-aura fixed bottom-0 left-0 right-0 z-[calc(var(--z-sticky)_-_1)] h-[170px] max-md:h-[140px] pointer-events-none"
+        style={{ backgroundImage: AURA_IMAGE }}
         aria-hidden="true"
       />
 
-      <div className="fixed right-7 bottom-[calc(24px+var(--safe-bottom))] z-[var(--z-sticky)] max-md:right-4 max-md:bottom-[calc(18px+var(--safe-bottom))]">
+      <div className="ao4-fab fixed right-7 bottom-[calc(24px+var(--safe-bottom))] z-[var(--z-sticky)] max-md:right-4 max-md:bottom-[calc(18px+var(--safe-bottom))]">
         <div className="relative h-[50px] w-[194px] max-md:h-[54px] max-md:w-[206px] rounded-full p-[3px] touch-none bg-bg [background-image:linear-gradient(color-mix(in_srgb,var(--text)_8%,transparent),color-mix(in_srgb,var(--text)_8%,transparent))] backdrop-blur-[12px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]">
           {/* On/off marks in the negative space (off = ring on the left, on = bar
               on the right); the thumb covers the active side. */}

@@ -24,7 +24,7 @@ export function BrowseHeader({ search }: Props = {}) {
 
   return (
     <>
-      <header className="sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
+      <header className="site-header sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
         <div className="mx-auto flex h-14 max-w-[var(--browse-max-width)] items-stretch px-6 max-md:items-center max-md:justify-between max-md:px-4">
           {/* ── Left zone: logo ── */}
           <div className="flex min-w-0 flex-1 items-center">

@@ -89,11 +89,15 @@ export function TagRow({
   param: string;
 }) {
   if (items.length === 0) return null;
+  // Dedupe: frontmatter can legitimately repeat a value (e.g. a self-ship
+  // listing "Original Female Character" twice) — one chip per value is enough,
+  // and repeated values would collide as React keys.
+  const unique = [...new Set(items)];
   return (
     <div className={TAG_ROW}>
       <span className={TAG_LABEL}>{label}</span>
       <div className={TAG_GROUP}>
-        {items.map((t) => (
+        {unique.map((t) => (
           <TagChip key={t} tag={t} category={category} clickable href={`/?${param}=${encodeURIComponent(t)}`} />
         ))}
       </div>

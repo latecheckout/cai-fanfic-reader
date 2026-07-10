@@ -82,3 +82,13 @@ export function truncateSummary(summary: string, max = 4): { text: string; hasMo
 export function stripChapterPrefix(title: string): string {
   return title.replace(/^\s*chapter\s+\d+\s*:\s*/i, '') || title;
 }
+
+/**
+ * True when a keyboard event targets an editable element — global single-key
+ * shortcuts (F for the drawer, S for sort) must not fire while typing.
+ */
+export function isTypingTarget(e: KeyboardEvent): boolean {
+  const el = e.target as HTMLElement | null;
+  const tag = el?.tagName?.toLowerCase();
+  return tag === 'input' || tag === 'textarea' || !!el?.isContentEditable;
+}

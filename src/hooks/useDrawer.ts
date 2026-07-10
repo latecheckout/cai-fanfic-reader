@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { isTypingTarget } from '@/lib/utils';
 
 interface Options {
   /** Desktop vs mobile — drives the body push-panel class (desktop only). */
@@ -52,10 +53,8 @@ export function useDrawer({ isMobile, escapeBlocked = false }: Options) {
         if (latest.current.open) setOpen(false);
         return;
       }
-      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
-      const isInput =
-        tag === 'input' || tag === 'textarea' || (e.target as HTMLElement)?.isContentEditable;
-      if (isInput) return;
+      // Bare F only — Cmd+F/Ctrl+F must stay the browser's find-in-page.
+      if (e.metaKey || e.ctrlKey || e.altKey || isTypingTarget(e)) return;
       if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
         setOpen((d) => !d);
