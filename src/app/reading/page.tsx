@@ -88,7 +88,13 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     dateTo: params.date_to,
   };
 
-  const filteredWorks = applyFilters(tabWorks, filters);
+  // Bookmarked tab: send the WHOLE archive filtered+sorted as one list — the
+  // client subsets it to mock bookmarks + local reading-page saves, keeping
+  // the ?sort order intact. @WIRE — collapses once /user/library exists.
+  const filteredWorks =
+    activeTab === 'bookmarked'
+      ? applyFilters(allWorks, filters)
+      : applyFilters(tabWorks, filters);
   const searchOptions = buildSearchOptions(tabWorks);
 
   return (
@@ -102,7 +108,6 @@ export default async function LibraryPage({ searchParams }: PageProps) {
             activeTab={activeTab}
             searchOptions={searchOptions}
             currentFilters={params}
-            filteredCount={filteredWorks.length}
           />
         </Suspense>
       </main>

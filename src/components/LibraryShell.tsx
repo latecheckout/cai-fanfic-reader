@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkSummary } from '@/types';
 import { SearchOptions } from '@/lib/filters';
-import { LibraryTab, LIBRARY_REMOVED_KEY } from '@/lib/library';
+import { LibraryTab, MOCK_BOOKMARKED, readSavedSlugs, readRemovedSlugs, removeBookmark } from '@/lib/library';
 import { useViewMode } from '@/hooks/useViewMode';
+import { useFilterFlash } from '@/hooks/useFilterFlash';
 import { FilterPanel } from './FilterPanel';
 // (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
-import { WorkCardCover } from './WorkCardCover';
-import { WorkCardGrid } from './WorkCardGrid';
-import { SkeletonCard } from './SkeletonCard';
+import { WorkGrid } from './WorkGrid';
 import { EmptyState } from './EmptyState';
+import { BookmarkCheckIcon } from './icons';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
@@ -20,6 +20,9 @@ const TAB_LABELS: Record<LibraryTab, string> = {
 };
 
 interface Props {
+  /** Tab works, filtered + sorted. For the bookmarked tab this is the whole
+      filtered archive — the client subsets it to mock + local bookmarks so
+      locally saved works keep the URL sort order. */
   works: WorkSummary[];
   tabCounts: Record<LibraryTab, number>;
   activeTab: LibraryTab;
@@ -52,29 +55,22 @@ interface Props {
     date_from?: string;
     date_to?: string;
   };
-  filteredCount: number;
 }
 
-const SKELETON_COUNT = 3;
-
-// Per-view layouts — identical to Browse: list = 1-then-2 columns, grid = 4→3→2→1.
-const GRID_CLS =
-  'grid grid-cols-4 gap-4 max-[1100px]:grid-cols-3 max-[768px]:grid-cols-2 max-[460px]:grid-cols-1';
-const LIST_CLS = 'grid grid-cols-1 gap-4 min-[1100px]:grid-cols-2';
-
-// Card wrapper (bookmarked tab) — page-load fade with an nth-child stagger.
+// Card entrance — page-load fade with an nth-child stagger. WorkGrid renders
+// this on an INNER div (always first-child), so the stagger keys off the
+// motion wrapper's position via parent-position variants.
 const CARD_WRAPPER_CLS =
-  'relative ' +
   'motion-reduce:animate-[fadeIn_150ms_ease_both] ' +
   'motion-safe:animate-[fadeIn_450ms_var(--ease-out-expo)_both] ' +
-  'motion-safe:[&:nth-child(2)]:animate-[fadeIn_450ms_var(--ease-out-expo)_20ms_both] ' +
-  'motion-safe:[&:nth-child(3)]:animate-[fadeIn_450ms_var(--ease-out-expo)_40ms_both] ' +
-  'motion-safe:[&:nth-child(4)]:animate-[fadeIn_450ms_var(--ease-out-expo)_60ms_both] ' +
-  'motion-safe:[&:nth-child(5)]:animate-[fadeIn_450ms_var(--ease-out-expo)_80ms_both] ' +
-  'motion-safe:[&:nth-child(6)]:animate-[fadeIn_450ms_var(--ease-out-expo)_100ms_both] ' +
-  'motion-safe:[&:nth-child(7)]:animate-[fadeIn_450ms_var(--ease-out-expo)_120ms_both] ' +
-  'motion-safe:[&:nth-child(8)]:animate-[fadeIn_450ms_var(--ease-out-expo)_140ms_both] ' +
-  'motion-safe:[&:nth-child(n+9)]:animate-[fadeIn_450ms_var(--ease-out-expo)_160ms_both]';
+  'motion-safe:[:nth-child(2)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_20ms_both] ' +
+  'motion-safe:[:nth-child(3)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_40ms_both] ' +
+  'motion-safe:[:nth-child(4)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_60ms_both] ' +
+  'motion-safe:[:nth-child(5)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_80ms_both] ' +
+  'motion-safe:[:nth-child(6)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_100ms_both] ' +
+  'motion-safe:[:nth-child(7)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_120ms_both] ' +
+  'motion-safe:[:nth-child(8)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_140ms_both] ' +
+  'motion-safe:[:nth-child(n+9)>&]:animate-[fadeIn_450ms_var(--ease-out-expo)_160ms_both]';
 
 export function LibraryShell({
   works,
@@ -82,42 +78,20 @@ export function LibraryShell({
   activeTab,
   searchOptions,
   currentFilters,
-  filteredCount,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [removedSlugs, setRemovedSlugs] = useState<Set<string>>(new Set());
-  const [isFiltering, setIsFiltering] = useState(false);
+  const [savedSlugs, setSavedSlugs] = useState<Set<string>>(new Set());
   // Global site mode (nav toggle) is the single source of layout truth.
-  const { view, viewSwitching } = useViewMode({ initial: 'list' });
-  const filterKey = JSON.stringify(currentFilters);
-  const prevFilterKey = useRef<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mountedRef = useRef(false);
+  const { view } = useViewMode({ initial: 'list' });
+  const isFiltering = useFilterFlash(currentFilters, 400);
 
-  // Load removed bookmarks from localStorage on mount
+  // Load removed bookmarks + reading-page saves from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(LIBRARY_REMOVED_KEY) ?? '[]');
-      setRemovedSlugs(new Set(Array.isArray(stored) ? stored : []));
-    } catch { /* ignore */ }
+    setRemovedSlugs(new Set(readRemovedSlugs()));
+    setSavedSlugs(new Set(readSavedSlugs()));
   }, []);
-
-  // Show skeleton briefly when filters change (skip initial mount)
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      prevFilterKey.current = filterKey;
-      return;
-    }
-    if (prevFilterKey.current === filterKey) return;
-    prevFilterKey.current = filterKey;
-
-    setIsFiltering(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setIsFiltering(false), 400);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [filterKey]);
 
   const handleTabChange = (tab: LibraryTab) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -126,22 +100,27 @@ export function LibraryShell({
   };
 
   const handleRemove = (slug: string) => {
-    const next = new Set([...removedSlugs, slug]);
-    setRemovedSlugs(next);
-    try {
-      localStorage.setItem(LIBRARY_REMOVED_KEY, JSON.stringify([...next]));
-    } catch { /* ignore */ }
+    removeBookmark(slug); // owns both localStorage keys (see lib/library.ts)
+    setRemovedSlugs(new Set(readRemovedSlugs()));
+    setSavedSlugs(new Set(readSavedSlugs()));
   };
 
-  // Filter out removed slugs on the bookmarked tab (client-side)
-  const displayedWorks = activeTab === 'bookmarked'
-    ? works.filter((w) => !removedSlugs.has(w.slug))
-    : works;
+  // Bookmarked tab: `works` is the whole filtered+sorted archive — subset it
+  // to (mock ∪ locally saved) − removed, preserving the URL sort order.
+  const displayedWorks =
+    activeTab === 'bookmarked'
+      ? works.filter(
+          (w) => (MOCK_BOOKMARKED.has(w.slug) || savedSlugs.has(w.slug)) && !removedSlugs.has(w.slug)
+        )
+      : works;
 
-  // Adjust bookmarked count for removals
+  // Adjust the bookmarked count badge for local additions/removals. (Saved
+  // and removed are disjoint by construction — removeBookmark unsaves.)
+  const localAdds = [...savedSlugs].filter((s) => !MOCK_BOOKMARKED.has(s)).length;
+  const removedFromMock = [...removedSlugs].filter((s) => MOCK_BOOKMARKED.has(s)).length;
   const displayedTabCounts = {
     ...tabCounts,
-    bookmarked: Math.max(0, tabCounts.bookmarked - removedSlugs.size),
+    bookmarked: Math.max(0, tabCounts.bookmarked - removedFromMock + localAdds),
   };
 
   return (
@@ -177,22 +156,14 @@ export function LibraryShell({
         basePath="/reading"
       />
 
-      {/* ── Work list ── */}
-      <div className={view === 'grid' ? GRID_CLS : LIST_CLS}>
-        {isFiltering || viewSwitching ? (
-          // Keep page height on a view switch so the scrollbar doesn't toggle (no FAB shift).
-          Array.from(
-            { length: viewSwitching ? Math.max(SKELETON_COUNT, displayedWorks.length) : SKELETON_COUNT },
-            (_, i) => (
-              <SkeletonCard
-                key={i}
-                index={i}
-                variant="library"
-                layout={view}
-              />
-            ),
-          )
-        ) : displayedWorks.length === 0 ? (
+      {/* ── Work list ── (shared WorkGrid: skeletons on filter, layout morph
+          on view switch, exit animation on bookmark removal) */}
+      <WorkGrid
+        works={displayedWorks}
+        view={view}
+        isFiltering={isFiltering}
+        cardClassName={CARD_WRAPPER_CLS}
+        empty={
           <EmptyState
             title={
               activeTab === 'continuing'
@@ -204,30 +175,29 @@ export function LibraryShell({
           >
             <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
           </EmptyState>
-        ) : (
-          displayedWorks.map((work) =>
-            activeTab === 'bookmarked' ? (
-              <div key={work.slug} className={CARD_WRAPPER_CLS}>
-                {view === 'grid' ? <WorkCardGrid work={work} /> : <WorkCardCover work={work} />}
+        }
+        renderOverlay={
+          activeTab === 'bookmarked'
+            ? (work) => (
+                /* Same saved-state glyph as the reading page's list button.
+                   z-[6] keeps it above the cards' hover:z-[5] lift; hovering
+                   the icon shows a translucent fill as the remove affordance. */
                 <button
-                  className="absolute top-4 right-1 z-[3] flex h-7 w-7 cursor-pointer items-center justify-center border-none bg-transparent p-0 text-text opacity-75 transition-opacity duration-150 hover:opacity-30"
+                  className={`absolute top-3 right-3 z-[6] flex h-8 w-8 cursor-pointer items-center justify-center rounded-[calc(var(--card-radius)-12px)] border-none bg-transparent p-0 opacity-90 transition-[background,opacity,transform] duration-150 hover:opacity-100 active:scale-95 ${
+                    view === 'grid'
+                      ? 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.55)] hover:bg-white/30 hover:[backdrop-filter:blur(4px)]'
+                      : 'text-text hover:bg-overlay-medium'
+                  }`}
                   onClick={() => handleRemove(work.slug)}
                   aria-label="Remove bookmark"
                   title="Remove bookmark"
                 >
-                  <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
-                    <path d="M0 0h14v18l-7-5-7 5V0z" />
-                  </svg>
+                  <BookmarkCheckIcon width={20} height={20} />
                 </button>
-              </div>
-            ) : view === 'grid' ? (
-              <WorkCardGrid key={work.slug} work={work} />
-            ) : (
-              <WorkCardCover key={work.slug} work={work} />
-            )
-          )
-        )}
-      </div>
+              )
+            : undefined
+        }
+      />
     </>
   );
 }

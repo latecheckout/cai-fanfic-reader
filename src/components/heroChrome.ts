@@ -11,7 +11,7 @@ export const heroSlide = {
   slide:
     'group/slide relative grow-0 shrink-0 basis-full snap-center aspect-[15/4] max-sm:aspect-[3/2] ' +
     'overflow-hidden text-inherit no-underline bg-border ' +
-    "after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-card after:border after:border-white/20 after:content-['']",
+    "after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-card after:border after:border-image-outline after:content-['']",
   bg: 'object-cover transition-transform duration-[600ms] ease-out-expo group-hover/slide:scale-[1.02]',
   scrim:
     'absolute inset-0 bg-[linear-gradient(100deg,rgba(15,12,10,0.82)_0%,rgba(15,12,10,0.55)_38%,rgba(15,12,10,0.12)_62%,rgba(15,12,10,0)_80%)]',

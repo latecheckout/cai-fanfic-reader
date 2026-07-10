@@ -3,21 +3,12 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
-import { SAVED_KEY } from '@/lib/constants';
+import { isBookmarked, toggleBookmark } from '@/lib/library';
 import { HUD_BUBBLE } from './readingChrome';
 import { FilterIcon, BookmarkIcon, BookmarkCheckIcon } from './icons';
 import { Tooltip } from './Tooltip';
 import { Popover } from './Popover';
 import { PrefsPanel } from './PrefsPanel';
-
-function readSavedList(): string[] {
-  try {
-    const raw = localStorage.getItem(SAVED_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
 
 /**
  * Cross-fades between two icons whenever `swapKey` changes — outgoing blurs and
@@ -45,18 +36,11 @@ export function ReadingActions() {
   const [inList, setInList] = useState(false);
 
   useEffect(() => {
-    setInList(readSavedList().includes(slug));
+    setInList(isBookmarked(slug));
   }, [slug]);
 
   function toggleReadingList() {
-    const saved = readSavedList();
-    const next = saved.includes(slug) ? saved.filter((s) => s !== slug) : [...saved, slug];
-    setInList(next.includes(slug));
-    try {
-      localStorage.setItem(SAVED_KEY, JSON.stringify(next));
-    } catch {
-      // fail silently
-    }
+    setInList(toggleBookmark(slug));
   }
 
   return (

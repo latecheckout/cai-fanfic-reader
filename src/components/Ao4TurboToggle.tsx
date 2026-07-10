@@ -113,8 +113,8 @@ export function Ao4TurboToggle() {
             type="button"
             role="switch"
             aria-checked={on}
-            aria-label="AO4 turbo"
-            title={on ? 'AO4 turbo on — text mode' : 'AO4 turbo off — covers'}
+            aria-label="AO4 Mode"
+            title={on ? 'AO4 Mode on — text mode' : 'AO4 Mode off — covers'}
             drag="x"
             dragConstraints={{ left: 0, right: TRAVEL }}
             dragElastic={0.04}
@@ -148,7 +148,7 @@ export function Ao4TurboToggle() {
               aria-hidden="true"
             />
             <span className="relative z-[1] flex"><BoltIcon /></span>
-            <span className="relative z-[1]">AO4 turbo</span>
+            <span className="relative z-[1]">AO4 Mode</span>
           </motion.button>
         </div>
       </div>

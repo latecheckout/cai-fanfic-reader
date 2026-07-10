@@ -107,7 +107,7 @@ export function Avatar() {
   return (
     <span className="relative mr-[7px] inline-block h-5 w-5 shrink-0 overflow-hidden rounded-full bg-border" aria-hidden="true">
       <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="20px" className="object-cover" />
-      <span className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]" />
+      <span className="pointer-events-none absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_var(--image-outline)]" />
     </span>
   );
 }

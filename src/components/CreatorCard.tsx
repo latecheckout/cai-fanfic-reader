@@ -27,7 +27,7 @@ export function CreatorCard({ creator, index = 0 }: Props) {
     >
       <span className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-border" aria-hidden="true">
         <Image src={CREATOR_PLACEHOLDER} alt="" fill sizes="96px" className="object-cover" />
-        <span className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)] pointer-events-none" />
+        <span className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_var(--image-outline)] pointer-events-none" />
       </span>
       <span className="mt-3 max-w-full font-serif text-[16px] font-medium leading-[1.3] text-text line-clamp-2 group-hover:underline group-hover:underline-offset-2">{creator.name}</span>
       {creator.bio && <span className="mt-2 mb-[2px] max-w-full font-serif text-[13px] leading-[1.5] text-secondary line-clamp-2">{creator.bio}</span>}

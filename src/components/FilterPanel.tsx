@@ -21,7 +21,7 @@ import { SortDropdown, SORT_OPTIONS } from './SortDropdown';
 import { useDrawer } from '@/hooks/useDrawer';
 import { usePresets } from '@/hooks/usePresets';
 import { usePendingParams } from '@/hooks/usePendingParams';
-import { EASE_OUT_EXPO } from '@/lib/motion';
+import { EASE_OUT_EXPO, PILL_EXIT } from '@/lib/motion';
 
 type PillState = 'neutral' | 'include' | 'exclude';
 
@@ -288,7 +288,7 @@ const ActiveFilterPill = memo(function ActiveFilterPill({
     <motion.div
       initial={reduce ? false : { scale: 0.82, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={reduce ? { opacity: 0 } : { scale: 0.72, opacity: 0, transition: { duration: 0.16, ease: EASE_OUT_EXPO } }}
+      exit={reduce ? { opacity: 0 } : PILL_EXIT}
       transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
       className={`${TOOLBAR_PILL} max-w-[240px] overflow-hidden ${
         pill.isExclude

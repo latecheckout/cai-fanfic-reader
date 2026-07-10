@@ -93,7 +93,7 @@ export function SelectionToolbar() {
                 className="group/av relative block h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-border"
               >
                 <Image src={activeCharacter.src} alt="" fill sizes="32px" className="object-cover" />
-                <span className="pointer-events-none absolute inset-0 rounded-lg shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]" />
+                <span className="pointer-events-none absolute inset-0 rounded-lg shadow-[inset_0_0_0_1px_var(--image-outline)]" />
                 {/* change icon — fades in on avatar hover */}
                 <span className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/45 opacity-0 transition-opacity duration-150 group-hover/av:opacity-100">
                   <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

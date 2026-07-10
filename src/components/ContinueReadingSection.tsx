@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
 import { RailViewport } from './RailViewport';
+import { ChevronRightIcon } from './icons';
 import { BOOKMARKS_KEY } from '@/lib/constants';
 
 interface Props {
@@ -75,17 +76,20 @@ export function ContinueReadingSection({ covers }: Props) {
       className={`mb-10 border-b border-border${pending ? ' hidden [html[data-has-reading]_&]:block' : ''}`}
     >
       {/* Section header band */}
-      <div className="flex justify-between items-baseline py-3 border-b border-border">
-        <span className="font-mono text-[12px] font-medium tracking-[0.1em] uppercase text-secondary">Continue Reading</span>
+      <div className="flex items-center justify-between py-3 border-b border-border">
+        <span className="inline-flex items-center gap-2 font-mono text-[12px] font-medium tracking-[0.05em] text-secondary">
+          Continue reading
+          {!pending && (
+            <span className="hidden rounded-full bg-overlay-soft px-2.5 py-1 font-normal leading-none tracking-normal md:inline-block">
+              {bookmarks.length} in progress
+            </span>
+          )}
+        </span>
         {!pending && (
-          <span className="hidden md:inline font-mono text-[12px] text-secondary">
-            {bookmarks.length} in progress{' · '}
+          <span className="hidden items-center gap-2 font-mono text-[12px] text-secondary md:inline-flex">
             <a href="/reading" className="inline-flex items-center gap-1 text-inherit no-underline hover:underline hover:underline-offset-2 max-md:text-secondary max-md:opacity-70 max-md:hover:opacity-100">
               view reading list
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor"
-                strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <polyline points="3 1.5 7 5 3 8.5" />
-              </svg>
+              <ChevronRightIcon width={14} height={14} className="shrink-0" />
             </a>
           </span>
         )}

@@ -33,6 +33,7 @@
   --color-card-border: var(--card-border);
   --color-bubble: var(--bubble-bg);
   --color-bubble-ring: var(--bubble-ring);
+  --color-image-outline: var(--image-outline);
   --color-overlay-soft: var(--overlay-soft);
   --color-overlay-medium: var(--overlay-medium);
 

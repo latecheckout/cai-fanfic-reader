@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { WorkSummary } from '@/types';
 import { SearchOptions } from '@/lib/filters';
 import { useViewMode } from '@/hooks/useViewMode';
+import { useFilterFlash } from '@/hooks/useFilterFlash';
 import { FilterPanel } from './FilterPanel';
-import { WorkCardCover } from './WorkCardCover';
-import { WorkCardGrid } from './WorkCardGrid';
-import { SkeletonCard } from './SkeletonCard';
+import { WorkGrid } from './WorkGrid';
 import { EmptyState } from './EmptyState';
 
 interface Props {
@@ -47,19 +45,9 @@ interface Props {
   from?: string;
 }
 
-// @TODO-DEV — SkeletonCard is shown during filter changes. Once content comes from an API,
-//             trigger it from a real loading/fetch state. See src/components/SkeletonCard.tsx.
-const SKELETON_COUNT = 6;
-
 const FROM_LABELS: Record<string, { href: string; label: string }> = {
   characters: { href: '/characters', label: '← Characters' },
 };
-
-// Layout modes (driven by the view toggle). Image cards: 4→3→2→1. Text/list
-// cards: single column, two on wide desktops so they fill the extra width.
-const GRID_CLS =
-  'grid grid-cols-4 gap-4 max-[1100px]:grid-cols-3 max-[768px]:grid-cols-2 max-[460px]:grid-cols-1';
-const LIST_CLS = 'grid grid-cols-1 gap-4 min-[1100px]:grid-cols-2';
 
 export function BrowseShell({
   works,
@@ -70,28 +58,8 @@ export function BrowseShell({
 }: Props) {
   // Global site mode (nav toggle) is the single source of layout truth: text
   // mode renders the rich-metadata list, visual mode the cover grid.
-  const { view, viewSwitching } = useViewMode({ initial: 'grid' });
-  const [isFiltering, setIsFiltering] = useState(false);
-  const filterKey = JSON.stringify(currentFilters);
-  const prevFilterKey = useRef<string | null>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const mountedRef = useRef(false);
-
-  // Show skeleton briefly when filters change (skip initial mount)
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      prevFilterKey.current = filterKey;
-      return;
-    }
-    if (prevFilterKey.current === filterKey) return;
-    prevFilterKey.current = filterKey;
-
-    setIsFiltering(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setIsFiltering(false), 450);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [filterKey]);
+  const { view } = useViewMode({ initial: 'grid' });
+  const isFiltering = useFilterFlash(currentFilters, 450);
 
   const activeFilterLabels = Object.entries(currentFilters)
     .filter(([k, v]) => v && k !== 'sort' && k !== 'order')
@@ -114,26 +82,16 @@ export function BrowseShell({
         </Link>
       )}
 
-      <div
-        className={`transition-opacity duration-[180ms] ease-[ease] motion-safe:animate-[fadeIn_650ms_var(--ease-out-expo)_400ms_both] ${
-          isFiltering ? LIST_CLS : view === 'grid' ? GRID_CLS : LIST_CLS
-        }`}
-      >
-        {isFiltering || viewSwitching ? (
-          // On a view switch keep the page the same height (one skeleton per work)
-          // so the scrollbar never toggles → no horizontal shift of the fixed FAB.
-          Array.from(
-            { length: viewSwitching ? Math.max(SKELETON_COUNT, works.length) : SKELETON_COUNT },
-            (_, i) => (
-              <SkeletonCard
-                key={i}
-                index={i}
-                layout={isFiltering ? 'list' : view}
-              />
-            ),
-          )
-        ) : works.length === 0 ? (
-          <EmptyState className="col-[1/-1]" title="No works match your filters.">
+      {/* View switches (AO4 toggle) morph via WorkGrid's layout animation;
+          skeletons only flash on filter changes. */}
+      <WorkGrid
+        works={works}
+        view={view}
+        isFiltering={isFiltering}
+        priorityCount={4}
+        containerClassName="transition-opacity duration-[180ms] ease-[ease] motion-safe:animate-[fadeIn_650ms_var(--ease-out-expo)_400ms_both]"
+        empty={
+          <EmptyState title="No works match your filters.">
             {activeFilterLabels.length > 0 && (
               <>
                 Try removing a filter or{' '}
@@ -141,16 +99,8 @@ export function BrowseShell({
               </>
             )}
           </EmptyState>
-        ) : (
-          works.map((work, i) =>
-            view === 'grid' ? (
-              <WorkCardGrid key={work.slug} work={work} priority={i < 4} />
-            ) : (
-              <WorkCardCover key={work.slug} work={work} />
-            ),
-          )
-        )}
-      </div>
+        }
+      />
     </>
   );
 }

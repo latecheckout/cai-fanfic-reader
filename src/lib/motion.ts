@@ -14,3 +14,10 @@ export const POPOVER_EXIT = {
   transition: { duration: 0.16, ease: 'easeIn' as const },
 };
 export const POPOVER_TRANSITION = { duration: 0.26, ease: EASE_SPRING_OUT };
+
+// Pill/card removal exit — shared by the toolbar filter pills and WorkGrid.
+export const PILL_EXIT = {
+  scale: 0.72,
+  opacity: 0,
+  transition: { duration: 0.16, ease: EASE_OUT_EXPO },
+};

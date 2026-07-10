@@ -6,6 +6,7 @@ import { buildShelves, buildCreators } from '@/lib/shelves';
 import { BrowseShell } from '@/components/BrowseShell';
 import { BrowseHeader } from '@/components/BrowseHeader';
 import { BrowseHome } from '@/components/BrowseHome';
+import { SectionHeader } from '@/components/RailSection';
 
 interface PageProps {
   searchParams: Promise<{
@@ -109,8 +110,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
               covers={Object.fromEntries(allWorks.map((w) => [w.slug, w.meta.cover]))}
             />
             <div className="mb-2">
-              <h2 className="m-0 font-serif text-2xl font-medium tracking-[-0.01em] text-text max-md:text-[21px]">Stories for you 📚</h2>
-              <p className="mt-[2px] font-sans text-[15px] text-secondary">The whole archive, ready to filter</p>
+              <SectionHeader title="Stories for you 📚" subtitle="The whole archive, ready to filter" />
             </div>
           </>
         )}

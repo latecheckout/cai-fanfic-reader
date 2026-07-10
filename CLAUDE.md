@@ -12,7 +12,7 @@
 
 **Dummy data locations** (files that must be replaced before production):
 - `src/data/comments.ts` — `@DUMMY` hardcoded comment threads (~1100 lines)
-- `src/lib/library.ts` — `@DUMMY` `MOCK_LIBRARY` reading state (no auth)
+- `src/lib/library.ts` — `@DUMMY` `MOCK_LIBRARY` reading state (no auth) + localStorage bookmark helpers (`isBookmarked`/`toggleBookmark`/`removeBookmark` — `@WIRE`, become the `/user/library` call sites)
 - `src/app/works/[slug]/page.tsx` — `@TODO-DEV` recommendations fallback
 
 **Fake loading state** (not real async):
@@ -65,7 +65,7 @@ npm run build     # Production build
 - `src/lib/ratings.ts` — `RATING_TIERS` config (single source for rating letter/color/tooltip); `ratingTier()`
 - `src/lib/filterParams.ts` — shared filter-URL helpers (comma-list, 3-state pill, presets)
 - `src/hooks/` — `useViewMode`, `useDrawer`, `usePresets`, `useSelectionAnchor`, `useChatCharacter`
-- `src/components/` — All UI (shared primitives: `FilterPill`, `RatingBadge`, `DrawerSection`, `EmptyState`, `RailViewport`, `TagChip`, `WorkCardCover` exports)
+- `src/components/` — All UI (shared primitives: `WorkGrid` (results grid for browse + library), `RailSection`/`SectionHeader` (home sections), `Popover`, `GhostButton`, `SortDropdown`, `FilterPill`, `RatingBadge`, `DrawerSection`, `EmptyState`, `RailViewport`, `TagChip`, `WorkCardCover` exports)
 - `src/types/index.ts` — WorkMeta, WorkSummary, Chapter, FilterState types
 
 ## Styling Conventions

@@ -42,7 +42,7 @@ export function ContinueCard({ item, cover }: Props) {
     >
       {/* Visual: cover + title/chapter at the top + progress at the bottom */}
       <span className="block transition-transform duration-150 ease-in-out group-hover:-translate-y-[2px] [html[data-mode=text]_&]:hidden">
-        <span className="relative block aspect-[2/3] rounded-card [clip-path:inset(0_round_14px)] bg-border after:content-[''] after:absolute after:inset-0 after:border after:border-white/20 after:rounded-card after:pointer-events-none">
+        <span className="relative block aspect-[2/3] rounded-card [clip-path:inset(0_round_var(--card-radius))] bg-border after:content-[''] after:absolute after:inset-0 after:border after:border-image-outline after:rounded-card after:pointer-events-none">
           <Image src={cover ?? GENERIC_COVER} alt="" fill sizes="150px" className="object-cover" />
           <span className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_bottom,rgba(0,0,0,0.95)_0%,rgba(0,0,0,0.55)_30%,rgba(0,0,0,0.12)_52%,transparent_64%)]" aria-hidden="true" />
           <span className={HEAD}>
@@ -56,7 +56,7 @@ export function ContinueCard({ item, cover }: Props) {
       </span>
 
       {/* Text: same 2:3 box, solid fill — same top header + bottom progress */}
-      <span className="hidden [html[data-mode=text]_&]:block [html[data-mode=text]_&]:relative [html[data-mode=text]_&]:aspect-[2/3] [html[data-mode=text]_&]:rounded-card [html[data-mode=text]_&]:[clip-path:inset(0_round_14px)] [html[data-mode=text]_&]:bg-card after:content-[''] after:absolute after:inset-0 after:border after:border-card-border after:rounded-card after:pointer-events-none after:transition-colors after:duration-150 group-hover:after:border-border-strong">
+      <span className="hidden [html[data-mode=text]_&]:block [html[data-mode=text]_&]:relative [html[data-mode=text]_&]:aspect-[2/3] [html[data-mode=text]_&]:rounded-card [html[data-mode=text]_&]:[clip-path:inset(0_round_var(--card-radius))] [html[data-mode=text]_&]:bg-card after:content-[''] after:absolute after:inset-0 after:border after:border-card-border after:rounded-card after:pointer-events-none after:transition-colors after:duration-150 group-hover:after:border-border-strong">
         <span className={HEAD}>
           <span className={`${TITLE} text-text`}>{item.title}</span>
           <span className={`${META} text-secondary`}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>

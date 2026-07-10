@@ -35,7 +35,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
           the card itself can stay overflow-visible — otherwise it clips the
           badge tooltips. The hairline ring is an ::after inside the same clip so
           the ring and the image edge round identically. */}
-      <div className="absolute inset-0 z-0 rounded-card bg-[#1a1614] [clip-path:inset(0_round_14px)] after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-card after:border after:border-white/20 after:content-['']">
+      <div className="absolute inset-0 z-0 rounded-card bg-[#1a1614] [clip-path:inset(0_round_var(--card-radius))] after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-card after:border after:border-image-outline after:content-['']">
         {meta.cover && (
           <Image
             src={meta.cover}
