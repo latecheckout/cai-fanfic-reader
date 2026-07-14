@@ -8,6 +8,7 @@ import { CHAT_CHARACTERS } from '@/lib/chatCharacters';
 import { EASE_SPRING_OUT } from '@/lib/motion';
 import { useSelectionAnchor } from '@/hooks/useSelectionAnchor';
 import { useChatCharacter } from '@/hooks/useChatCharacter';
+import { useReading, useReadingUI } from '@/context/ReadingContext';
 import { CheckIcon } from './icons';
 
 const SPRING = { duration: 0.26, ease: EASE_SPRING_OUT };
@@ -32,6 +33,28 @@ export function SelectionToolbar() {
 
   const { anchor } = useSelectionAnchor('[data-chapter-prose]', toolbarRef);
   const { charId, activeCharacter, selectCharacter } = useChatCharacter();
+  const { activeChapterIndex } = useReading();
+  const { setChatOpen, setChatSeed, setImagineOpen, setImagineSeed } = useReadingUI();
+
+  // Order is load-bearing: read the selection BEFORE collapsing it (the
+  // anchor hook clears itself via selectionchange once ranges are removed).
+  // Chat and Imagine share the bottom-right slot — each closes the other.
+  function handleChat() {
+    const quote = window.getSelection()?.toString().trim() ?? '';
+    setChatSeed(quote ? { quote, chapterIndex: activeChapterIndex } : null);
+    setImagineOpen(false);
+    setChatOpen(true);
+    window.getSelection()?.removeAllRanges();
+  }
+
+  function handleImagine() {
+    const quote = window.getSelection()?.toString().trim() ?? '';
+    if (!quote) return;
+    setImagineSeed({ quote, chapterIndex: activeChapterIndex });
+    setChatOpen(false);
+    setImagineOpen(true);
+    window.getSelection()?.removeAllRanges();
+  }
 
   useEffect(() => setMounted(true), []);
 
@@ -104,6 +127,7 @@ export function SelectionToolbar() {
               <button
                 type="button"
                 aria-label="Chat about this"
+                onClick={handleChat}
                 className="whitespace-nowrap font-sans text-[15px] font-medium"
               >
                 Chat about this
@@ -112,9 +136,10 @@ export function SelectionToolbar() {
 
             <span className="h-6 w-px shrink-0 bg-border-strong" aria-hidden="true" />
 
-            {/* Right: Imagine (placeholder — no action yet) */}
+            {/* Right: Imagine — renders the highlighted passage as art */}
             <button
               type="button"
+              onClick={handleImagine}
               className="flex h-10 items-center rounded-xl px-2.5 font-sans text-[15px] font-medium transition-colors hover:bg-overlay-soft"
             >
               Imagine

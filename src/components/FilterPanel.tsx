@@ -22,6 +22,7 @@ import { useDrawer } from '@/hooks/useDrawer';
 import { usePresets } from '@/hooks/usePresets';
 import { usePendingParams } from '@/hooks/usePendingParams';
 import { EASE_OUT_EXPO, PILL_EXIT } from '@/lib/motion';
+import { Tooltip } from './Tooltip';
 
 type PillState = 'neutral' | 'include' | 'exclude';
 
@@ -297,22 +298,25 @@ const ActiveFilterPill = memo(function ActiveFilterPill({
       }`}
     >
       {pill.canToggle ? (
-        <button
-          className="inline-flex min-w-0 cursor-pointer items-center gap-1.5 border-none bg-transparent py-1.5 pl-3 pr-1 font-[inherit] text-[inherit] text-inherit transition-opacity duration-150 hover:opacity-85"
-          onClick={() => onToggle(pill)}
-          title={pill.isExclude ? `${pill.label}\nClick to include` : `${pill.label}\nClick to exclude`}
-        >
-          {pill.isExclude ? (
-            <MinusIcon width={17} height={17} className="flex-shrink-0 opacity-70" />
-          ) : (
-            <PlusIcon width={17} height={17} className="flex-shrink-0 opacity-70" />
-          )}
-          <span className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">{pill.label}</span>
-        </button>
+        <Tooltip label={pill.isExclude ? 'Click to include' : 'Click to exclude'}>
+          <button
+            className="inline-flex min-w-0 cursor-pointer items-center gap-1.5 border-none bg-transparent py-1.5 pl-3 pr-1 font-[inherit] text-[inherit] text-inherit transition-opacity duration-150 hover:opacity-85"
+            onClick={() => onToggle(pill)}
+          >
+            {pill.isExclude ? (
+              <MinusIcon width={17} height={17} className="flex-shrink-0 opacity-70" />
+            ) : (
+              <PlusIcon width={17} height={17} className="flex-shrink-0 opacity-70" />
+            )}
+            <span className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">{pill.label}</span>
+          </button>
+        </Tooltip>
       ) : (
-        <span className="inline-flex min-w-0 cursor-default items-center py-1.5 pl-3 pr-0" title={pill.label}>
-          <span className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">{pill.label}</span>
-        </span>
+        <Tooltip label={pill.label}>
+          <span className="inline-flex min-w-0 cursor-default items-center py-1.5 pl-3 pr-0">
+            <span className="max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap">{pill.label}</span>
+          </span>
+        </Tooltip>
       )}
       <button
         className="flex-shrink-0 cursor-pointer py-1.5 pl-1 pr-2.5 leading-none text-inherit opacity-50 transition-opacity duration-150 hover:opacity-100"
@@ -1081,7 +1085,6 @@ export function FilterPanel({
                                   className="inline-flex flex-shrink-0 cursor-pointer items-center justify-center bg-transparent p-0 text-secondary opacity-0 transition-[opacity,color] duration-200 ease-out-expo hover:text-text group-hover/preset:opacity-100 focus-visible:opacity-100"
                                   onClick={() => deletePreset(idx)}
                                   aria-label={`Delete ${preset.name}`}
-                                  title={`Delete ${preset.name}`}
                                 >
                                   <CloseIcon width={16} height={16} />
                                 </button>

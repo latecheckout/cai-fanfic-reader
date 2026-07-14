@@ -21,7 +21,6 @@ export function CreatorCard({ creator, index = 0 }: Props) {
   return (
     <Link
       href={creator.href}
-      title={creator.name}
       className="group flex-shrink-0 w-[168px] md:w-[200px] aspect-[2/3] flex flex-col items-center justify-center text-center p-4 md:p-5 border border-card-border rounded-card bg-card no-underline text-inherit transition-colors duration-150 ease-in-out hover:border-border-strong animate-[caiRevealUp_650ms_var(--ease-out-expo)_both]"
       style={{ animationDelay: `${(index + 1) * 30}ms` }}
     >

@@ -28,7 +28,6 @@
   --color-border-chip: var(--border-chip);
   --color-border-active: var(--border-active);
   --color-accent: var(--accent);
-  --color-accent-subtle: var(--accent-subtle);
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
   --color-bubble: var(--bubble-bg);
@@ -39,7 +38,6 @@
 
   /* Brand (Character.ai) */
   --color-brand: var(--brand);
-  --color-brand-deep: var(--brand-deep);
 
   /* Rating colors */
   --color-rating-g: var(--rating-g);
@@ -89,28 +87,13 @@
   --color-pure-black-2: var(--pure-black-2);
   --color-pure-black-3: var(--pure-black-3);
 
-  --color-slippery-butter: var(--slippery-butter);
-  --color-wired-lime: var(--wired-lime);
-  --color-icy-sky: var(--icy-sky);
-  --color-lowkey-lavender: var(--lowkey-lavender);
-  --color-irl-rose: var(--irl-rose);
 
-  --color-gold-rush: var(--gold-rush);
-  --color-lucky-emerald: var(--lucky-emerald);
-  --color-refresh-cyan: var(--refresh-cyan);
   --color-alt-violet: var(--alt-violet);
   --color-hot-pink: var(--hot-pink);
 
   --color-toasty-amber: var(--toasty-amber);
-  --color-dark-sage: var(--dark-sage);
-  --color-cloudy-blue: var(--cloudy-blue);
-  --color-pinned-purple: var(--pinned-purple);
-  --color-hyperlink-magenta: var(--hyperlink-magenta);
 
   --color-cached-crimson: var(--cached-crimson);
-  --color-midnight-forest: var(--midnight-forest);
-  --color-quill-ink: var(--quill-ink);
-  --color-lock-in-espresso: var(--lock-in-espresso);
 
   /* Author-note bubble (theme-adaptive quill-ink) */
   --color-author-bubble: var(--author-bubble);
@@ -163,6 +146,12 @@
                 padding-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Text selection everywhere uses the amber wash (same family as the chat
+     quote blocks + quote-flash highlight). */
+  ::selection {
+    background-color: color-mix(in srgb, var(--toasty-amber) 35%, transparent);
+  }
+
   a {
     color: inherit;
     text-decoration: none;
@@ -211,6 +200,20 @@
   }
   .prose p:last-child {
     margin-bottom: 0;
+  }
+
+  /* Editorial drop cap on each chapter's opening paragraph. Anchored to the
+     first <p> (not first child — the pipeline can emit headings/notes first).
+     Sized in em so it tracks the reader's font-size preference. */
+  .prose > p:first-of-type::first-letter {
+    float: left;
+    font-family: var(--font-serif);
+    font-size: 3.1em;
+    font-weight: 500;
+    line-height: 0.85;
+    padding-right: 0.12em;
+    margin-top: 0.04em;
+    color: var(--text);
   }
 
   .prose h1,
@@ -488,6 +491,13 @@ html.focus-active .prose-outer::after {
 @keyframes caiSkeletonShimmer {
   0%   { background-position: 150% 0; }
   100% { background-position: -150% 0; }
+}
+
+/* Character-chat typing indicator — dots pulse in sequence (per-dot delay set
+   inline). Reduced-motion users get static dots via the global safety net. */
+@keyframes caiTypingDot {
+  0%, 60%, 100% { opacity: 0.35; transform: none; }
+  30%           { opacity: 1; transform: translateY(-2px); }
 }
 
 /* ============================================================

@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
 import { getWork, getAllSlugs, getWorkSummaries } from '@/lib/works';
 import { markdownToHtml } from '@/lib/markdown';
-import { WorkHeader } from '@/components/WorkHeader';
 import { ReadingCluster } from '@/components/ReadingCluster';
 import { ChapterList } from '@/components/ChapterList';
 import { ReadingHUD } from '@/components/ReadingHUD';
+import { FandomHub } from '@/components/FandomHub';
 import { ReadingActions } from '@/components/ReadingActions';
 import { SelectionToolbar } from '@/components/SelectionToolbar';
-import { ReturnToPositionFAB } from '@/components/ReturnToPositionFAB';
+import { CharacterChat } from '@/components/CharacterChat';
+import { ImagineModal } from '@/components/ImagineModal';
 import { FocusEffect } from '@/components/FocusEffect';
 import { MobileReadingBar } from '@/components/MobileReadingBar';
 import { ReadingProvider } from '@/context/ReadingContext';
@@ -87,26 +88,33 @@ export default async function ReaderPage({ params }: PageProps) {
         totalChapters={chapters.length}
         slug={slug}
       >
-        {/* Fixed HUD — back (left) + actions (right), over a gradient scrim */}
+        {/* Fixed HUD, split in two layers: the gradient scrim stays under the
+            fandom hub while the buttons ride above it (so the back + hub
+            toggle cluster can tuck into the open panel's corner). */}
         <div
-          className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-reading-bar)] flex items-start justify-between p-4 max-md:hidden"
+          className="pointer-events-none fixed inset-x-0 top-0 h-[72px] z-[var(--z-reading-bar)] max-md:hidden"
           style={{ background: 'linear-gradient(to bottom, var(--bg), transparent)' }}
-        >
+          aria-hidden="true"
+        />
+        <div className="pointer-events-none fixed inset-x-0 top-0 z-[calc(var(--z-hub)_+_10)] flex items-start justify-between p-4 max-md:hidden">
           <ReadingHUD />
           <ReadingActions />
         </div>
-        <ReturnToPositionFAB />
+        {/* Mirror scrim under the bottom pill cluster */}
+        <div
+          className="pointer-events-none fixed inset-x-0 bottom-0 h-[72px] z-[var(--z-reading-bar)] max-md:hidden"
+          style={{ background: 'linear-gradient(to top, var(--bg), transparent)' }}
+          aria-hidden="true"
+        />
+        <FandomHub />
         <MobileReadingBar />
         <SelectionToolbar />
+        <CharacterChat />
+        <ImagineModal />
 
         {/* Main reading content — no opacity animation here: it would create a
             stacking context and trap the sticky cluster's z-index below the bar. */}
         <main className="p-0 max-md:pb-[calc(44px+20px+var(--safe-bottom)+24px)]">
-          {/* Work header — three-zone scroll animation */}
-          <WorkHeader
-            meta={meta}
-            totalChapters={chapters.length}
-          />
 
           {/* Reading cluster — in-flow below the header, sticks to top on scroll */}
           <ReadingCluster />

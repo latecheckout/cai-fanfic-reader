@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
 import { BOOKMARKS_KEY } from '@/lib/constants';
 import { EASE_OUT_EXPO } from '@/lib/motion';
+import { BUBBLE_PILL } from './readingChrome';
 import { ArrowDownIcon } from './icons';
 
 interface BookmarkEntry {
@@ -65,7 +66,9 @@ export function ReturnToPositionFAB() {
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
           transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
-          className="fixed bottom-7 right-6 z-[var(--z-dropdown)] inline-flex items-center gap-2 rounded-full bg-bubble py-2 pl-[11px] pr-[14px] font-mono text-[11px] tracking-[0.03em] text-text shadow-bubble transition-shadow duration-[120ms] ease-out-expo hover:shadow-bubble-hover max-md:bottom-[calc(20px+var(--safe-bottom)+44px+12px)] max-md:left-0 max-md:right-0 max-md:mx-auto max-md:w-fit"
+          // Rendered inside the bottom cluster, to the right of the chapter
+          // pill — same BUBBLE_PILL chrome/size as its siblings.
+          className={`${BUBBLE_PILL} gap-2 px-4 font-sans text-[13px]`}
         >
           <ArrowDownIcon width={15} height={15} />
           <span>Your place</span>

@@ -4,6 +4,7 @@ import { accentChain } from 'glimm';
 import { GlimmProvider } from 'glimm/next';
 import { ThemeScript } from '@/components/ThemeScript';
 import { DevAnnotation } from '@/components/DevAnnotation';
+import { TooltipProvider } from '@/components/Tooltip';
 
 // Sweep palette — warm→cool iridescent ribbon, blended in OKLCH:
 //   toasty amber → hot pink → alt violet → lowkey lavender.
@@ -40,7 +41,9 @@ export default function RootLayout({
             paper bg. Provider defaults the AO4 toggle's sweep inherits.
             No <InterceptLinks /> — the sweep fires only on the toggle, not nav. */}
         <GlimmProvider palette={SWEEP_PALETTE} brightness={0.84} peakAlpha={0.8}>
-          {children}
+          {/* One tooltip provider app-wide → Base UI delay grouping (sweep
+              across adjacent buttons opens follow-up tooltips instantly). */}
+          <TooltipProvider>{children}</TooltipProvider>
           {/* Dev-only UI annotation overlay; stripped from production builds. */}
           {process.env.NODE_ENV !== 'production' && <DevAnnotation />}
         </GlimmProvider>

@@ -79,5 +79,5 @@ export function useSelectionAnchor(
     };
   }, [containerSelector, ignoreRef, clear]);
 
-  return { anchor, clear };
+  return { anchor };
 }

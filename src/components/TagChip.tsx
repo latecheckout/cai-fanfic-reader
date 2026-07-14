@@ -68,9 +68,8 @@ export function TagChip({ tag, category, clickable, href, onImage }: Props) {
 
 // ── Labeled tag row (Warnings / Fandom / Ships / Characters / Tags) ──
 // One row = an uppercase label + a wrapped group of filter-link TagChips.
-// Shared by WorkHeader and MetadataOverlay (was duplicated 5× in each, with the
-// row/label/group classes copy-pasted between both files). Renders nothing when
-// the field is empty. `max-md:` stacking is a no-op in the desktop-only overlay.
+// Shared by the FandomHub sidebar (and the browse cards' chips). Renders
+// nothing when the field is empty. `max-md:` stacking is a no-op there.
 const TAG_ROW = 'flex items-baseline gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5';
 const TAG_LABEL =
   'w-[70px] shrink-0 pt-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary max-md:w-auto max-md:shrink max-md:text-[9px]';

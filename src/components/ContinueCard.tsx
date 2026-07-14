@@ -37,7 +37,6 @@ export function ContinueCard({ item, cover }: Props) {
     <Link
       href={`/works/${item.slug}`}
       className="group flex-shrink-0 block w-[150px] no-underline text-inherit"
-      title={`${item.title} · Ch. ${item.chapterIndex + 1} of ${item.totalChapters}`}
       aria-label={`Continue reading ${item.title}, chapter ${item.chapterIndex + 1} of ${item.totalChapters}`}
     >
       {/* Visual: cover + title/chapter at the top + progress at the bottom */}

@@ -41,14 +41,6 @@ export function formatChapters(
   return `${posted}/${chaptersTotal}`;
 }
 
-/** Word tier 1–4 for length bars (< 5k / 5k–25k / 25k–75k / 75k+) */
-export function wordTier(words: number): 1 | 2 | 3 | 4 {
-  if (words < 5000) return 1;
-  if (words < 25000) return 2;
-  if (words < 75000) return 3;
-  return 4;
-}
-
 /** Short label from AO3-style category array.
  *  Returns '' for Gen — the absence of ships already signals it. */
 export function categoryLabel(cats: string[]): string {
@@ -81,6 +73,16 @@ export function truncateSummary(summary: string, max = 4): { text: string; hasMo
 /** Drop a leading "Chapter N:" from a title — the number is already shown separately. */
 export function stripChapterPrefix(title: string): string {
   return title.replace(/^\s*chapter\s+\d+\s*:\s*/i, '') || title;
+}
+
+/** Compact relative timestamp for chat history rows: Today / Yesterday / Nd ago / short date. */
+export function relativeTime(ts: number): string {
+  const startOfDay = (t: number) => new Date(new Date(t).toDateString()).getTime();
+  const days = Math.round((startOfDay(Date.now()) - startOfDay(ts)) / 86_400_000);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days}d ago`;
+  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 /**

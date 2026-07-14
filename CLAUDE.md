@@ -14,6 +14,10 @@
 - `src/data/comments.ts` — `@DUMMY` hardcoded comment threads (~1100 lines)
 - `src/lib/library.ts` — `@DUMMY` `MOCK_LIBRARY` reading state (no auth) + localStorage bookmark helpers (`isBookmarked`/`toggleBookmark`/`removeBookmark` — `@WIRE`, become the `/user/library` call sites)
 - `src/app/works/[slug]/page.tsx` — `@TODO-DEV` recommendations fallback
+- `src/lib/chatReplies.ts` — `@DUMMY` canned character-chat replies (becomes the c.ai chat backend)
+- `src/lib/chatCharacters.ts` — `@DUMMY` `resolveCharacterName` maps global avatars → work characters by index
+- `src/components/CharacterChat.tsx` — `@DUMMY` user-persona avatar reuses `/creators/placeholder.png`
+- `src/components/ImagineModal.tsx` — `@DUMMY` image slot is a persistent shimmer (becomes the c.ai image-gen call); "Post to c.ai feed"/"Reimagine" CTAs are stubs
 
 **Fake loading state** (not real async):
 - `src/components/BrowseSearchBar.tsx` — `@LOADING` setTimeout on vibe search (synchronous, fake delay)
@@ -55,7 +59,7 @@ npm run build     # Production build
 - `src/lib/works.ts` — Loads and parses works from `content/`
 - `src/lib/filters.ts` — `applyFilters`, `buildVibeFilters`, search option builders
 - `src/lib/markdown.ts` — remark/rehype pipeline for chapter HTML
-- `src/lib/utils.ts` — Formatters, rating helpers, word tier
+- `src/lib/utils.ts` — Formatters, rating helpers
 - `src/lib/constants.ts` — Canonical filter taxonomy (`RATINGS`, `WARNINGS`, `CATEGORIES`, `STATUSES`) + localStorage keys (`PRESETS_KEY`, `HISTORY_KEY`)
 - `src/lib/library.ts` — `@DUMMY` — `MOCK_LIBRARY` simulates logged-in user reading state
 - `src/data/comments.ts` — `@DUMMY` — hardcoded comment threads (~1100 lines)

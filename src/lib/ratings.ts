@@ -7,7 +7,7 @@
  * Color utilities are kept as LITERAL class strings (`bg-rating-g`, …) so
  * Tailwind's scanner emits them — dynamic interpolation would not be detected.
  */
-export interface RatingTier {
+interface RatingTier {
   /** Canonical rating string (matches content frontmatter + the RATINGS list). */
   rating: string;
   /** Badge letter (G/T/M/E/NR). */
@@ -22,35 +22,35 @@ export interface RatingTier {
   bg: string;
   /** Include-state class for the filter pill card. */
   includeClass: string;
-  /** Hover tooltip copy for the badge. */
-  tooltip: { title: string; desc: string };
+  /** Hover tooltip label for the badge (single line). */
+  tooltip: string;
 }
 
-export const RATING_TIERS: Record<string, RatingTier> = {
+const RATING_TIERS: Record<string, RatingTier> = {
   'General Audiences': {
     rating: 'General Audiences', letter: 'G', shortName: 'General', key: 'g',
     classKey: 'ratingG', bg: 'bg-rating-g', includeClass: 'bg-rating-g border-rating-g',
-    tooltip: { title: 'General Audiences', desc: 'Suitable for all ages' },
+    tooltip: 'General Audiences',
   },
   'Teen And Up Audiences': {
     rating: 'Teen And Up Audiences', letter: 'T', shortName: 'Teen+', key: 't',
     classKey: 'ratingT', bg: 'bg-rating-t', includeClass: 'bg-rating-t border-rating-t',
-    tooltip: { title: 'Teen And Up Audiences', desc: 'Mild themes or language' },
+    tooltip: 'Teen And Up Audiences',
   },
   'Mature': {
     rating: 'Mature', letter: 'M', shortName: 'Mature', key: 'm',
     classKey: 'ratingM', bg: 'bg-rating-m', includeClass: 'bg-rating-m border-rating-m',
-    tooltip: { title: 'Mature', desc: 'Adult themes, violence, or strong language' },
+    tooltip: 'Mature',
   },
   'Explicit': {
     rating: 'Explicit', letter: 'E', shortName: 'Explicit', key: 'e',
     classKey: 'ratingE', bg: 'bg-rating-e', includeClass: 'bg-rating-e border-rating-e',
-    tooltip: { title: 'Explicit', desc: 'Contains explicit sexual content' },
+    tooltip: 'Explicit',
   },
   'Not Rated': {
     rating: 'Not Rated', letter: 'NR', shortName: 'Not Rated', key: 'nr',
     classKey: 'ratingNR', bg: 'bg-rating-nr', includeClass: 'bg-rating-nr border-rating-nr',
-    tooltip: { title: 'Not Rated', desc: 'Rating not provided by the author' },
+    tooltip: 'Not Rated',
   },
 };
 

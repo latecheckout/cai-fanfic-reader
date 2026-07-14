@@ -3,6 +3,7 @@
 import { useReading } from '@/context/ReadingContext';
 import { stripChapterPrefix } from '@/lib/utils';
 import { MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
+import { Tooltip } from './Tooltip';
 
 interface Props {
   chapters: string[];
@@ -41,13 +42,14 @@ export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
                 {label}
               </span>
               {lastReadChapterIndex !== null && i === lastReadChapterIndex && (
-                <span
-                  className="ml-auto shrink-0 font-mono text-[14px] leading-none text-secondary/50"
-                  aria-label="Last read"
-                  title="You left off here"
-                >
-                  ·
-                </span>
+                <Tooltip label="You left off here" align="right">
+                  <span
+                    className="ml-auto shrink-0 font-mono text-[14px] leading-none text-secondary/50"
+                    aria-label="Last read"
+                  >
+                    ·
+                  </span>
+                </Tooltip>
               )}
             </button>
           </li>

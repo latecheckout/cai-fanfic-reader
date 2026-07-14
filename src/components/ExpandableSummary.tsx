@@ -5,8 +5,8 @@ import { truncateSummary } from '@/lib/utils';
 
 /**
  * Italic summary paragraph that shows the first ~4 sentences with an inline
- * "see more"/"see less" toggle. Shared by WorkHeader and the cluster's
- * MetadataOverlay so the two stay identical. Renders nothing for an empty summary.
+ * "see more"/"see less" toggle. Rendered via WorkMetaBlock (FandomHub).
+ * Renders nothing for an empty summary.
  */
 export function ExpandableSummary({ summary }: { summary: string }) {
   const [expanded, setExpanded] = useState(false);

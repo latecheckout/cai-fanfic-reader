@@ -114,7 +114,6 @@ export function Ao4TurboToggle() {
             role="switch"
             aria-checked={on}
             aria-label="AO4 Mode"
-            title={on ? 'AO4 Mode on — text mode' : 'AO4 Mode off — covers'}
             drag="x"
             dragConstraints={{ left: 0, right: TRAVEL }}
             dragElastic={0.04}

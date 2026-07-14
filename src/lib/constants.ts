@@ -11,6 +11,7 @@ export const SITE_MODE_EVENT = 'cai-mode-change';    // window CustomEvent name
 // Reading-page (per-work) state keys.
 export const SAVED_KEY = 'fanfic-saved-works'; // reading-list (bookmarked work slugs)
 export const BOOKMARKS_KEY = 'fanfic-bookmarks'; // scroll position + furthest + last chapter
+export const CHAT_HISTORY_KEY = 'fanfic-chat-history'; // Record<slug, Conversation[]> — character chat modal
 export const KUDOS_KEY = 'fanfic-kudos';        // slugs the reader has left kudos on
 
 // Reading preferences (typography + theme).

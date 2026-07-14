@@ -9,6 +9,7 @@ import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, i
 import { ratingTier } from '@/lib/ratings';
 import { HeartIcon, FlagIcon, ViewsIcon } from './icons';
 import { TagChip } from './TagChip';
+import { Tooltip } from './Tooltip';
 
 interface Props {
   work: WorkSummary;
@@ -20,38 +21,21 @@ const MAX_TAGS_LIST = 8;
 /** @DUMMY — placeholder until real author photos exist. */
 const CREATOR_PLACEHOLDER = '/creators/placeholder.png';
 
-const CATEGORY_TOOLTIPS: Record<string, { title: string; desc: string }> = {
-  'M/M':   { title: 'Male / Male',     desc: 'A relationship between two male characters' },
-  'F/F':   { title: 'Female / Female', desc: 'A relationship between two female characters' },
-  'F/M':   { title: 'Female / Male',   desc: 'A relationship between a female and male character' },
-  'M/F':   { title: 'Male / Female',   desc: 'A relationship between a male and female character' },
-  'Gen':   { title: 'General',         desc: 'No romantic or sexual relationships' },
-  'Multi': { title: 'Multiple',        desc: 'Multiple pairings or relationship types' },
-  'Other': { title: 'Other',           desc: 'An unconventional or unspecified relationship type' },
+// Single-line tooltip labels (no two-tier title/desc tooltips anywhere).
+const CATEGORY_TOOLTIPS: Record<string, string> = {
+  'M/M':   'Male / Male',
+  'F/F':   'Female / Female',
+  'F/M':   'Female / Male',
+  'M/F':   'Male / Female',
+  'Gen':   'General',
+  'Multi': 'Multiple',
+  'Other': 'Other',
 };
 
 const STATUS_TOOLTIPS = {
-  wip:  { title: 'Work in Progress', desc: 'The author is still adding chapters' },
-  done: { title: 'Complete',         desc: 'All chapters have been published' },
+  wip:  'Work in Progress',
+  done: 'Complete',
 };
-
-
-/** Two-tier badge tooltip — bold title over a lighter description. Shared by all
- *  three SignalStrip badges so the styling is identical. Anchored to the strip's
- *  bottom-left (the strip is the positioned ancestor). `onImage` inverts the
- *  surface (light bubble, dark text) so it reads over a dark cover overlay. */
-function BadgeTooltip({ title, desc, onImage }: { title: string; desc: string; onImage?: boolean }) {
-  return (
-    <span
-      className={`absolute left-0 top-[calc(100%+8px)] z-20 flex flex-col gap-[3px] whitespace-nowrap rounded-[4px] px-[10px] py-[6px] font-mono opacity-0 shadow-[0_4px_14px_rgba(0,0,0,0.28),0_1px_4px_rgba(0,0,0,0.2)] transition-opacity duration-150 pointer-events-none group-hover/badge:opacity-100 ${
-        onImage ? 'bg-bg text-text' : 'bg-text text-bg'
-      }`}
-    >
-      <span className="text-[11px] font-bold leading-[1.3] tracking-[0.04em]">{title}</span>
-      <span className="text-[10px] font-normal leading-[1.3] tracking-[0.02em] opacity-[0.65]">{desc}</span>
-    </span>
-  );
-}
 
 const CheckGlyph = () => (
   <svg width="12" height="12" viewBox="0 0 9 9" fill="none" stroke="currentColor"
@@ -127,42 +111,38 @@ export function StatsLine({ items, className }: { items: ReactNode[]; className:
 }
 
 // Shared badge chrome — mono, rounded-chip (matches tags), non-interactive
-// whitespace but hoverable for the tooltip (group/badge scopes each tooltip).
+// whitespace but hoverable for the tooltip.
 const BADGE_BASE =
-  'group/badge flex h-6 items-center justify-center rounded-chip shrink-0 font-mono pointer-events-auto cursor-default';
+  'flex h-6 items-center justify-center rounded-chip shrink-0 font-mono pointer-events-auto cursor-default';
 
 /** Shared badge box for the signal row (rating / category / status). One chrome
- *  + optional hover tooltip so the three badges can't drift apart. */
+ *  + optional hover tooltip (the shared Base UI Tooltip — single line) so the
+ *  three badges can't drift apart. */
 function Badge({
   className = '',
   tooltip,
-  onImage,
   children,
 }: {
   className?: string;
-  tooltip?: { title: string; desc: string };
-  onImage?: boolean;
+  tooltip?: string;
   children: ReactNode;
 }) {
+  const badge = <span className={`${BADGE_BASE} ${className}`}>{children}</span>;
+  if (!tooltip) return badge;
   return (
-    <span className={`${BADGE_BASE} ${className}`}>
-      {children}
-      {tooltip && <BadgeTooltip title={tooltip.title} desc={tooltip.desc} onImage={onImage} />}
-    </span>
+    <Tooltip label={tooltip} align="left">
+      {badge}
+    </Tooltip>
   );
 }
 
 /** Filled rating badge (letter + hover tooltip). All presentation is derived
  *  from the shared rating tier config so the card and filter pill stay in sync.
  *  Top-level + memoized since many render at once across a results list. */
-const RatingBadge = memo(function RatingBadge({ rating, onImage }: { rating: string; onImage?: boolean }) {
+const RatingBadge = memo(function RatingBadge({ rating }: { rating: string }) {
   const tier = ratingTier(rating);
   return (
-    <Badge
-      className={`w-6 text-[13px] font-bold tracking-[0.02em] text-white ${tier.bg}`}
-      tooltip={tier.tooltip}
-      onImage={onImage}
-    >
+    <Badge className={`w-6 text-[13px] font-bold tracking-[0.02em] text-white ${tier.bg}`} tooltip={tier.tooltip}>
       {tier.letter}
     </Badge>
   );
@@ -183,15 +163,11 @@ export function SignalStrip({
 }) {
   return (
     <div className="pointer-events-none relative z-[2] flex flex-row items-center gap-[7px]">
-      <RatingBadge rating={rating} onImage={onImage} />
+      <RatingBadge rating={rating} />
       {catLabel && (
         <Badge
           className="min-w-6 bg-secondary px-[6px] text-[13px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white"
-          tooltip={{
-            title: CATEGORY_TOOLTIPS[category[0]]?.title ?? catLabel,
-            desc: CATEGORY_TOOLTIPS[category[0]]?.desc ?? '',
-          }}
-          onImage={onImage}
+          tooltip={CATEGORY_TOOLTIPS[category[0]] ?? catLabel}
         >
           {catLabel}
         </Badge>
@@ -203,7 +179,6 @@ export function SignalStrip({
             : 'border-border-active text-secondary theme-dark:text-[color-mix(in_srgb,var(--text)_70%,transparent)]'
         }`}
         tooltip={isWip ? STATUS_TOOLTIPS.wip : STATUS_TOOLTIPS.done}
-        onImage={onImage}
       >
         {isWip ? <ProgressGlyph /> : <CheckGlyph />}
       </Badge>

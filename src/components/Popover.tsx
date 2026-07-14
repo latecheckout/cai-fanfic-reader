@@ -6,6 +6,7 @@ import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from
 import { POPOVER_PANEL } from './popoverChrome';
 
 type Align = 'left' | 'center' | 'right';
+type Side = 'bottom' | 'top';
 
 // Where the content anchors relative to the trigger, and the scale origin.
 const POS: Record<Align, string> = {
@@ -13,10 +14,14 @@ const POS: Record<Align, string> = {
   center: 'left-1/2',
   right: 'right-0',
 };
-const ORIGIN: Record<Align, string> = {
-  left: 'top left',
-  center: 'top',
-  right: 'top right',
+// Vertical anchor: content drops below the trigger, or rises above it.
+const SIDE_POS: Record<Side, string> = {
+  bottom: 'top-full mt-2',
+  top: 'bottom-full mb-2',
+};
+const ORIGIN: Record<Side, Record<Align, string>> = {
+  bottom: { left: 'top left', center: 'top', right: 'top right' },
+  top: { left: 'bottom left', center: 'bottom', right: 'bottom right' },
 };
 
 interface TriggerArgs {
@@ -36,6 +41,7 @@ interface TriggerArgs {
  */
 export function Popover({
   align = 'right',
+  side = 'bottom',
   ariaLabel,
   contentClassName = '',
   open: openProp,
@@ -44,6 +50,8 @@ export function Popover({
   children,
 }: {
   align?: Align;
+  /** Which side of the trigger the content opens on. */
+  side?: Side;
   ariaLabel: string;
   contentClassName?: string;
   /** Controlled open state — omit to let Popover manage it internally. */
@@ -88,6 +96,10 @@ export function Popover({
   }, [open]);
 
   const centerX = align === 'center' ? { x: '-50%' } : {};
+  // Enter/exit slide direction follows the side (down-from-above vs up-from-below).
+  const flipY = side === 'top' ? (y: number) => -y : (y: number) => y;
+  const enter = { ...POPOVER_ENTER, y: flipY(POPOVER_ENTER.y) };
+  const exit = { ...POPOVER_EXIT, y: flipY(POPOVER_EXIT.y) };
 
   return (
     <div ref={wrapRef} className="relative inline-flex">
@@ -97,12 +109,12 @@ export function Popover({
           <motion.div
             role="dialog"
             aria-label={ariaLabel}
-            initial={reduce ? false : { ...POPOVER_ENTER, ...centerX }}
+            initial={reduce ? false : { ...enter, ...centerX }}
             animate={{ ...POPOVER_VISIBLE, ...centerX }}
-            exit={{ ...POPOVER_EXIT, ...centerX }}
+            exit={{ ...exit, ...centerX }}
             transition={POPOVER_TRANSITION}
-            style={{ transformOrigin: ORIGIN[align] }}
-            className={`absolute top-full z-[var(--z-popover)] mt-2 ${POPOVER_PANEL} ${POS[align]} ${contentClassName}`}
+            style={{ transformOrigin: ORIGIN[side][align] }}
+            className={`absolute z-[var(--z-popover)] ${SIDE_POS[side]} ${POPOVER_PANEL} ${POS[align]} ${contentClassName}`}
           >
             {typeof children === 'function' ? children({ close }) : children}
           </motion.div>

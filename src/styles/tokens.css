@@ -14,13 +14,11 @@
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.40);
   --accent: #8B4040;
-  --accent-subtle: rgba(139, 64, 64, 0.12);
 
   /* Brand accent — Character.ai duller secondaries (dark-sage family).
      Used by the AO4 toggle, mode-switch particles, and reading progress.
      Constant across themes (only listed vars are overridden below). */
   --brand: #65a98f;        /* dark-sage */
-  --brand-deep: #2b9247;   /* midnight-forest */
 
   /* Card surface ("page on paper") — solid colours for cross-browser safety */
   --card-bg: #FBFAF8;
@@ -30,6 +28,7 @@
   --card-radius: 16.5px;
   /* Subtle 1px image edge — pure black in light, pure white in dark (see dark block). */
   --image-outline: rgba(0, 0, 0, 0.1);
+  --image-outline-faint: rgba(0, 0, 0, 0.045); /* chat card + composer hairline */
 
   /* Rating dot colors — per brief spec */
   --rating-g:  #3d9970;
@@ -47,20 +46,16 @@
   --font-size-body: 19px;
 
   /* Spacing (8px base unit) */
-  --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
 
   /* Bubble chrome */
   --bubble-bg: #ffffff;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.055);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.07);
+  /* Warn variant (back button): same lift, ring goes low-opacity crimson. */
+  --bubble-shadow-crimson: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px color-mix(in srgb, var(--cached-crimson) 30%, transparent);
   /* The 1px ring inside bubble-shadow-hover — so an open popover's border can
      match the stroke of the bubble pill/HUD control that triggered it. */
   --bubble-ring: rgba(0, 0, 0, 0.07);
@@ -75,6 +70,7 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --spring:        cubic-bezier(0.16, 1, 0.3, 1);   /* panel opening — soft deceleration */
   --collapse:      cubic-bezier(0.4, 0, 0.8, 1);    /* panel closing — quick, purposeful */
+  --ease-sidebar:  cubic-bezier(0.32, 0.72, 0, 1);  /* fandom-hub slide (character-manga port) */
 
   /* Reader line width */
   --line-width-narrow:  560px;
@@ -85,17 +81,10 @@
   /* Reading layout */
   --reader-max-width: 68ch;
   --browse-max-width: 1280px;
-  --content-padding: 40px;
-
-  /* Grid lines */
-  --grid-line: rgba(26, 24, 22, 0.055);
 
   /* Transitions */
   --transition-micro: 150ms ease-in-out;
-  --transition-panel: 250ms ease-in-out;
   --transition-chrome: 200ms ease-in-out;
-  --ghost-opacity: 0.12;
-  --ghost-progress-opacity: 0.25;
 
   /* Preset blue — used for preset chip */
   --preset-blue: #3B7BF5;
@@ -105,13 +94,9 @@
   /* Safe area insets (notch / Dynamic Island support) */
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left:   env(safe-area-inset-left, 0px);
-  --safe-right:  env(safe-area-inset-right, 0px);
 
   /* Z-index scale */
-  --z-base:     1;
   --z-sticky:   100;
-  --z-dropdown: 200;
   --z-panel:    300;
   --z-modal:    400;
 
@@ -119,6 +104,7 @@
      Order: content < reading-bar < cluster < popover < tooltip < modal/toolbar. */
   --z-reading-bar:     250; /* fixed top HUD scrim + mobile bottom bar */
   --z-reading-cluster: 260; /* sticky pill cluster (rides above the bar gradient) */
+  --z-hub:             270; /* fandom-hub sidebar (HUD buttons ride +10 above it) */
   --z-popover:         300; /* anchored popovers (= --z-panel) */
   --z-tooltip:         320; /* hover tooltips (above popovers) */
 
@@ -129,7 +115,6 @@
   --color-exclude:        #7A1A1A;
   --color-exclude-bg:     rgba(140, 30, 30, 0.10);
   --color-exclude-border: rgba(140, 30, 30, 0.3);
-  --color-star:           #B8952A;
 
   /* Filter drawer push geometry: 380px floating panel + 12px right inset +
      12px gap left of the panel. Everything that rides the push (body padding,
@@ -156,32 +141,14 @@
   --pure-black-2: #262626;
   --pure-black-3: #404040;
 
-  /* Secondary palette — Light */
-  --slippery-butter: #fff59e;
-  --wired-lime:      #aed900;
-  --icy-sky:         #abf5ed;
-  --lowkey-lavender: #df91f2;
-  --irl-rose:        #ffadd2;
-
-  /* Secondary palette — Vivid */
-  --gold-rush:      #ffe600;
-  --lucky-emerald:  #00d973;
-  --refresh-cyan:   #00d9d9;
+  /* Secondary palette (only hues with live consumers kept) */
   --alt-violet:     #ae00d9;
   --hot-pink:       #ff4dc9;
 
-  /* Secondary palette — Warm */
   --toasty-amber:      #f28500;
-  --dark-sage:         #65a98f;
-  --cloudy-blue:       #7db4ff;
-  --pinned-purple:     #6b2e63;
-  --hyperlink-magenta: #d90082;
 
-  /* Secondary palette — Deep */
   --cached-crimson:   #d90000;
-  --midnight-forest:  #2b9247;
   --quill-ink:        #3e2733;
-  --lock-in-espresso: #652e1f;
 
   /* Author-note bubble — quill-ink base, lightened per theme so it stays
      legible on dark backgrounds (see the dark override). */
@@ -198,7 +165,6 @@
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.40);
   --accent: #8B4040;
-  --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
   --rating-g:  #3d9970;
@@ -207,7 +173,6 @@
   --rating-e:  #b02828;
   --rating-nr: #aaaaaa;
   --bubble-bg: #ffffff;
-  --grid-line: rgba(26, 24, 22, 0.055);
 }
 
 [data-theme="paper"] {
@@ -219,7 +184,6 @@
   --border-chip: rgba(26, 24, 22, 0.18);
   --border-active: rgba(26, 24, 22, 0.42);
   --accent: #8B4040;
-  --accent-subtle: rgba(139, 64, 64, 0.12);
   --card-bg: #F4F1EB;
   --card-border: rgba(26, 24, 22, 0.09);
   --rating-g:  #3d9970;
@@ -228,7 +192,6 @@
   --rating-e:  #b02828;
   --rating-nr: #aaaaaa;
   --bubble-bg: #f5f0e8;
-  --grid-line: rgba(26, 24, 22, 0.055);
 }
 
 [data-theme="dark"] {
@@ -240,10 +203,10 @@
   --border-chip: rgba(229, 225, 216, 0.22);
   --border-active: rgba(229, 225, 216, 0.42);
   --accent: #C4785A;
-  --accent-subtle: rgba(196, 120, 90, 0.14);
   --card-bg: #1D1B1A;
   --card-border: rgba(229, 225, 216, 0.20);
   --image-outline: rgba(255, 255, 255, 0.1);
+  --image-outline-faint: rgba(255, 255, 255, 0.05);
   --rating-g:  #3d9970;
   --rating-t:  #c8a020;
   --rating-m:  #c0601a;
@@ -252,11 +215,11 @@
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.24);
+  --bubble-shadow-crimson: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px color-mix(in srgb, var(--cached-crimson) 45%, transparent);
   --bubble-ring: rgba(255, 255, 255, 0.24);
   /* Lift quill-ink off the near-black bg so the author bubble stays visible. */
   --author-bubble: color-mix(in srgb, var(--quill-ink) 78%, #ffffff 22%);
   --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.45);
-  --grid-line: rgba(229, 225, 216, 0.055);
 }
 
 /* Font preference */
