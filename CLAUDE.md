@@ -14,10 +14,6 @@
 - `src/data/comments.ts` — `@DUMMY` hardcoded comment threads (~1100 lines)
 - `src/lib/library.ts` — `@DUMMY` `MOCK_LIBRARY` reading state (no auth) + localStorage bookmark helpers (`isBookmarked`/`toggleBookmark`/`removeBookmark` — `@WIRE`, become the `/user/library` call sites)
 - `src/app/works/[slug]/page.tsx` — `@TODO-DEV` recommendations fallback
-- `src/lib/chatReplies.ts` — `@DUMMY` canned character-chat replies (becomes the c.ai chat backend)
-- `src/lib/chatCharacters.ts` — `@DUMMY` `resolveCharacterName` maps global avatars → work characters by index
-- `src/components/CharacterChat.tsx` — `@DUMMY` user-persona avatar reuses `/creators/placeholder.png`
-- `src/components/ImagineModal.tsx` — `@DUMMY` image slot is a persistent shimmer (becomes the c.ai image-gen call); "Post to c.ai feed"/"Reimagine" CTAs are stubs
 
 **Fake loading state** (not real async):
 - `src/components/BrowseSearchBar.tsx` — `@LOADING` setTimeout on vibe search (synchronous, fake delay)
@@ -68,7 +64,7 @@ npm run build     # Production build
 - `src/lib/motion.ts` — shared easing arrays (`EASE_OUT_EXPO`, `EASE_SPRING_OUT`) for `motion`
 - `src/lib/ratings.ts` — `RATING_TIERS` config (single source for rating letter/color/tooltip); `ratingTier()`
 - `src/lib/filterParams.ts` — shared filter-URL helpers (comma-list, 3-state pill, presets)
-- `src/hooks/` — `useViewMode`, `useDrawer`, `usePresets`, `useSelectionAnchor`, `useChatCharacter`
+- `src/hooks/` — `useViewMode`, `useDrawer`, `usePresets`
 - `src/components/` — All UI (shared primitives: `WorkGrid` (results grid for browse + library), `RailSection`/`SectionHeader` (home sections), `Popover`, `GhostButton`, `SortDropdown`, `FilterPill`, `RatingBadge`, `DrawerSection`, `EmptyState`, `RailViewport`, `TagChip`, `WorkCardCover` exports)
 - `src/types/index.ts` — WorkMeta, WorkSummary, Chapter, FilterState types
 
@@ -259,13 +255,13 @@ Stored in `localStorage` key `cai_fanfic_presets` as:
 
 ## Reading Page Architecture
 
-Two HUD layers:
-1. **ReadingHUD** (`position: fixed`) — Back-to-browse chevron, always visible
-2. **ReadingCluster** (`position: sticky`) — Pill cluster between work header and chapter content:
-   - Title pill — hidden at natural position, animates in when sticky
-   - Chapter pill — current chapter + scroll progress bar (multi-chapter only)
-   - Settings pill — reading preferences (font size, font family, line width, theme)
-   - Pills morph into panels via 8-step open / 5-step collapse sequence using live DOM positions
+One layout at every breakpoint (no separate mobile bar/sheets), two fixed layers:
+1. **Top HUD row** (`position: fixed`, top) — `ReadingHUD` (Back-to-browse chevron, left) + `ReadingActions` (prefs / reading-list / account, right), over a gradient scrim
+2. **ReadingCluster** (`position: fixed`, bottom center) — pill cluster:
+   - Title pill — always visible; opens the `StoryOverview` popover (cover, `WorkMetaBlock` identity block, dashed-divider `TagRow` list, report flag)
+   - Chapter pill — current chapter + rating-tinted scroll progress bar (`useScrollProgress`), opens `ChapterPanel` (multi-chapter only; locked rows get a gradient-masked title + `LockIcon`)
+   - `ReturnToPositionFAB` — "Your place" pill, returns to furthest-read position
+   - All popovers open upward via the shared `Popover` (`side="top"`); the StoryOverview panel width is viewport-clamped for small screens
 
 ---
 

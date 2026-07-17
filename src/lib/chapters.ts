@@ -9,6 +9,7 @@ import { Chapter } from '@/types';
  *   :::notes-begin ... :::notes-end
  *   [body content]
  *   :::notes-bottom ... :::notes-bottom-end
+ *   :::locked            (optional — chapter is paywalled)
  *   :::end-chapter
  */
 export function parseChapters(rawContent: string): Chapter[] {
@@ -42,11 +43,15 @@ export function parseChapters(rawContent: string): Chapter[] {
     // Extract author notes (end)
     const notesEnd = extractBlock(chapterBody, ':::notes-bottom', ':::notes-bottom-end');
 
+    // Locked marker — standalone line, presence flags the chapter as paywalled
+    const locked = /^:::locked\s*$/m.test(chapterBody);
+
     // Extract main content — everything not in the special blocks
     let content = chapterBody;
     content = removeBlock(content, ':::summary', ':::end-summary');
     content = removeBlock(content, ':::notes-begin', ':::notes-end');
     content = removeBlock(content, ':::notes-bottom', ':::notes-bottom-end');
+    content = content.replace(/^:::locked\s*$/m, '');
     content = content.trim();
 
     chapters.push({
@@ -56,6 +61,7 @@ export function parseChapters(rawContent: string): Chapter[] {
       notesEnd: notesEnd || undefined,
       content,
       index: i - 1,
+      locked: locked || undefined,
     });
   }
 

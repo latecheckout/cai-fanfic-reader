@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { accentChain } from 'glimm';
 import { GlimmProvider } from 'glimm/next';
@@ -14,6 +14,15 @@ import { TooltipProvider } from '@/components/Tooltip';
 // bg + the toggle's espresso; magenta→violet echoes the toggle's glow.
 // Plain serializable Palette — crosses the server→client boundary fine.
 const SWEEP_PALETTE = accentChain(['#f28500', '#ff4dc9', '#ae00d9', '#df91f2']);
+
+// Via the Viewport export (not a manual <meta>) so Next doesn't also emit its
+// default viewport tag — WebKit honors the LAST viewport meta, which silently
+// dropped viewport-fit=cover and zeroed every env(safe-area-inset-*).
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   title: 'c.ai Fanfic',
@@ -33,7 +42,6 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light" data-font="serif" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <ThemeScript />
       </head>
       <body>

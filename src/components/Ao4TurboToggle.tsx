@@ -5,6 +5,7 @@ import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
 import { useGlimm } from 'glimm/next';
 import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
 import { LightningIcon } from './icons';
+import { Tooltip } from './Tooltip';
 
 export type SiteMode = 'visual' | 'text';
 // Re-exported for back-compat; canonical definitions live in @/lib/constants.
@@ -36,6 +37,15 @@ const GLOW_IMAGE =
   'radial-gradient(200px circle at calc(100% - var(--mx)) calc(100% - var(--my)), color-mix(in oklch, var(--ab-alt-violet) 85%, transparent), transparent 65%)';
 
 const BoltIcon = () => <LightningIcon width={14} height={14} />;
+
+// Plush inner drop-shadow + glass stroke shared by the thumb and the collapsed
+// mobile FAB; dark mode dials the white insets back.
+const PLUSH_INSET =
+  'shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.44),inset_0_2.5px_5px_0_rgba(255,255,255,0.44)] theme-dark:shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.24),inset_0_2.5px_5px_0_rgba(255,255,255,0.24)] [outline:1.25px_solid_rgba(255,255,255,0.22)] [outline-offset:-1.25px]';
+
+// One-line mode blurbs for the tooltips (single line always — keep them short).
+const VISUAL_LABEL = 'Visual mode: cover-art cards';
+const TEXT_LABEL = 'AO4 mode: dense text lists';
 
 /**
  * AO4 turbo toggle — the global mode switch. ON = text mode. Drag the "AO4
@@ -95,20 +105,42 @@ export function Ao4TurboToggle() {
       />
 
       <div className="ao4-fab fixed right-7 bottom-[calc(24px+var(--safe-bottom))] z-[var(--z-sticky)] max-md:right-4 max-md:bottom-[calc(18px+var(--safe-bottom))]">
-        <div className="relative h-[50px] w-[194px] max-md:h-[54px] max-md:w-[206px] rounded-full p-[3px] touch-none bg-bg [background-image:linear-gradient(color-mix(in_srgb,var(--text)_8%,transparent),color-mix(in_srgb,var(--text)_8%,transparent))] backdrop-blur-[12px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]">
+        {/* On mobile the thumb is icon-only (no "AO4 Mode" text), so the track
+            shrinks to match: 3px pad ×2 + 48px thumb + 48px travel = 102px. */}
+        <div className="relative h-[50px] w-[194px] max-md:h-[54px] max-md:w-[102px] rounded-full p-[3px] touch-none bg-bg [background-image:linear-gradient(color-mix(in_srgb,var(--text)_8%,transparent),color-mix(in_srgb,var(--text)_8%,transparent))] backdrop-blur-[12px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]">
           {/* On/off marks in the negative space (off = ring on the left, on = bar
-              on the right); the thumb covers the active side. */}
-          <span className="absolute left-[26px] top-1/2 flex -translate-y-1/2 pointer-events-none text-secondary opacity-50" aria-hidden="true">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="7" cy="7" r="4.5" />
-            </svg>
-          </span>
-          <span className="absolute right-[26px] top-1/2 flex -translate-y-1/2 pointer-events-none text-secondary opacity-50" aria-hidden="true">
-            <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <line x1="7" y1="2.5" x2="7" y2="9.5" />
-            </svg>
-          </span>
+              on the right); the thumb covers the active side. Each mark is a real
+              button (full-height ≥40px hit area) that jumps straight to its mode,
+              with a tooltip naming what the mode does — only the exposed side is
+              interactive, the thumb sits on top of the other. */}
+          <Tooltip label={VISUAL_LABEL} disabled={!on}>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-label="Switch to visual mode"
+              onClick={() => commit(false)}
+              className="absolute left-0 top-0 flex h-full w-[52px] max-md:w-[51px] items-center justify-center rounded-full border-none bg-transparent p-0 text-secondary cursor-pointer"
+            >
+              <svg className="opacity-50" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="7" cy="7" r="4.5" />
+              </svg>
+            </button>
+          </Tooltip>
+          <Tooltip label={TEXT_LABEL} disabled={on}>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-label="Switch to AO4 text mode"
+              onClick={() => commit(true)}
+              className="absolute right-0 top-0 flex h-full w-[52px] max-md:w-[51px] items-center justify-center rounded-full border-none bg-transparent p-0 text-secondary cursor-pointer"
+            >
+              <svg className="opacity-50" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <line x1="7" y1="2.5" x2="7" y2="9.5" />
+              </svg>
+            </button>
+          </Tooltip>
 
+          <Tooltip label={on ? TEXT_LABEL : VISUAL_LABEL}>
           <motion.button
             type="button"
             role="switch"
@@ -128,7 +160,7 @@ export function Ao4TurboToggle() {
               commit(!on);
             }}
             className={
-              'group/thumb absolute left-[3px] top-[3px] flex h-11 w-[140px] max-md:h-12 max-md:w-[152px] items-center justify-center gap-2 overflow-hidden rounded-full border-none p-0 ' +
+              'group/thumb absolute left-[3px] top-[3px] flex h-11 w-[140px] max-md:h-12 max-md:w-12 items-center justify-center gap-2 overflow-hidden rounded-full border-none p-0 ' +
               'font-sans text-sm max-md:text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-white cursor-grab will-change-transform active:cursor-grabbing ' +
               'shadow-[0_2px_5px_-1px_rgba(0,0,0,0.26),0_9px_20px_-9px_rgba(0,0,0,0.38)] ' +
               '[--ab-magenta:#652E1F] [--ab-hot-pink:#AE00D9] [--ab-alt-violet:#6B2E63] [--mx:50%] [--my:50%] ' +
@@ -141,14 +173,11 @@ export function Ao4TurboToggle() {
               style={{ backgroundImage: GLOW_IMAGE }}
               aria-hidden="true"
             />
-            {/* Plush inner drop-shadow + glass stroke; dark mode dials the white insets back. */}
-            <span
-              className="absolute inset-0 rounded-[inherit] pointer-events-none shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.44),inset_0_2.5px_5px_0_rgba(255,255,255,0.44)] theme-dark:shadow-[inset_0_-2.5px_5px_0_rgba(255,255,255,0.24),inset_0_2.5px_5px_0_rgba(255,255,255,0.24)] [outline:1.25px_solid_rgba(255,255,255,0.22)] [outline-offset:-1.25px]"
-              aria-hidden="true"
-            />
+            <span className={'absolute inset-0 rounded-[inherit] pointer-events-none ' + PLUSH_INSET} aria-hidden="true" />
             <span className="relative z-[1] flex"><BoltIcon /></span>
-            <span className="relative z-[1]">AO4 Mode</span>
+            <span className="relative z-[1] max-md:hidden">AO4 Mode</span>
           </motion.button>
+          </Tooltip>
         </div>
       </div>
     </>

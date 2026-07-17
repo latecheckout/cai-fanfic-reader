@@ -873,7 +873,7 @@ export function FilterPanel({
       <div ref={sentinelRef} style={{ height: 0, overflow: 'hidden' }} aria-hidden="true" />
       <div
         ref={barRef}
-        className="sticky top-[56px] z-50 mb-5 pt-3 bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] [backdrop-filter:blur(8px)_saturate(1.2)] [&[data-stuck]]:border-b [&[data-stuck]]:border-border [body.search-fs-open_&]:z-[500] [body.search-fs-open_&]:[backdrop-filter:none]"
+        className="sticky top-[var(--header-height)] z-50 mb-5 pt-3 bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] [backdrop-filter:blur(8px)_saturate(1.2)] [&[data-stuck]]:border-b [&[data-stuck]]:border-border [body.search-fs-open_&]:z-[500] [body.search-fs-open_&]:[backdrop-filter:none]"
       >
         {/* Row 1: Search + controls — single flex line (fadeUp entrance) */}
         <motion.div

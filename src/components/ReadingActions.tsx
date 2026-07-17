@@ -5,16 +5,17 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
 import { isBookmarked, toggleBookmark } from '@/lib/library';
 import { HUD_BUBBLE } from './readingChrome';
-import { FilterIcon, BookmarkIcon, BookmarkCheckIcon } from './icons';
+import { FilterIcon, BookmarkIcon, BookmarkCheckIcon, UserProfileIcon } from './icons';
 import { Tooltip } from './Tooltip';
 import { Popover } from './Popover';
 import { PrefsPanel } from './PrefsPanel';
+import { AccountMenu } from './AccountMenu';
 
 /**
  * Cross-fades between two icons whenever `swapKey` changes — outgoing blurs and
  * shrinks out, incoming blurs and scales in (spring, duration 0.3, bounce 0).
  */
-function CrossfadeSwap({ swapKey, children }: { swapKey: string; children: React.ReactNode }) {
+export function CrossfadeSwap({ swapKey, children }: { swapKey: string; children: React.ReactNode }) {
   return (
     <AnimatePresence mode="popLayout" initial={false}>
       <motion.span
@@ -79,6 +80,23 @@ export function ReadingActions() {
           </CrossfadeSwap>
         </button>
       </Tooltip>
+
+      {/* Account menu — shared body (AccountMenu), HUD-bubble trigger */}
+      <AccountMenu
+        renderTrigger={({ open, toggle }) => (
+          <Tooltip label="Account" align="right" disabled={open}>
+            <button
+              onClick={toggle}
+              aria-label="Account menu"
+              aria-haspopup="menu"
+              aria-expanded={open}
+              className={`${HUD_BUBBLE} ${open ? 'shadow-bubble-hover [&_svg]:opacity-100' : ''}`}
+            >
+              <UserProfileIcon width={20} height={20} />
+            </button>
+          </Tooltip>
+        )}
+      />
     </div>
   );
 }

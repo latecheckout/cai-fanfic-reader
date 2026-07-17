@@ -14,7 +14,7 @@ export function EndOfStory({ recommendations }: Props) {
           shows the image grid card, text shows the list card. Both are rendered
           and CSS picks one, so this stays a server component. */}
       {recommendations.length > 0 && (
-        <div className="mt-[60px] grid grid-cols-2 gap-4 border-t border-border pt-6 [html[data-mode=text]_&]:flex [html[data-mode=text]_&]:flex-col">
+        <div className="mt-10 grid grid-cols-2 gap-4 border-t border-border pt-10 [html[data-mode=text]_&]:flex [html[data-mode=text]_&]:flex-col">
           {recommendations.map((work) => (
             <div key={work.slug}>
               <div className="[html[data-mode=text]_&]:hidden">

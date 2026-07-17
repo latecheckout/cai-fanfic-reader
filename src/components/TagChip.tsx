@@ -68,7 +68,7 @@ export function TagChip({ tag, category, clickable, href, onImage }: Props) {
 
 // ── Labeled tag row (Warnings / Fandom / Ships / Characters / Tags) ──
 // One row = an uppercase label + a wrapped group of filter-link TagChips.
-// Shared by the FandomHub sidebar (and the browse cards' chips). Renders
+// Shared by the reader's StoryOverview popover (and the browse cards' chips). Renders
 // nothing when the field is empty. `max-md:` stacking is a no-op there.
 const TAG_ROW = 'flex items-baseline gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5';
 const TAG_LABEL =

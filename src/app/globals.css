@@ -94,6 +94,9 @@
   --color-toasty-amber: var(--toasty-amber);
 
   --color-cached-crimson: var(--cached-crimson);
+  --color-quill-ink: var(--quill-ink);
+  --color-espresso: var(--espresso);
+  --color-pinned-purple: var(--pinned-purple);
 
   /* Author-note bubble (theme-adaptive quill-ink) */
   --color-author-bubble: var(--author-bubble);
@@ -144,12 +147,6 @@
     min-height: 100vh;
     transition: background-color var(--transition-chrome), color var(--transition-chrome),
                 padding-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Text selection everywhere uses the amber wash (same family as the chat
-     quote blocks + quote-flash highlight). */
-  ::selection {
-    background-color: color-mix(in srgb, var(--toasty-amber) 35%, transparent);
   }
 
   a {
@@ -491,13 +488,6 @@ html.focus-active .prose-outer::after {
 @keyframes caiSkeletonShimmer {
   0%   { background-position: 150% 0; }
   100% { background-position: -150% 0; }
-}
-
-/* Character-chat typing indicator — dots pulse in sequence (per-dot delay set
-   inline). Reduced-motion users get static dots via the global safety net. */
-@keyframes caiTypingDot {
-  0%, 60%, 100% { opacity: 0.35; transform: none; }
-  30%           { opacity: 1; transform: translateY(-2px); }
 }
 
 /* ============================================================

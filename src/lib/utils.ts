@@ -75,16 +75,6 @@ export function stripChapterPrefix(title: string): string {
   return title.replace(/^\s*chapter\s+\d+\s*:\s*/i, '') || title;
 }
 
-/** Compact relative timestamp for chat history rows: Today / Yesterday / Nd ago / short date. */
-export function relativeTime(ts: number): string {
-  const startOfDay = (t: number) => new Date(new Date(t).toDateString()).getTime();
-  const days = Math.round((startOfDay(Date.now()) - startOfDay(ts)) / 86_400_000);
-  if (days <= 0) return 'Today';
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days}d ago`;
-  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-}
-
 /**
  * True when a keyboard event targets an editable element — global single-key
  * shortcuts (F for the drawer, S for sort) must not fire while typing.

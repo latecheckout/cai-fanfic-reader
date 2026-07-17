@@ -219,6 +219,7 @@ One more chapter to go! The conclusion will be posted next week.
 :::end-chapter
 
 :::chapter Chapter 3: Resolution
+:::locked
 :::summary
 The final chapter. Spock and T'Pring must work together to escape and complete their mission - and confront what lies between them.
 :::end-summary
@@ -334,4 +335,14 @@ Thank you so much for reading! This story has been a joy to write, and I'm so gr
 
 Live long and prosper!
 :::notes-bottom-end
+:::end-chapter
+
+:::chapter Chapter 4: Homecoming
+:::locked
+:::summary
+Back aboard the Enterprise, Spock files his report while T'Pring prepares to depart — but an encrypted message from Vulcan changes both of their plans, and neither is prepared for what it asks of them.
+:::end-summary
+
+The Enterprise's transporter room had never felt so quiet.
+
 :::end-chapter

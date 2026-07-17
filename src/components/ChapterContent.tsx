@@ -76,8 +76,7 @@ export function ChapterContent({ chapter, chapterHtml, totalChapters, author, wo
         </ChapterCallout>
       )}
 
-      {/* Story text — data-chapter-prose scopes the selection toolbar to story text */}
-      <article data-chapter-prose className="prose" dangerouslySetInnerHTML={{ __html: chapterHtml }} />
+      <article className="prose" dangerouslySetInnerHTML={{ __html: chapterHtml }} />
 
       {/* Author's ending notes — message bubble from the author */}
       {chapter.notesEnd && (

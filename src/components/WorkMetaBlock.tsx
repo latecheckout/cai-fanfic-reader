@@ -9,7 +9,7 @@ import { formatWords, formatChapters, readingTime, ratingClass, categoryLabel, i
 
 /**
  * The work "identity" block — signal badges, title, author byline, summary,
- * stats line. Single source of truth, rendered by the FandomHub sidebar.
+ * stats line. Single source of truth, rendered by the StoryOverview popover.
  */
 export function WorkMetaBlock({ meta, totalChapters }: { meta: WorkMeta; totalChapters: number }) {
   const rClass = ratingClass(meta.rating);

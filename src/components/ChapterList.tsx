@@ -3,11 +3,13 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { Chapter, WorkMeta, WorkSummary } from '@/types';
 import { ChapterContent } from './ChapterContent';
+import { LockedChapterCard } from './LockedChapterCard';
 import { ChapterBreak } from './ChapterBreak';
 import { ChapterComments } from './ChapterComments';
 import { EndOfStory } from './EndOfStory';
 import { KudosSection } from './KudosSection';
 import { useReading } from '@/context/ReadingContext';
+import { stripChapterPrefix } from '@/lib/utils';
 import { BOOKMARKS_KEY } from '@/lib/constants';
 
 interface Props {
@@ -21,9 +23,14 @@ interface Props {
 const HUD_OFFSET = 90;
 
 const CHAPTER = 'mx-auto max-w-[var(--reader-line-width)] px-6 pt-8 max-md:px-4';
+// Locked-chapter sections use the recommendation grid's rhythm instead of the
+// chapter flow's: 60px into the section, gap-4 (16px) between stacked cards.
+const CHAPTER_LOCKED = 'mx-auto max-w-[var(--reader-line-width)] px-6 max-md:px-4';
 
 export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta }: Props) {
   const { setActiveChapterIndex, registerChapter, slug, totalChapters, setLastReadChapterIndex, lastReadChapterIndex, chapterTitles, scrollToChapter } = useReading();
+  // Kudos renders after the last chapter you can actually read.
+  const lastUnlockedIndex = chapters.reduce((acc, c, i) => (c.locked ? acc : i), -1);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
   const scrollSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didRestoreRef = useRef(false);
@@ -195,11 +202,15 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
             <section
               id={`chapter-${i}`}
               ref={setRef(i)}
-              className={CHAPTER}
+              className={
+                chapter.locked
+                  ? `${CHAPTER_LOCKED} ${chapters[i - 1]?.locked ? 'mt-4' : 'mt-[60px]'}`
+                  : CHAPTER
+              }
               aria-label={chapter.title || `Chapter ${i + 1}`}
             >
               {/* In-flow "you left off here" banner — only for chapters after the first */}
-              {lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
+              {!chapter.locked && lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
                 <div className="pointer-events-none flex items-center gap-3 pb-6 pt-5" aria-hidden="true">
                   <span className="h-px flex-1 bg-secondary opacity-20" />
                   <span className="shrink-0 whitespace-nowrap font-mono text-[9px] tracking-[0.1em] text-secondary opacity-[0.45]">
@@ -208,17 +219,27 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
                   <span className="h-px flex-1 bg-secondary opacity-20" />
                 </div>
               )}
-              <ChapterContent
-                chapter={chapter}
-                chapterHtml={chapterHtmls[i]}
-                totalChapters={chapters.length}
-                author={workMeta.author}
-                workTitle={workMeta.title}
-              />
+              {/* Locked chapters keep their real section (the scroll observer and
+                  scrollToChapter need the element) but swap content for the card. */}
+              {chapter.locked ? (
+                <LockedChapterCard
+                  chapterNumber={i + 1}
+                  title={stripChapterPrefix(chapter.title || `Chapter ${i + 1}`)}
+                  summary={chapter.summary}
+                />
+              ) : (
+                <ChapterContent
+                  chapter={chapter}
+                  chapterHtml={chapterHtmls[i]}
+                  totalChapters={chapters.length}
+                  author={workMeta.author}
+                  workTitle={workMeta.title}
+                />
+              )}
             </section>
 
             {/* End of chapter label — above the comments zone for multi-chapter works */}
-            {chapters.length > 1 && (
+            {!chapter.locked && chapters.length > 1 && (
               <div
                 className="mx-auto mt-14 max-w-[var(--reader-line-width)] px-6 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-secondary opacity-[0.45] max-md:px-4"
                 aria-hidden="true"
@@ -227,16 +248,16 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
               </div>
             )}
 
-            {/* Comments after each chapter */}
-            <ChapterComments slug={slug} chapterIndex={i} />
+            {/* Comments after each chapter — none on locked chapters */}
+            {!chapter.locked && <ChapterComments slug={slug} chapterIndex={i} />}
 
-            {/* Kudos section after the last chapter's comments */}
-            {i === chapters.length - 1 && (
+            {/* Kudos section after the last unlocked chapter's comments */}
+            {i === lastUnlockedIndex && (
               <KudosSection slug={slug} totalKudos={workMeta.kudos} />
             )}
 
-            {/* Chapter break before next chapter */}
-            {i < chapters.length - 1 && <ChapterBreak chapterNumber={i + 1} />}
+            {/* Chapter break before next chapter — locked cards space themselves */}
+            {i < chapters.length - 1 && !chapters[i + 1].locked && <ChapterBreak chapterNumber={i + 1} />}
           </div>
         ))}
 

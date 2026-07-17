@@ -57,21 +57,26 @@ export function ReturnToPositionFAB() {
   }
 
   return (
-    <AnimatePresence>
+    // popLayout: the exiting pill is lifted out of the row so its siblings'
+    // `layout` animation can glide them over instead of snapping.
+    <AnimatePresence mode="popLayout" initial={false}>
       {visible && (
         <motion.button
+          layout="position"
           onClick={handleClick}
           aria-label="Return to your last reading position"
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, x: -8 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          // Exit softer than enter — fade with a slight shrink, no slide.
+          exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
           // Rendered inside the bottom cluster, to the right of the chapter
-          // pill — same BUBBLE_PILL chrome/size as its siblings.
-          className={`${BUBBLE_PILL} gap-2 px-4 font-sans text-[13px]`}
+          // pill — same BUBBLE_PILL chrome/size as its siblings. Collapses to
+          // a circular arrow bubble on mobile (CSS-only, matches the info pill).
+          className={`${BUBBLE_PILL} gap-2 px-4 font-sans text-[13px] max-md:w-11 max-md:shrink-0 max-md:justify-center max-md:px-0`}
         >
-          <ArrowDownIcon width={15} height={15} />
-          <span>Your place</span>
+          <ArrowDownIcon width={15} height={15} className="shrink-0 text-secondary" />
+          <span className="max-md:hidden">Your place</span>
         </motion.button>
       )}
     </AnimatePresence>

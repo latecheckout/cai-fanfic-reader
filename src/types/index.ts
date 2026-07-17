@@ -34,6 +34,7 @@ export interface Chapter {
   notesEnd?: string;
   content: string; // raw markdown
   index: number;
+  locked?: boolean; // paywalled — content replaced by an unlock card
 }
 
 export interface Work {

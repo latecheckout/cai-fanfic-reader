@@ -35,10 +35,17 @@ export function RailViewport({ railClassName, rowClassName, children }: Props) {
     if (!el) return;
     update();
     el.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    // The rail's content can mount/resize after this effect runs (e.g.
+    // ContinueReading populates from localStorage) — scrollWidth changes
+    // without a scroll event, so observe layout + children, not just scroll.
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    const mo = new MutationObserver(update);
+    mo.observe(el, { childList: true, subtree: true });
     return () => {
       el.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      ro.disconnect();
+      mo.disconnect();
     };
   }, [update]);
 

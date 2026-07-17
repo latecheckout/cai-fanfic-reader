@@ -5,7 +5,7 @@ import { truncateSummary } from '@/lib/utils';
 
 /**
  * Italic summary paragraph that shows the first ~4 sentences with an inline
- * "see more"/"see less" toggle. Rendered via WorkMetaBlock (FandomHub).
+ * "see more"/"see less" toggle. Rendered via WorkMetaBlock (StoryOverview).
  * Renders nothing for an empty summary.
  */
 export function ExpandableSummary({ summary }: { summary: string }) {

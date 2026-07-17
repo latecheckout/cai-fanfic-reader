@@ -55,7 +55,6 @@
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.055);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.07);
   /* Warn variant (back button): same lift, ring goes low-opacity crimson. */
-  --bubble-shadow-crimson: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 1px color-mix(in srgb, var(--cached-crimson) 30%, transparent);
   /* The 1px ring inside bubble-shadow-hover — so an open popover's border can
      match the stroke of the bubble pill/HUD control that triggered it. */
   --bubble-ring: rgba(0, 0, 0, 0.07);
@@ -70,7 +69,6 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --spring:        cubic-bezier(0.16, 1, 0.3, 1);   /* panel opening — soft deceleration */
   --collapse:      cubic-bezier(0.4, 0, 0.8, 1);    /* panel closing — quick, purposeful */
-  --ease-sidebar:  cubic-bezier(0.32, 0.72, 0, 1);  /* fandom-hub slide (character-manga port) */
 
   /* Reader line width */
   --line-width-narrow:  560px;
@@ -81,6 +79,10 @@
   /* Reading layout */
   --reader-max-width: 68ch;
   --browse-max-width: 1280px;
+  /* Browse navbar height — matches the reading page's top bar rhythm
+     (40px controls + 16px breathing room top and bottom). FilterPanel's
+     sticky toolbar offset derives from this too. */
+  --header-height: 72px;
 
   /* Transitions */
   --transition-micro: 150ms ease-in-out;
@@ -104,7 +106,6 @@
      Order: content < reading-bar < cluster < popover < tooltip < modal/toolbar. */
   --z-reading-bar:     250; /* fixed top HUD scrim + mobile bottom bar */
   --z-reading-cluster: 260; /* sticky pill cluster (rides above the bar gradient) */
-  --z-hub:             270; /* fandom-hub sidebar (HUD buttons ride +10 above it) */
   --z-popover:         300; /* anchored popovers (= --z-panel) */
   --z-tooltip:         320; /* hover tooltips (above popovers) */
 
@@ -149,6 +150,8 @@
 
   --cached-crimson:   #d90000;
   --quill-ink:        #3e2733;
+  --espresso:         #652E1F; /* the AO4 toggle's warm brown */
+  --pinned-purple:    #6b2e63; /* character-brain palette (white text) */
 
   /* Author-note bubble — quill-ink base, lightened per theme so it stays
      legible on dark backgrounds (see the dark override). */
@@ -215,7 +218,6 @@
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.24);
-  --bubble-shadow-crimson: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px color-mix(in srgb, var(--cached-crimson) 45%, transparent);
   --bubble-ring: rgba(255, 255, 255, 0.24);
   /* Lift quill-ink off the near-black bg so the author bubble stays visible. */
   --author-bubble: color-mix(in srgb, var(--quill-ink) 78%, #ffffff 22%);

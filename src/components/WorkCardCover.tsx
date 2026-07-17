@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { WorkSummary } from '@/types';
 import { formatWords, formatCount, formatChapters, ratingClass, categoryLabel, isWipStatus } from '@/lib/utils';
 import { ratingTier } from '@/lib/ratings';
-import { HeartIcon, FlagIcon, ViewsIcon } from './icons';
+import { HeartIcon, BookmarkIcon, ViewsIcon } from './icons';
 import { TagChip } from './TagChip';
 import { Tooltip } from './Tooltip';
 
@@ -75,11 +75,11 @@ export function Kudos({ count }: { count: number }) {
   );
 }
 
-/** Bookmark count with the flag icon. */
+/** Bookmark count with the bookmark ribbon icon (matches the save action). */
 export function Bookmarks({ count }: { count: number }) {
   return (
     <span className={STAT_VIEWS}>
-      <FlagIcon width={12} height={12} className="shrink-0" />
+      <BookmarkIcon width={12} height={12} className="shrink-0" />
       {formatCount(count)}
     </span>
   );
