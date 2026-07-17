@@ -215,7 +215,7 @@ function LinkList({
       {items.map((item, i) => (
         <span key={`${param}-${i}`}>
           {i > 0 && separator}
-          <Link href={`/?${param}=${encodeURIComponent(item)}`} className={linkClassName}>{item}</Link>
+          <Link href={`/browse?${param}=${encodeURIComponent(item)}`} className={linkClassName}>{item}</Link>
         </span>
       ))}
     </div>
@@ -262,7 +262,7 @@ export function WorkCardCover({ work }: Props) {
             <span className="relative z-[1] inline-flex items-center overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[14px] text-secondary pointer-events-none">
               <span className="mr-[5px]">by</span>
               <Avatar />
-              <Link href={`/?q=${encodeURIComponent(meta.author)}`} className="relative z-[2] text-inherit no-underline pointer-events-auto hover:text-text hover:underline hover:underline-offset-2">
+              <Link href={`/browse?q=${encodeURIComponent(meta.author)}`} className="relative z-[2] text-inherit no-underline pointer-events-auto hover:text-text hover:underline hover:underline-offset-2">
                 {meta.author}
               </Link>
             </span>
@@ -274,10 +274,10 @@ export function WorkCardCover({ work }: Props) {
         {(warnings.length > 0 || meta.tags.length > 0) && (
           <div className="relative z-[1] flex flex-wrap gap-[6px] pointer-events-auto">
             {warnings.map((w) => (
-              <TagChip key={`warn-${w}`} tag={w} category="warning" clickable href={`/?warning=${encodeURIComponent(w)}`} />
+              <TagChip key={`warn-${w}`} tag={w} category="warning" clickable href={`/browse?warning=${encodeURIComponent(w)}`} />
             ))}
             {visibleTags.map((t) => (
-              <TagChip key={`tag-${t}`} tag={t} category="additional" clickable href={`/?tag=${encodeURIComponent(t)}`} />
+              <TagChip key={`tag-${t}`} tag={t} category="additional" clickable href={`/browse?tag=${encodeURIComponent(t)}`} />
             ))}
             {hiddenTagCount > 0 && (
               <button type="button" className="inline-flex items-center rounded-chip border border-dashed border-border-chip px-2 py-[3px] font-sans text-[13px] leading-[18px] text-secondary transition-colors duration-150 ease-in-out cursor-pointer hover:border-border-active hover:text-text" onClick={() => setTagsExpanded(!tagsExpanded)}>

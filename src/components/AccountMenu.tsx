@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { Popover } from './Popover';
-import { LogOutIcon } from './icons';
+import { MENU_ROW } from './popoverChrome';
+import { AboutIcon, LogOutIcon } from './icons';
 
 // @DUMMY logged-in user — becomes the real session once auth is wired.
 export const MOCK_USER_EMAIL = 'collinbriggs19@gmail.com';
@@ -30,8 +31,10 @@ export function AccountMenu({
   );
 }
 
-/** Menu body (email label + sign out) — shared by the desktop popover and the
- *  mobile prefs sheet's account footer. */
+/** Menu body (email + site links + sign out). The header is this menu's only
+ *  surface — it also absorbs the links that don't fit the mobile header:
+ *  About (all breakpoints) and the Write on c.ai CTA (mobile only; desktop
+ *  keeps the header pill). */
 export function AccountMenuBody({ onClose }: { onClose: () => void }) {
   return (
     <>
@@ -39,6 +42,20 @@ export function AccountMenuBody({ onClose }: { onClose: () => void }) {
         {MOCK_USER_EMAIL}
       </div>
       <div className="my-1 h-px bg-border" aria-hidden="true" />
+      <a
+        href="/about"
+        onClick={onClose}
+        className={`${MENU_ROW} font-sans text-sm text-secondary no-underline hover:text-text`}
+      >
+        <AboutIcon width={18} height={18} /> About
+      </a>
+      <a
+        href="/creators/apply"
+        onClick={onClose}
+        className={`${MENU_ROW} hidden font-sans text-sm text-secondary no-underline hover:text-text max-md:flex`}
+      >
+        Write on c.ai
+      </a>
       {/* MENU_ROW layout minus its hover bg — two bg utilities on one
           element resolve by emission order, so the crimson fill must be
           the only one. @WIRE — sign out becomes the real session call. */}

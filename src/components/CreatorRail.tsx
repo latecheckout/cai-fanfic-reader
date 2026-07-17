@@ -14,7 +14,7 @@ export function CreatorRail({ creators }: Props) {
   if (creators.length === 0) return null;
 
   return (
-    <RailSection title="Trending creators ✍️" subtitle="The humans behind the stories">
+    <RailSection title="Trending creators" subtitle="The humans behind the stories">
       {creators.map((c, i) => <CreatorCard key={c.name} creator={c} index={i} />)}
     </RailSection>
   );

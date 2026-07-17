@@ -52,7 +52,7 @@ export function ChapterContent({ chapter, chapterHtml, totalChapters, author, wo
               <span className="mr-1.5 shrink-0">by</span>
               <Avatar />
               <Link
-                href={`/?q=${encodeURIComponent(author)}`}
+                href={`/browse?q=${encodeURIComponent(author)}`}
                 className="shrink-0 text-inherit hover:text-text hover:underline hover:underline-offset-2"
               >
                 {author}

@@ -1,6 +1,5 @@
 import { getWorkSummaries } from '@/lib/works';
-import { buildSearchOptions } from '@/lib/filters';
-import { BrowseHeader } from '@/components/BrowseHeader';
+import { SiteHeader } from '@/components/SiteHeader';
 
 export const metadata = {
   title: 'Fandoms — Archive of Our Stories',
@@ -8,7 +7,6 @@ export const metadata = {
 
 export default function FandomsPage() {
   const works = getWorkSummaries();
-  const searchOptions = buildSearchOptions(works);
 
   // Build fandom → count map
   const fandomMap = new Map<string, number>();
@@ -25,7 +23,7 @@ export default function FandomsPage() {
 
   return (
     <div>
-      <BrowseHeader />
+      <SiteHeader />
       <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12">
         <div className="mb-8 flex items-baseline gap-4">
           <h2 className="font-sans text-2xl font-medium tracking-[-0.015em] text-text">Fandoms</h2>
@@ -39,7 +37,7 @@ export default function FandomsPage() {
             {fandoms.map(([fandom, count]) => (
               <li key={fandom} className="border-b border-border last:border-b-0">
                 <a
-                  href={`/?fandom=${encodeURIComponent(fandom)}`}
+                  href={`/browse?fandom=${encodeURIComponent(fandom)}`}
                   className="flex items-baseline justify-between gap-6 py-4 text-inherit no-underline transition-opacity duration-[var(--transition-micro)] hover:opacity-65"
                 >
                   <span className="font-sans text-lg font-normal text-text">{fandom}</span>

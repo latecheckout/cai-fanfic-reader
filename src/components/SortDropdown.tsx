@@ -77,7 +77,7 @@ export const SortDropdown = memo(function SortDropdown({
         contentClassName="min-w-full w-max overflow-hidden p-2"
         renderTrigger={({ open: isOpen, toggle }) => (
           <button
-            className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 font-sans text-sm leading-none whitespace-nowrap flex-shrink-0 cursor-pointer transition-[color,border-color,background,box-shadow] duration-150 ease-in-out ${
+            className={`inline-flex h-10 max-md:h-11 items-center gap-1.5 rounded-full border px-3.5 font-sans text-sm leading-none whitespace-nowrap flex-shrink-0 cursor-pointer transition-[color,border-color,background,box-shadow] duration-150 ease-in-out ${
               isOpen
                 ? 'border-transparent bg-secondary text-bg hover:text-bg hover:opacity-90'
                 : 'border-border-strong bg-transparent text-secondary hover:border-border-active hover:text-text'

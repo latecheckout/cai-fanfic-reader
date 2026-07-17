@@ -7,7 +7,9 @@ import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/cons
 import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
 import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
 import { POPOVER_PANEL, MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
-import { ClockIcon, CloseIcon, UpDownArrowIcon } from './icons';
+import { HUD_BUBBLE } from './readingChrome';
+import { SEARCH_INPUT, SEARCH_ICON } from './searchChrome';
+import { ClockIcon, CloseIcon, MagnifierIcon, UpDownArrowIcon } from './icons';
 import { usePendingParams } from '@/hooks/usePendingParams';
 
 const HISTORY_LIMIT = 5;
@@ -69,11 +71,14 @@ type SearchItem = ACItem | FilterACItem;
 
 interface Props {
   options: SearchOptions;
-  /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
+  /** Base path for filter navigation. Defaults to '/browse' (catalog). Pass '/reading' for library page. */
   basePath?: string;
+  /** Collapse to a magnifier bubble ≤768px (the header slot has no room for
+      an input there). Toolbar instances keep the full input. */
+  collapsible?: boolean;
 }
 
-export function BrowseSearchBar({ options, basePath = '/' }: Props) {
+export function BrowseSearchBar({ options, basePath = '/browse', collapsible = false }: Props) {
   // Shared with FilterPanel via module-level pending state so a search
   // submit racing a pill click composes instead of last-write-winning.
   const { readParams, pushParams } = usePendingParams(basePath);
@@ -85,6 +90,18 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [isMobileFS, setIsMobileFS] = useState(false);
+  // Compact (collapsible + ≤768px): the header has no room for an input —
+  // render a magnifier bubble that opens the fullscreen overlay instead.
+  const [isNarrow, setIsNarrow] = useState(false);
+  const isCompact = collapsible && isNarrow;
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsNarrow(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [savedPresets, setSavedPresets] = useState<Preset[]>([]);
   const [history, setHistory] = useState<string[]>([]);
@@ -157,17 +174,23 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
     };
   }, [query]);
 
-  // ⌘K / Ctrl+K focuses the search input
+  // ⌘K / Ctrl+K focuses the search input (opening the overlay first in compact mode)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        inputRef.current?.focus();
+        if (isCompact) {
+          setIsMobileFS(true);
+          setFocused(true);
+          requestAnimationFrame(() => inputRef.current?.focus());
+        } else {
+          inputRef.current?.focus();
+        }
       }
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, []);
+  }, [isCompact]);
 
   // Click-outside closes dropdown
   useEffect(() => {
@@ -366,6 +389,26 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
   const hasACResults = items.length > 0;
   const showVibeHint = !isDefaultState && !vibeLoading && !vibeResult && hasACResults;
 
+  // Compact header mode: just the magnifier bubble; the full search UI is
+  // the existing fullscreen overlay, opened on tap (or ⌘K).
+  if (isCompact && !isMobileFS) {
+    return (
+      <button
+        type="button"
+        aria-label="Search"
+        aria-haspopup="dialog"
+        onClick={() => {
+          setIsMobileFS(true);
+          setFocused(true);
+          requestAnimationFrame(() => inputRef.current?.focus());
+        }}
+        className={`${HUD_BUBBLE} text-secondary`}
+      >
+        <MagnifierIcon width={18} height={18} />
+      </button>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -378,21 +421,12 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
       {/* inputRow: inputWrap + close × button (mobileFS only) */}
       <div className={isMobileFS ? 'mb-2 flex flex-shrink-0 items-center gap-2 px-4' : ''}>
         <div className={`relative flex items-center ${isMobileFS ? 'min-w-0 flex-1' : ''}`}>
-          {/* Search icon */}
-          <svg
-            className="pointer-events-none absolute left-[13px] top-1/2 flex-shrink-0 -translate-y-1/2 text-secondary opacity-[0.45] transition-opacity duration-150 group-focus-within:opacity-70"
-            width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"
-          >
-            <circle cx="5.8" cy="5.8" r="4.2" stroke="currentColor" strokeWidth="1.4" />
-            <path d="M9 9L12 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-          </svg>
+          <MagnifierIcon className={SEARCH_ICON} />
 
           <input
             ref={inputRef}
             type="text"
-            className={`h-9 max-[768px]:h-11 w-full rounded-full border border-border-strong bg-transparent pl-[34px] font-sans text-[15px] text-text outline-none transition-colors duration-150 hover:border-border-active focus:border-border-active placeholder:text-secondary placeholder:opacity-[0.55] ${
-              query ? 'pr-[72px]' : 'pr-9'
-            }`}
+            className={`${SEARCH_INPUT} ${query ? 'pr-[72px]' : 'pr-9'}`}
             placeholder="Search…"
             value={query}
             onChange={(e) => {
@@ -401,7 +435,10 @@ export function BrowseSearchBar({ options, basePath = '/' }: Props) {
             }}
             onFocus={() => {
               setFocused(true);
-              if (window.matchMedia('(max-width: 480px)').matches) setIsMobileFS(true);
+              // Header instances go fullscreen from the compact bubble (≤768);
+              // toolbar instances keep the inline input until phone widths.
+              const fsBreakpoint = collapsible ? 768 : 480;
+              if (window.matchMedia(`(max-width: ${fsBreakpoint}px)`).matches) setIsMobileFS(true);
             }}
             onKeyDown={handleKeyDown}
             aria-label="Search"

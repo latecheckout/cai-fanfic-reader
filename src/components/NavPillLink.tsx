@@ -23,13 +23,13 @@ export function NavPillLink({
   big?: boolean;
   filled?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   // Font family + bg/text live inside the variant branches — same-property
   // utilities on one element resolve by emission order, never stack them.
   const variant = filled
     ? 'bg-quill-ink font-sans text-[13px] text-white shadow-bubble hover:bg-pinned-purple hover:shadow-bubble-hover'
-    : `bg-bg/16 font-mono text-[12px] backdrop-blur-md hover:bg-text/6 ${
+    : `bg-overlay-soft font-mono text-[12px] backdrop-blur-md hover:bg-overlay-medium ${
         active ? 'text-text' : 'text-secondary hover:text-text'
       }`;
   return (
@@ -38,7 +38,7 @@ export function NavPillLink({
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
       className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full no-underline transition-[color,background-color,box-shadow] duration-150 ease-out hover:underline underline-offset-4 ${
-        big ? 'px-4 py-2.5' : 'px-3 py-1.5'
+        big ? 'h-10 px-4 max-md:h-11' : 'px-3 py-1.5'
       } ${variant} ${className}`}
     >
       {label}

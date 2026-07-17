@@ -1,25 +1,23 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Ao4TurboToggle } from './Ao4TurboToggle';
-import { HamburgerIcon, UserProfileIcon } from './icons';
+import { BrowseIcon, CharactersIcon, LibraryIcon, UserProfileIcon } from './icons';
 import { AccountMenu } from './AccountMenu';
 import { NavPillLink } from './NavPillLink';
-import { Popover } from './Popover';
-import { MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
 import { HUD_BUBBLE } from './readingChrome';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Stories' },
-  { href: '/reading', label: 'Library' },
-  { href: '/characters', label: 'Characters' },
-  { href: '/about', label: 'About' },
+  { href: '/browse', label: 'Browse', Icon: BrowseIcon },
+  { href: '/characters', label: 'Characters', Icon: CharactersIcon },
+  { href: '/reading', label: 'Library', Icon: LibraryIcon },
 ];
 
 interface Props {
-  /** Search slot, rendered in the right zone. The browse home passes
-      BrowseSearchBar here; results pages keep search in their toolbar. */
+  /** Search slot, rendered in the right zone. SiteHeader passes the global
+      BrowseSearchBar here (routes to /browse) on every header page. */
   search?: ReactNode;
 }
 
@@ -30,8 +28,8 @@ export function BrowseHeader({ search }: Props = {}) {
     <>
       <header className="site-header sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
         <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--browse-max-width)] items-stretch px-6 max-md:items-center max-md:justify-between max-md:px-4">
-          {/* ── Left zone: logo ── */}
-          <div className="flex min-w-0 flex-1 items-center">
+          {/* ── Left zone: logo + nav links (desktop) ── */}
+          <div className="flex min-w-0 flex-1 items-center gap-5 max-md:gap-0">
             <a
               href="/"
               className="flex items-center text-text no-underline opacity-[0.88] transition-opacity duration-150 ease-in-out hover:opacity-100"
@@ -54,25 +52,42 @@ export function BrowseHeader({ search }: Props = {}) {
             <path d="M474.731 5.71484C479.392 5.71484 482.574 8.89751 482.574 13.5576C482.574 18.2176 479.392 21.4004 474.731 21.4004C470.071 21.4003 466.889 18.2176 466.889 13.5576C466.889 8.89755 470.071 5.7149 474.731 5.71484Z" fill="currentColor"/>
             </svg>
           </a>
+
+          {/* Nav links, left-aligned after the logo — NavPillLink treatment:
+              lowercase mono pills, bg reveal + underline on hover, magenta dot
+              on the active pill. */}
+          <nav className="flex items-center gap-1 max-md:hidden" aria-label="Site navigation">
+            {NAV_LINKS.map(({ href, label }) => (
+              <NavPillLink key={href} href={href} label={label} active={pathname === href} />
+            ))}
+          </nav>
         </div>
 
-        {/* ── Center zone: nav links — character-ux-audit's NavPillLink treatment:
-            lowercase mono pills, bg reveal + underline on hover, magenta dot on
-            the active pill. ── */}
-        <nav className="flex items-center justify-center gap-1 max-md:hidden" aria-label="Site navigation">
-          {NAV_LINKS.map(({ href, label }) => (
-            <NavPillLink key={href} href={href} label={label} active={pathname === href} />
-          ))}
-        </nav>
-
-        {/* ── Right zone: search slot + avatar (desktop) + hamburger (mobile) ── */}
+        {/* ── Right zone: search slot + CTA (desktop) + nav icons (mobile) + avatar ── */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 max-md:gap-1.5">
-          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:max-w-none">{search}</div>}
-          {/* CTA — big filled variant of the nav-pill link (espresso → quill-ink). */}
-          <NavPillLink href="/creators/apply" label="Write on c.ai" big filled className="shrink-0" />
-          {/* Account dropdown — shared AccountMenu body, HUD-bubble trigger to
-              match the reading page. Same dropdown on mobile (popovers clamp
-              to the viewport). */}
+          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:max-w-none max-md:flex-none">{search}</div>}
+          {/* CTA — big filled variant of the nav-pill link (espresso → quill-ink).
+              Desktop only; on mobile it lives in the account dropdown. */}
+          <NavPillLink href="/creators/apply" label="Write on c.ai" big filled className="shrink-0 max-md:hidden" />
+          {/* Mobile nav — icon bubbles for the same destinations the center
+              nav shows on desktop, active route tinted. */}
+          <nav className="hidden shrink-0 items-center gap-1.5 max-md:flex" aria-label="Site navigation">
+            {NAV_LINKS.map(({ href, label, Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-label={label}
+                aria-current={pathname === href ? 'page' : undefined}
+                className={`${HUD_BUBBLE} ${
+                  pathname === href ? 'text-text shadow-bubble-hover [&_svg]:opacity-100' : 'text-secondary'
+                }`}
+              >
+                <Icon width={20} height={20} />
+              </Link>
+            ))}
+          </nav>
+          {/* Account dropdown — shared AccountMenu body, HUD-bubble trigger.
+              Same dropdown on mobile (popovers clamp to the viewport). */}
           <div className="shrink-0">
             <AccountMenu
               renderTrigger={({ open, toggle }) => (
@@ -88,48 +103,6 @@ export function BrowseHeader({ search }: Props = {}) {
                 </button>
               )}
             />
-          </div>
-          {/* Mobile nav menu — same HUD-bubble trigger + dropdown system as the
-              account menu, holding the pages the center nav shows on desktop. */}
-          <div className="hidden shrink-0 max-md:block">
-            <Popover
-              align="right"
-              ariaLabel="Site navigation"
-              contentClassName="w-48 p-2"
-              renderTrigger={({ open, toggle }) => (
-                <button
-                  type="button"
-                  aria-label="Open navigation"
-                  aria-haspopup="menu"
-                  aria-expanded={open}
-                  onClick={toggle}
-                  className={`${HUD_BUBBLE} ${open ? 'shadow-bubble-hover [&_svg]:opacity-100' : ''}`}
-                >
-                  <HamburgerIcon width={20} height={20} />
-                </button>
-              )}
-            >
-              {({ close }) => (
-                <nav aria-label="Site navigation">
-                  {NAV_LINKS.map(({ href, label }) => (
-                    <a
-                      key={href}
-                      href={href}
-                      onClick={close}
-                      aria-current={pathname === href ? 'page' : undefined}
-                      className={`${MENU_ROW} justify-between font-mono text-[12px] no-underline ${
-                        pathname === href ? `${MENU_ROW_ACTIVE} text-text` : 'text-secondary hover:text-text'
-                      }`}
-                    >
-                      {label}
-                      {pathname === href && (
-                        <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[#d90082]" />
-                      )}
-                    </a>
-                  ))}
-                </nav>
-              )}
-            </Popover>
           </div>
         </div>
         </div>

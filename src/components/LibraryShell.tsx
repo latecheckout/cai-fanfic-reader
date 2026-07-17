@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkSummary } from '@/types';
-import { SearchOptions } from '@/lib/filters';
 import { LibraryTab, MOCK_BOOKMARKED, readSavedSlugs, readRemovedSlugs, removeBookmark } from '@/lib/library';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useFilterFlash } from '@/hooks/useFilterFlash';
-import { FilterPanel } from './FilterPanel';
-// (ViewSlider FAB removed; view toggle now lives in the FilterPanel toolbar)
+import { ScopedSearchInput } from './ScopedSearchInput';
+import { NavPillLink } from './NavPillLink';
+import { SectionHeader } from './RailSection';
 import { WorkGrid } from './WorkGrid';
 import { EmptyState } from './EmptyState';
 import { BookmarkCheckIcon } from './icons';
@@ -26,7 +26,6 @@ interface Props {
   works: WorkSummary[];
   tabCounts: Record<LibraryTab, number>;
   activeTab: LibraryTab;
-  searchOptions: SearchOptions;
   currentFilters: {
     tab?: string;
     fandom?: string;
@@ -76,7 +75,6 @@ export function LibraryShell({
   works,
   tabCounts,
   activeTab,
-  searchOptions,
   currentFilters,
 }: Props) {
   const router = useRouter();
@@ -125,36 +123,31 @@ export function LibraryShell({
 
   return (
     <>
-      {/* ── Page heading ── */}
+      {/* ── Page heading — same SectionHeader style as browse/characters ── */}
       <div className="mb-5">
-        <h2 className="m-0 font-sans text-[28px] font-semibold tracking-[-0.01em] text-text">Library</h2>
+        <SectionHeader title="Library" subtitle="Your saved, in-progress, and finished stories" />
       </div>
 
-      {/* ── Tab bar ── */}
-      <div className="mb-2 flex gap-6 border-b border-border" role="tablist">
-        {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
-          <button
-            key={tab}
-            role="tab"
-            aria-selected={activeTab === tab}
-            className={`-mb-px inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap border-b-2 bg-transparent pt-2 pb-3 font-mono text-[13px] tracking-[0.04em] transition-[color,border-color] duration-[120ms] hover:text-text ${
-              activeTab === tab ? 'border-text text-text' : 'border-transparent text-secondary'
-            }`}
-            onClick={() => handleTabChange(tab)}
-          >
-            {TAB_LABELS[tab]}
-            <span className="font-mono text-xs text-inherit opacity-[0.55]">{displayedTabCounts[tab]}</span>
-          </button>
-        ))}
+      {/* ── Tab row: nav-pill tabs left, scoped search right ── */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <nav className="flex items-center gap-1" aria-label="Library tabs">
+          {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
+            <NavPillLink
+              key={tab}
+              href={`/reading?tab=${tab}`}
+              label={`${TAB_LABELS[tab]} · ${displayedTabCounts[tab]}`}
+              active={activeTab === tab}
+              onClick={(e) => {
+                e.preventDefault();
+                handleTabChange(tab);
+              }}
+            />
+          ))}
+        </nav>
+        <div className="flex min-w-[220px] max-w-[340px] flex-[1_1_auto] items-center">
+          <ScopedSearchInput basePath="/reading" placeholder="Search your bookmarks" />
+        </div>
       </div>
-
-      {/* ── Toolbar + drawer (reuses FilterPanel with library's basePath) ── */}
-      <FilterPanel
-        searchOptions={searchOptions}
-        currentFilters={currentFilters}
-        filteredCount={displayedWorks.length}
-        basePath="/reading"
-      />
 
       {/* ── Work list ── (shared WorkGrid: skeletons on filter, layout morph
           on view switch, exit animation on bookmark removal) */}
@@ -173,7 +166,7 @@ export function LibraryShell({
                 : 'Nothing completed yet.'
             }
           >
-            <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
+            <a href="/browse" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
           </EmptyState>
         }
         renderOverlay={

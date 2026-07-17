@@ -1,14 +1,18 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import { getWorkSummaries } from '@/lib/works';
-import { applyFilters } from '@/lib/filters';
+import { applyFilters, buildSearchOptions } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { MOCK_LIBRARY, getTabSlugs, type LibraryTab } from '@/lib/library';
+import { BrowseShell } from '@/components/BrowseShell';
 import { SiteHeader } from '@/components/SiteHeader';
-import { LibraryShell } from '@/components/LibraryShell';
+import { SectionHeader } from '@/components/RailSection';
+
+export const metadata: Metadata = {
+  title: 'Browse — c.ai Fanfic',
+};
 
 interface PageProps {
   searchParams: Promise<{
-    tab?: string;
     fandom?: string;
     relationship?: string;
     tag?: string;
@@ -34,32 +38,15 @@ interface PageProps {
     date_preset?: string;
     date_from?: string;
     date_to?: string;
+    preset?: string;
+    /** Navigation source — used to show a back link ('characters') */
+    from?: string;
   }>;
 }
 
-export default async function LibraryPage({ searchParams }: PageProps) {
+export default async function BrowsePage({ searchParams }: PageProps) {
   const params = await searchParams;
 
-  // Determine active tab (default: continuing)
-  const activeTab: LibraryTab =
-    params.tab === 'bookmarked' || params.tab === 'completed' || params.tab === 'continuing'
-      ? (params.tab as LibraryTab)
-      : 'continuing';
-
-  const allWorks = getWorkSummaries();
-
-  // Tab counts (before client-side removals — removals handled in LibraryShell)
-  const tabCounts = {
-    continuing: MOCK_LIBRARY.continuing.length,
-    bookmarked: MOCK_LIBRARY.bookmarked.length,
-    completed: MOCK_LIBRARY.completed.length,
-  };
-
-  // Filter all works to just this tab's slugs
-  const tabSlugs = new Set(getTabSlugs(activeTab));
-  const tabWorks = allWorks.filter((w) => tabSlugs.has(w.slug));
-
-  // Apply URL-driven filters within the tab's works
   const filters: FilterState = {
     fandom: params.fandom,
     relationship: params.relationship,
@@ -88,24 +75,33 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     dateTo: params.date_to,
   };
 
-  // Bookmarked tab: send the WHOLE archive filtered+sorted as one list — the
-  // client subsets it to mock bookmarks + local reading-page saves, keeping
-  // the ?sort order intact. @WIRE — collapses once /user/library exists.
-  const filteredWorks =
-    activeTab === 'bookmarked'
-      ? applyFilters(allWorks, filters)
-      : applyFilters(tabWorks, filters);
+  const allWorks = getWorkSummaries();
+  const filteredWorks = applyFilters(allWorks, filters);
+  const searchOptions = buildSearchOptions(allWorks);
 
   return (
     <div className="min-h-screen">
-      <SiteHeader />
+      {/* The catalog owns its search (in the sticky toolbar below), so the
+          header's global search bar is hidden here to avoid a duplicate. */}
+      <SiteHeader showSearch={false} />
+
       <main className="relative mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-[calc(128px+var(--safe-bottom))] max-md:px-4 max-md:pt-5">
+        {/* Visually-hidden h1 for screen reader landmark — the section header
+            below serves as the visible heading */}
+        <h1 className="visually-hidden">Browse Works</h1>
+
+        <div className="mb-2">
+          <SectionHeader title="Stories for you" subtitle="The whole archive, ready to filter" />
+        </div>
+
+        {/* The catalog surface: search, sort, and filters live in its sticky toolbar. */}
         <Suspense>
-          <LibraryShell
+          <BrowseShell
             works={filteredWorks}
-            tabCounts={tabCounts}
-            activeTab={activeTab}
+            searchOptions={searchOptions}
             currentFilters={params}
+            filteredCount={filteredWorks.length}
+            from={params.from}
           />
         </Suspense>
       </main>

@@ -47,7 +47,7 @@ export function WorkMetaBlock({ meta, totalChapters }: { meta: WorkMeta; totalCh
         <span className="mr-1.5">by</span>
         <Avatar />
         <Link
-          href={`/?q=${encodeURIComponent(meta.author)}`}
+          href={`/browse?q=${encodeURIComponent(meta.author)}`}
           className="text-inherit hover:text-text hover:underline hover:underline-offset-2"
         >
           {meta.author}

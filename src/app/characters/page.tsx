@@ -1,5 +1,6 @@
 import { getWorkSummaries } from '@/lib/works';
-import { BrowseHeader } from '@/components/BrowseHeader';
+import { SiteHeader } from '@/components/SiteHeader';
+import { SectionHeader } from '@/components/RailSection';
 import { CharactersList } from '@/components/CharactersList';
 
 export const metadata = {
@@ -36,11 +37,10 @@ export default function CharactersPage() {
 
   return (
     <div>
-      <BrowseHeader />
+      <SiteHeader />
       <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12">
-        <div className="mb-8 flex items-baseline gap-4">
-          <h2 className="font-sans text-2xl font-medium tracking-[-0.015em] text-text">Characters</h2>
-          <span className="font-mono text-xs text-secondary">{sorted.length} characters</span>
+        <div className="mb-8">
+          <SectionHeader title="Characters" subtitle={`${sorted.length} characters across the archive, A to Z`} />
         </div>
         <CharactersList grouped={grouped} />
       </main>

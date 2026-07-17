@@ -97,7 +97,7 @@ export function TagRow({
       <span className={TAG_LABEL}>{label}</span>
       <div className={TAG_GROUP}>
         {unique.map((t) => (
-          <TagChip key={t} tag={t} category={category} clickable href={`/?${param}=${encodeURIComponent(t)}`} />
+          <TagChip key={t} tag={t} category={category} clickable href={`/browse?${param}=${encodeURIComponent(t)}`} />
         ))}
       </div>
     </div>

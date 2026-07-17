@@ -33,7 +33,7 @@ const SLIDES: Slide[] = [
     kicker: 'Trope of the week',
     headline: 'Enemies to lovers, done right.',
     cta: 'Explore the tag',
-    href: '/?tag=Enemies%20to%20Lovers',
+    href: '/browse?tag=Enemies%20to%20Lovers',
   },
   {
     image: '/hero/banner-3.png',

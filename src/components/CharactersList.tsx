@@ -90,7 +90,7 @@ export function CharactersList({ grouped }: Props) {
                 {group.items.map(({ name, count }) => (
                   <li key={name} className="block">
                     <Link
-                      href={`/?character=${encodeURIComponent(name)}&from=characters`}
+                      href={`/browse?character=${encodeURIComponent(name)}&from=characters`}
                       className="flex items-baseline justify-between gap-6 py-2 text-inherit no-underline transition-opacity duration-[var(--transition-micro)] hover:opacity-65"
                     >
                       <span className="min-w-0 font-sans text-[17px] font-normal text-text">{name}</span>

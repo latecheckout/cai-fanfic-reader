@@ -11,7 +11,8 @@ import { EmptyState } from './EmptyState';
 
 interface Props {
   works: WorkSummary[];
-  searchOptions: SearchOptions;
+  /** When set, the toolbar renders its own search bar (the catalog surface). */
+  searchOptions?: SearchOptions;
   currentFilters: {
     fandom?: string;
     relationship?: string;
@@ -68,6 +69,7 @@ export function BrowseShell({
   return (
     <>
       <FilterPanel
+        basePath="/browse"
         searchOptions={searchOptions}
         currentFilters={currentFilters}
         filteredCount={filteredCount}
@@ -95,7 +97,7 @@ export function BrowseShell({
             {activeFilterLabels.length > 0 && (
               <>
                 Try removing a filter or{' '}
-                <a href="/" className="text-text underline underline-offset-2 hover:opacity-70">clear all</a>.
+                <a href="/browse" className="text-text underline underline-offset-2 hover:opacity-70">clear all</a>.
               </>
             )}
           </EmptyState>

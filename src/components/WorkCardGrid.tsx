@@ -76,7 +76,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
             <span className="mr-[5px]">by</span>
             <Avatar />
             <Link
-              href={`/?q=${encodeURIComponent(meta.author)}`}
+              href={`/browse?q=${encodeURIComponent(meta.author)}`}
               className="pointer-events-auto text-inherit no-underline hover:text-white hover:underline hover:underline-offset-2"
             >
               {meta.author}
@@ -92,7 +92,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
                 tag={t}
                 category="additional"
                 clickable
-                href={`/?tag=${encodeURIComponent(t)}`}
+                href={`/browse?tag=${encodeURIComponent(t)}`}
                 onImage
               />
             ))}

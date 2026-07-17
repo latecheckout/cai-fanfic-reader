@@ -30,7 +30,12 @@ type PillState = 'neutral' | 'include' | 'exclude';
 const EASE_COLLAPSE = [0.4, 0, 0.8, 1] as const;
 
 interface Props {
+  /** When set, the toolbar renders its own search bar (the catalog surface);
+      other pages rely on the global header search instead. */
   searchOptions?: SearchOptions;
+  /** Custom search element for the toolbar (e.g. the Library's scoped
+      "Search your bookmarks" input). Takes precedence over searchOptions. */
+  searchSlot?: ReactNode;
   currentFilters: {
     fandom?: string;
     relationship?: string;
@@ -60,7 +65,7 @@ interface Props {
     preset?: string;
   };
   filteredCount: number;
-  /** Base path for filter navigation. Defaults to '/' (browse page). Pass '/reading' for library page. */
+  /** Base path for filter navigation. Defaults to '/browse' (catalog). Pass '/reading' for library page. */
   basePath?: string;
 }
 
@@ -414,10 +419,11 @@ const FilterPill = memo(function FilterPill({
 });
 
 export function FilterPanel({
-  searchOptions: _searchOptions,
+  searchOptions,
+  searchSlot,
   currentFilters,
   filteredCount,
-  basePath = '/',
+  basePath = '/browse',
 }: Props) {
   const searchParams = useSearchParams();
   const reduce = useReducedMotion();
@@ -875,15 +881,18 @@ export function FilterPanel({
         ref={barRef}
         className="sticky top-[var(--header-height)] z-50 mb-5 pt-3 bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] [backdrop-filter:blur(8px)_saturate(1.2)] [&[data-stuck]]:border-b [&[data-stuck]]:border-border [body.search-fs-open_&]:z-[500] [body.search-fs-open_&]:[backdrop-filter:none]"
       >
-        {/* Row 1: Search + controls — single flex line (fadeUp entrance) */}
+        {/* Row 1: search (catalog surface) + controls — pages without
+            searchOptions rely on the global header search, so the controls
+            just sit right. */}
         <motion.div
           className="flex items-center gap-2 pb-1.5"
           initial={reduce ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.65, delay: 0.175, ease: EASE_OUT_EXPO }}
         >
-          <BrowseSearchBar options={_searchOptions ?? { tags: [], fandoms: [] }} basePath={basePath} />
+          {searchSlot ?? (searchOptions && <BrowseSearchBar options={searchOptions} basePath={basePath} />)}
 
+          <div className={`flex items-center gap-2 ${searchSlot || searchOptions ? '' : 'ml-auto'}`}>
           {/* Sort capsule button + popover (desktop only) */}
           <SortDropdown
             currentValue={currentSortValue}
@@ -894,7 +903,7 @@ export function FilterPanel({
 
           {/* Filters button — icon-only on mobile, full label on desktop */}
           <button
-            className={`group inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 font-sans text-sm leading-none whitespace-nowrap flex-shrink-0 cursor-pointer transition-[color,border-color,background,box-shadow] duration-150 ease-in-out max-md:h-11 max-md:w-11 max-md:justify-center max-md:p-0 ${
+            className={`group inline-flex h-10 items-center gap-1.5 rounded-full border px-3.5 font-sans text-sm leading-none whitespace-nowrap flex-shrink-0 cursor-pointer transition-[color,border-color,background,box-shadow] duration-150 ease-in-out max-md:h-11 max-md:w-11 max-md:justify-center max-md:p-0 ${
               drawerOpen
                 ? 'border-transparent bg-secondary text-bg hover:text-bg hover:opacity-90'
                 : activeFilterCount > 0
@@ -913,6 +922,7 @@ export function FilterPanel({
             )}
             <kbd className="ml-px font-mono text-xs tracking-[0.02em] opacity-60 max-md:hidden">F</kbd>
           </button>
+          </div>
         </motion.div>
 
         {/* Pills row: active filter pills — only shown when filters are active */}

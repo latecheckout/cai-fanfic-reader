@@ -268,19 +268,6 @@ export function CloseIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function HamburgerIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M2 7C2 6.44772 2.44772 6 3 6H21C21.5523 6 22 6.44772 22 7C22 7.55228 21.5523 8 21 8H3C2.44772 8 2 7.55228 2 7ZM2 17C2 16.4477 2.44772 16 3 16H21C21.5523 16 22 16.4477 22 17C22 17.5523 21.5523 18 21 18H3C2.44772 18 2 17.5523 2 17Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 export function LogOutIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
@@ -381,6 +368,83 @@ export function PaperModeIcon(props: SVGProps<SVGSVGElement>) {
         fill="currentColor"
       />
       <path d="M19.4142 8L14 2.58579V7C14 7.55228 14.4477 8 15 8H19.4142Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Outlined circle + question mark — the About row (ported from character-brain's info glyph). */
+export function AboutIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
+        fill="currentColor"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12 9C11.6227 9 11.2926 9.2086 11.1215 9.52152C10.8564 10.0061 10.2488 10.184 9.76426 9.91899C9.27972 9.65396 9.10177 9.04632 9.36679 8.56178C9.87463 7.63331 10.8626 7 12 7C13.5147 7 14.5669 8.00643 14.8664 9.189C15.1676 10.3779 14.7101 11.763 13.3416 12.4472C13.1323 12.5519 13 12.7659 13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.0084 11.5603 11.1018 12.4472 10.6584C12.902 10.431 13.0188 10.0397 12.9277 9.6801C12.835 9.31417 12.5283 9 12 9Z"
+        fill="currentColor"
+      />
+      <path
+        d="M13 16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16C11 15.4477 11.4477 15 12 15C12.5523 15 13 15.4477 13 16Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** Plain magnifier — search inputs and the compact header search bubble. */
+export function MagnifierIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" {...props}>
+      <circle cx="5.8" cy="5.8" r="4.2" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M9 9L12 12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Magnifier + filter lines — the Browse nav destination. */
+export function BrowseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M15.0039 5C11.1379 5 8.00391 8.13401 8.00391 12C8.00391 15.866 11.1379 19 15.0039 19C16.5752 19 18.0256 18.4823 19.1938 17.6081L21.2929 19.7071C21.6834 20.0976 22.3166 20.0976 22.7071 19.7071C23.0976 19.3166 23.0976 18.6834 22.7071 18.2929L20.6086 16.1944C21.4848 15.0254 22.0039 13.5733 22.0039 12C22.0039 8.13401 18.8699 5 15.0039 5ZM15 9C13.3431 9 12 10.3431 12 12C12 12.5523 11.5523 13 11 13C10.4477 13 10 12.5523 10 12C10 9.23858 12.2386 7 15 7C15.5523 7 16 7.44772 16 8C16 8.55228 15.5523 9 15 9Z"
+        fill="currentColor"
+      />
+      <path d="M2.00391 7C2.00391 6.44772 2.45162 6 3.00391 6H6.00391C6.55619 6 7.00391 6.44772 7.00391 7C7.00391 7.55228 6.55619 8 6.00391 8H3.00391C2.45162 8 2.00391 7.55228 2.00391 7Z" fill="currentColor" />
+      <path d="M2.00391 12C2.00391 11.4477 2.45162 11 3.00391 11H5.00391C5.55619 11 6.00391 11.4477 6.00391 12C6.00391 12.5523 5.55619 13 5.00391 13H3.00391C2.45162 13 2.00391 12.5523 2.00391 12Z" fill="currentColor" />
+      <path d="M3.00391 16C2.45162 16 2.00391 16.4477 2.00391 17C2.00391 17.5523 2.45162 18 3.00391 18H6.00391C6.55619 18 7.00391 17.5523 7.00391 17C7.00391 16.4477 6.55619 16 6.00391 16H3.00391Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Book spines — the Library nav destination. */
+export function LibraryIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M13.6489 3.06394C14.166 2.87002 14.7424 3.13203 14.9363 3.64915L20.9363 19.6491C21.1302 20.1663 20.8682 20.7427 20.3511 20.9366C19.834 21.1305 19.2576 20.8685 19.0637 20.3514L13.0637 4.35139C12.8698 3.83427 13.1318 3.25786 13.6489 3.06394ZM4 3.00027C4.55228 3.00027 5 3.44799 5 4.00027V20.0003C5 20.5526 4.55228 21.0003 4 21.0003C3.44772 21.0003 3 20.5526 3 20.0003V4.00027C3 3.44799 3.44772 3.00027 4 3.00027ZM9 3.00027C9.55228 3.00027 10 3.44799 10 4.00027V20.0003C10 20.5526 9.55228 21.0003 9 21.0003C8.44772 21.0003 8 20.5526 8 20.0003V4.00027C8 3.44799 8.44772 3.00027 9 3.00027Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** Two figures — the Characters nav destination. */
+export function CharactersIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path d="M3.49902 7C3.49902 4.79086 5.28988 3 7.49902 3C9.70816 3 11.499 4.79086 11.499 7C11.499 9.20914 9.70816 11 7.49902 11C5.28988 11 3.49902 9.20914 3.49902 7Z" fill="currentColor" />
+      <path d="M12.499 7C12.499 4.79086 14.2899 3 16.499 3C18.7082 3 20.499 4.79086 20.499 7C20.499 9.20914 18.7082 11 16.499 11C14.2899 11 12.499 9.20914 12.499 7Z" fill="currentColor" />
+      <path d="M7.49876 12C10.3695 12 13.0926 13.9807 14.1062 17.6135C14.6361 19.5131 13.016 21 11.3528 21H3.64471C1.98155 21 0.36144 19.5131 0.891377 17.6135C1.90488 13.9807 4.62798 12 7.49876 12Z" fill="currentColor" />
+      <path d="M16.0334 17.0761C15.5456 15.3276 14.7069 13.8486 13.6289 12.7021C14.5244 12.2386 15.5031 12 16.4995 12C19.3703 12 22.0934 13.9807 23.1069 17.6135C23.6368 19.5131 22.0167 21 20.3535 21H15.3297C16.0978 19.9549 16.4485 18.5641 16.0334 17.0761Z" fill="currentColor" />
     </svg>
   );
 }

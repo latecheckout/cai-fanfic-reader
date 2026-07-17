@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "fanfic-reader",
-      "runtimeExecutable": "/Users/paulloots/.nvm/versions/node/v22.22.1/bin/node",
-      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev", "--turbopack"],
       "port": 3000
     }
   ]

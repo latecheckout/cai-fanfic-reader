@@ -25,7 +25,7 @@ export function AuthorNote({
       <span className="pl-[38px] font-sans text-[12px] font-medium text-text">
         {author ? (
           <Link
-            href={`/?q=${encodeURIComponent(author)}`}
+            href={`/browse?q=${encodeURIComponent(author)}`}
             className="hover:underline hover:underline-offset-2"
           >
             {author}
