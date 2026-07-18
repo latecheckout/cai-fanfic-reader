@@ -24,13 +24,25 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+// Titles/descriptions mirror labs.character.ai/reads (the production SEO
+// values). opengraph-image.png + icon.png in this directory are auto-wired
+// by Next's file conventions.
 export const metadata: Metadata = {
-  title: 'c.ai Fanfic',
-  description: 'AI-generated fanfic stories from your favorite characters. Browse by character, pairing, rating, and tag.',
+  title: {
+    default: '(c.ai) reads',
+    template: '%s | (c.ai) reads',
+  },
+  description:
+    '(c.ai) reads - stories with your favorite Characters, created by a community of millions of writers, readers, and fans.',
   openGraph: {
-    title: 'c.ai Fanfic',
-    description: 'AI-generated fanfic stories from your favorite characters. Browse by character, pairing, rating, and tag.',
-    siteName: 'c.ai Fanfic',
+    title: '(c.ai) reads',
+    description:
+      '(c.ai) reads - stories with your favorite Characters, created by a community of millions of writers, readers, and fans.',
+    siteName: '(c.ai) reads',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
   },
 };
 

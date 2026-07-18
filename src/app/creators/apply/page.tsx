@@ -5,7 +5,7 @@ import { NavPillLink } from '@/components/NavPillLink';
 import { CreditIcon, EyesOnStoryIcon, SupportIcon } from '@/components/icons';
 
 export const metadata: Metadata = {
-  title: 'Write on c.ai | c.ai Fanfic',
+  title: 'Write on c.ai',
   description:
     'Early applications are open for the first group of (c.ai) reads writers. A paid program with a built-in audience. Any genre, no finished manuscript needed.',
   openGraph: {

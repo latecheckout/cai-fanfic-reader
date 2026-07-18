@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { FaqAccordion } from '@/components/FaqAccordion';
 
 export const metadata: Metadata = {
-  title: 'About | c.ai Fanfic',
+  title: 'About',
   description:
     "(c.ai) reads is Character.ai's home for serialized fiction: human-authored original stories, cocreated with (c.ai), published chapter by chapter.",
   openGraph: {

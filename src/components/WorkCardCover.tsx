@@ -142,7 +142,7 @@ function Badge({
 const RatingBadge = memo(function RatingBadge({ rating }: { rating: string }) {
   const tier = ratingTier(rating);
   return (
-    <Badge className={`w-6 text-[13px] font-bold tracking-[0.02em] text-white ${tier.bg}`} tooltip={tier.tooltip}>
+    <Badge className={`w-6 text-[13px] font-bold tracking-[0.02em] ${tier.fg} ${tier.bg}`} tooltip={tier.tooltip}>
       {tier.letter}
     </Badge>
   );

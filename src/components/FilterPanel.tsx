@@ -225,9 +225,9 @@ const DPILL_BASE =
   `${PILL_METRICS} px-3.5 cursor-pointer transition-[background,color,border-color] duration-150 ease-in-out`;
 function dPillClass(state: PillState) {
   if (state === 'include')
-    return `${DPILL_BASE} ${PILL_INCLUDE} hover:bg-[rgba(30,100,40,0.16)]`;
+    return `${DPILL_BASE} ${PILL_INCLUDE} hover:bg-[rgba(43,146,71,0.16)]`;
   if (state === 'exclude')
-    return `${DPILL_BASE} ${PILL_EXCLUDE} hover:bg-[rgba(140,30,30,0.16)]`;
+    return `${DPILL_BASE} ${PILL_EXCLUDE} hover:bg-[rgba(217,0,0,0.13)]`;
   return `${DPILL_BASE} bg-transparent border-border-strong text-secondary hover:text-text hover:border-border-active`;
 }
 
@@ -371,7 +371,7 @@ const FilterPill = memo(function FilterPill({
           ? 'bg-[var(--color-exclude-bg)] border-[var(--color-exclude-border)]'
           : 'bg-transparent border-border-strong hover:border-border-active hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]';
     const letterClass =
-      state === 'include' ? 'text-white' : state === 'exclude' ? 'text-[var(--color-exclude)] line-through' : 'text-text';
+      state === 'include' ? tier.fg : state === 'exclude' ? 'text-[var(--color-exclude)] line-through' : 'text-text';
     return (
       <motion.button
         {...flipAnim}

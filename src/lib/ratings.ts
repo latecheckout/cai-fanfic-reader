@@ -20,6 +20,9 @@ interface RatingTier {
   classKey: string;
   /** Filled badge background utility. */
   bg: string;
+  /** Letter color on the filled bg — the brand token's specified textColor
+      (character-brain colors.json), NOT always white. */
+  fg: string;
   /** Include-state class for the filter pill card. */
   includeClass: string;
   /** Hover tooltip label for the badge (single line). */
@@ -29,27 +32,27 @@ interface RatingTier {
 const RATING_TIERS: Record<string, RatingTier> = {
   'General Audiences': {
     rating: 'General Audiences', letter: 'G', shortName: 'General', key: 'g',
-    classKey: 'ratingG', bg: 'bg-rating-g', includeClass: 'bg-rating-g border-rating-g',
+    classKey: 'ratingG', bg: 'bg-rating-g', fg: 'text-white', includeClass: 'bg-rating-g border-rating-g',
     tooltip: 'General Audiences',
   },
   'Teen And Up Audiences': {
     rating: 'Teen And Up Audiences', letter: 'T', shortName: 'Teen+', key: 't',
-    classKey: 'ratingT', bg: 'bg-rating-t', includeClass: 'bg-rating-t border-rating-t',
+    classKey: 'ratingT', bg: 'bg-rating-t', fg: 'text-black', includeClass: 'bg-rating-t border-rating-t',
     tooltip: 'Teen And Up Audiences',
   },
   'Mature': {
     rating: 'Mature', letter: 'M', shortName: 'Mature', key: 'm',
-    classKey: 'ratingM', bg: 'bg-rating-m', includeClass: 'bg-rating-m border-rating-m',
+    classKey: 'ratingM', bg: 'bg-rating-m', fg: 'text-black', includeClass: 'bg-rating-m border-rating-m',
     tooltip: 'Mature',
   },
   'Explicit': {
     rating: 'Explicit', letter: 'E', shortName: 'Explicit', key: 'e',
-    classKey: 'ratingE', bg: 'bg-rating-e', includeClass: 'bg-rating-e border-rating-e',
+    classKey: 'ratingE', bg: 'bg-rating-e', fg: 'text-white', includeClass: 'bg-rating-e border-rating-e',
     tooltip: 'Explicit',
   },
   'Not Rated': {
     rating: 'Not Rated', letter: 'NR', shortName: 'Not Rated', key: 'nr',
-    classKey: 'ratingNR', bg: 'bg-rating-nr', includeClass: 'bg-rating-nr border-rating-nr',
+    classKey: 'ratingNR', bg: 'bg-rating-nr', fg: 'text-black', includeClass: 'bg-rating-nr border-rating-nr',
     tooltip: 'Not Rated',
   },
 };

@@ -31,11 +31,11 @@
   --image-outline-faint: rgba(0, 0, 0, 0.045); /* chat card + composer hairline */
 
   /* Rating dot colors — per brief spec */
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
-  --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-g:  #2b9247;  /* midnight-forest */
+  --rating-t:  #ffe600;  /* gold-rush */
+  --rating-m:  #f28500;  /* toasty-amber */
+  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-nr: #aca7b0;  /* off-white-3 */
 
   /* Typography */
   --font-serif: "Lora", Georgia, 'Times New Roman', serif;
@@ -110,12 +110,17 @@
   --z-tooltip:         320; /* hover tooltips (above popovers) */
 
   /* Filter pill state colors */
-  --color-include:        #1A5A24;
-  --color-include-bg:     rgba(30, 100, 40, 0.10);
-  --color-include-border: rgba(30, 100, 40, 0.3);
-  --color-exclude:        #7A1A1A;
-  --color-exclude-bg:     rgba(140, 30, 30, 0.10);
-  --color-exclude-border: rgba(140, 30, 30, 0.3);
+  /* Include/exclude pill states, anchored to the Character brand palette
+     (character-brain colors.json): midnight-forest #2b9247 / cached-crimson
+     #d90000. Text greens are the brand color mixed toward black — straight
+     midnight-forest is ~4.1:1 on the paper bg, under the 4.5:1 AA bar for
+     the pills' 14px labels; crimson passes as is. Tints use the brand RGB. */
+  --color-include:        color-mix(in srgb, #2b9247 80%, black);
+  --color-include-bg:     rgba(43, 146, 71, 0.10);
+  --color-include-border: rgba(43, 146, 71, 0.35);
+  --color-exclude:        #d90000;
+  --color-exclude-bg:     rgba(217, 0, 0, 0.08);
+  --color-exclude-border: rgba(217, 0, 0, 0.30);
 
   /* Filter drawer push geometry: 380px floating panel + 12px right inset +
      12px gap left of the panel. Everything that rides the push (body padding,
@@ -170,11 +175,11 @@
   --accent: #8B4040;
   --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
-  --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-g:  #2b9247;  /* midnight-forest */
+  --rating-t:  #ffe600;  /* gold-rush */
+  --rating-m:  #f28500;  /* toasty-amber */
+  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #ffffff;
 }
 
@@ -189,11 +194,11 @@
   --accent: #8B4040;
   --card-bg: #F4F1EB;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
-  --rating-e:  #b02828;
-  --rating-nr: #aaaaaa;
+  --rating-g:  #2b9247;  /* midnight-forest */
+  --rating-t:  #ffe600;  /* gold-rush */
+  --rating-m:  #f28500;  /* toasty-amber */
+  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #f5f0e8;
 }
 
@@ -210,11 +215,11 @@
   --card-border: rgba(229, 225, 216, 0.20);
   --image-outline: rgba(255, 255, 255, 0.1);
   --image-outline-faint: rgba(255, 255, 255, 0.05);
-  --rating-g:  #3d9970;
-  --rating-t:  #c8a020;
-  --rating-m:  #c0601a;
-  --rating-e:  #b02828;
-  --rating-nr: #666666;
+  --rating-g:  #2b9247;  /* midnight-forest */
+  --rating-t:  #ffe600;  /* gold-rush */
+  --rating-m:  #f28500;  /* toasty-amber */
+  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.24);
