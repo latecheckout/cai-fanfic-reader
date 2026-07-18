@@ -8,8 +8,9 @@ export const POPOVER_PANEL =
   'rounded-[24px] border border-bubble-ring bg-bubble text-text shadow-float';
 
 // Inset menu row (ChapterPanel geometry): rounded row inside a p-2 panel.
+// max-md:min-h-11 lifts every popover row to the 44px touch minimum on mobile.
 export const MENU_ROW =
-  'flex w-full cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-left transition-colors hover:bg-overlay-soft';
+  'flex w-full cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 max-md:min-h-11 text-left transition-colors hover:bg-overlay-soft';
 export const MENU_ROW_ACTIVE = 'bg-overlay-medium';
 
 /** 32px round icon button (panel-header actions) — the after:-inset-1.5 extends

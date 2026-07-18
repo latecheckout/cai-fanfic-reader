@@ -899,6 +899,7 @@ export function FilterPanel({
             onChange={handleSortChange}
             open={sortOpen}
             onOpenChange={setSortOpen}
+            className="max-md:hidden"
           />
 
           {/* Filters button — icon-only on mobile, full label on desktop */}

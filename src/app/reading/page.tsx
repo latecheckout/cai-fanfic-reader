@@ -2,7 +2,14 @@ import { Suspense } from 'react';
 import { getWorkSummaries } from '@/lib/works';
 import { applyFilters } from '@/lib/filters';
 import { FilterState } from '@/types';
-import { MOCK_LIBRARY, getTabSlugs, type LibraryTab } from '@/lib/library';
+import {
+  MOCK_LIBRARY,
+  getTabSlugs,
+  getLibraryTimestamps,
+  LIBRARY_SORT_KEYS,
+  LIBRARY_SORT_OPTIONS,
+  type LibraryTab,
+} from '@/lib/library';
 import { SiteHeader } from '@/components/SiteHeader';
 import { LibraryShell } from '@/components/LibraryShell';
 
@@ -59,6 +66,14 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   const tabSlugs = new Set(getTabSlugs(activeTab));
   const tabWorks = allWorks.filter((w) => tabSlugs.has(w.slug));
 
+  // Sort: default to the tab's first option ("Recently read"/"Recently
+  // bookmarked"). Library-only keys (last_read/bookmarked_at) sort on the
+  // user's activity timestamps AFTER applyFilters — they aren't work meta,
+  // so applyFilters gets sort: undefined for them.
+  const defaultSortKey = LIBRARY_SORT_OPTIONS[activeTab][0].value.split(':')[0];
+  const sortKey = params.sort ?? defaultSortKey;
+  const isLibrarySort = LIBRARY_SORT_KEYS.has(sortKey);
+
   // Apply URL-driven filters within the tab's works
   const filters: FilterState = {
     fandom: params.fandom,
@@ -72,7 +87,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
     warning: params.warning,
     minWords: params.min_words ? Number(params.min_words) : undefined,
     maxWords: params.max_words ? Number(params.max_words) : undefined,
-    sort: params.sort as FilterState['sort'],
+    sort: isLibrarySort ? undefined : (sortKey as FilterState['sort']),
     order: params.order as FilterState['order'],
     q: params.q,
     exFandom: params.ex_fandom,
@@ -91,10 +106,24 @@ export default async function LibraryPage({ searchParams }: PageProps) {
   // Bookmarked tab: send the WHOLE archive filtered+sorted as one list — the
   // client subsets it to mock bookmarks + local reading-page saves, keeping
   // the ?sort order intact. @WIRE — collapses once /user/library exists.
-  const filteredWorks =
+  let filteredWorks =
     activeTab === 'bookmarked'
       ? applyFilters(allWorks, filters)
       : applyFilters(tabWorks, filters);
+
+  if (isLibrarySort) {
+    // Activity-timestamp sort. Slugs without a timestamp (e.g. local saves the
+    // server can't see) rank newest — LibraryShell surfaces them client-side.
+    const timestamps = getLibraryTimestamps(activeTab);
+    const dir = params.order === 'asc' ? 1 : -1;
+    filteredWorks = [...filteredWorks].sort(
+      // MAX_SAFE_INTEGER (not Infinity): two missing slugs must compare 0, not NaN.
+      (a, b) =>
+        dir *
+        ((timestamps.get(a.slug) ?? Number.MAX_SAFE_INTEGER) -
+          (timestamps.get(b.slug) ?? Number.MAX_SAFE_INTEGER))
+    );
+  }
 
   return (
     <div className="min-h-screen">

@@ -29,7 +29,7 @@ export function NavPillLink({
   // utilities on one element resolve by emission order, never stack them.
   const variant = filled
     ? 'bg-quill-ink font-sans text-[13px] text-white shadow-bubble hover:bg-pinned-purple hover:shadow-bubble-hover'
-    : `bg-overlay-soft font-mono text-[12px] backdrop-blur-md hover:bg-overlay-medium ${
+    : `bg-bg/16 font-mono text-[12px] backdrop-blur-md hover:bg-text/6 ${
         active ? 'text-text' : 'text-secondary hover:text-text'
       }`;
   return (

@@ -463,3 +463,33 @@ export function LorebookIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** Hamburger (original set) — the mobile site-menu trigger; CloseIcon is its
+    open-state counterpart. Restored from 0bfefed after the nav cleanup. */
+export function HamburgerIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M2 7C2 6.44772 2.44772 6 3 6H21C21.5523 6 22 6.44772 22 7C22 7.55228 21.5523 8 21 8H3C2.44772 8 2 7.55228 2 7ZM2 17C2 16.4477 2.44772 16 3 16H21C21.5523 16 22 16.4477 22 17C22 17.5523 21.5523 18 21 18H3C2.44772 18 2 17.5523 2 17Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** Pen nib — the Write on c.ai destination. */
+export function PenIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
+      <path
+        d="M15.7 4.7a2.4 2.4 0 0 1 3.4 0l.2.2a2.4 2.4 0 0 1 0 3.4l-9.6 9.6-4.5 1.1 1.1-4.5 9.4-9.8Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path d="M13.5 7L17 10.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}

@@ -38,10 +38,14 @@ export function usePendingParams(basePath: string) {
   }, []);
 
   const pushParams = useCallback(
-    (params: URLSearchParams) => {
+    // `replace: true` swaps the current history entry instead of pushing —
+    // for live-typing surfaces so each keystroke isn't a back-button stop.
+    (params: URLSearchParams, { replace = false } = {}) => {
       pending = { params, at: Date.now() };
       const qs = params.toString();
-      router.push(qs ? `${basePath}?${qs}` : basePath);
+      const url = qs ? `${basePath}?${qs}` : basePath;
+      if (replace) router.replace(url);
+      else router.push(url);
     },
     [router, basePath]
   );

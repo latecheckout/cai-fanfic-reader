@@ -116,6 +116,11 @@ export function Ao4TurboToggle() {
           <Tooltip label={VISUAL_LABEL} disabled={!on}>
             <button
               type="button"
+              // Explicit ids on all three tooltip triggers: Base UI falls back
+              // to useId, which hydration-mismatches on this header when a
+              // sibling Suspense boundary (the search slot) suspends during
+              // SSR and shifts the server's useId tree (React limitation).
+              id="ao4-mark-visual"
               tabIndex={-1}
               aria-label="Switch to visual mode"
               onClick={() => commit(false)}
@@ -129,6 +134,7 @@ export function Ao4TurboToggle() {
           <Tooltip label={TEXT_LABEL} disabled={on}>
             <button
               type="button"
+              id="ao4-mark-text"
               tabIndex={-1}
               aria-label="Switch to AO4 text mode"
               onClick={() => commit(true)}
@@ -143,6 +149,7 @@ export function Ao4TurboToggle() {
           <Tooltip label={on ? TEXT_LABEL : VISUAL_LABEL}>
           <motion.button
             type="button"
+            id="ao4-thumb"
             role="switch"
             aria-checked={on}
             aria-label="AO4 Mode"

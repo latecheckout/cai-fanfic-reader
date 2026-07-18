@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getWorkSummaries } from '@/lib/works';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SectionHeader } from '@/components/RailSection';
@@ -38,11 +39,15 @@ export default function CharactersPage() {
   return (
     <div>
       <SiteHeader />
-      <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12">
+      <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12 max-md:px-4 max-md:pt-5">
         <div className="mb-8">
           <SectionHeader title="Characters" subtitle={`${sorted.length} characters across the archive, A to Z`} />
         </div>
-        <CharactersList grouped={grouped} />
+        {/* CharactersList reads useSearchParams (q/sort) — the boundary keeps
+            the page statically renderable. */}
+        <Suspense>
+          <CharactersList grouped={grouped} />
+        </Suspense>
       </main>
     </div>
   );

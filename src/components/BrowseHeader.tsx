@@ -1,13 +1,15 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Ao4TurboToggle } from './Ao4TurboToggle';
-import { BrowseIcon, CharactersIcon, LibraryIcon, UserProfileIcon } from './icons';
+import { AboutIcon, BrowseIcon, CharactersIcon, CloseIcon, HamburgerIcon, LibraryIcon, PenIcon, UserProfileIcon } from './icons';
 import { AccountMenu } from './AccountMenu';
+import { CrossfadeSwap } from './ReadingActions';
+import { Popover } from './Popover';
+import { MenuBubbleTrigger, MenuColumn, MenuDivider, MenuRowLink } from './Menu';
 import { NavPillLink } from './NavPillLink';
-import { HUD_BUBBLE } from './readingChrome';
+import { TabPill } from './TabPill';
 
 const NAV_LINKS = [
   { href: '/browse', label: 'Browse', Icon: BrowseIcon },
@@ -29,7 +31,7 @@ export function BrowseHeader({ search }: Props = {}) {
       <header className="site-header sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
         <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--browse-max-width)] items-stretch px-6 max-md:items-center max-md:justify-between max-md:px-4">
           {/* ── Left zone: logo + nav links (desktop) ── */}
-          <div className="flex min-w-0 flex-1 items-center gap-5 max-md:gap-0">
+          <div className="flex min-w-0 flex-1 items-center gap-8 max-md:gap-0">
             <a
               href="/"
               className="flex items-center text-text no-underline opacity-[0.88] transition-opacity duration-150 ease-in-out hover:opacity-100"
@@ -53,56 +55,87 @@ export function BrowseHeader({ search }: Props = {}) {
             </svg>
           </a>
 
-          {/* Nav links, left-aligned after the logo — NavPillLink treatment:
-              lowercase mono pills, bg reveal + underline on hover, magenta dot
-              on the active pill. */}
-          <nav className="flex items-center gap-1 max-md:hidden" aria-label="Site navigation">
+          {/* Nav links, left-aligned after the logo — TabPill treatment (same
+              as the library tabs): text-only mono labels stretched to the
+              header height, active indicator riding the header's bottom
+              stroke and sliding between links on client nav. */}
+          <nav className="flex items-stretch gap-6 self-stretch max-md:hidden" aria-label="Site navigation">
             {NAV_LINKS.map(({ href, label }) => (
-              <NavPillLink key={href} href={href} label={label} active={pathname === href} />
+              <TabPill
+                key={href}
+                href={href}
+                label={label}
+                active={pathname === href}
+                indicatorId="site-nav-indicator"
+              />
             ))}
           </nav>
         </div>
 
         {/* ── Right zone: search slot + CTA (desktop) + nav icons (mobile) + avatar ── */}
         <div className="flex min-w-0 flex-1 items-center justify-end gap-2 max-md:gap-1.5">
-          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:max-w-none max-md:flex-none">{search}</div>}
+          {/* Header search is desktop-only — mobile keeps just the two icons
+              (profile + menu); each surface owns its own scoped search. */}
+          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:hidden">{search}</div>}
           {/* CTA — big filled variant of the nav-pill link (espresso → quill-ink).
               Desktop only; on mobile it lives in the account dropdown. */}
           <NavPillLink href="/creators/apply" label="Write on c.ai" big filled className="shrink-0 max-md:hidden" />
-          {/* Mobile nav — icon bubbles for the same destinations the center
-              nav shows on desktop, active route tinted. */}
-          <nav className="hidden shrink-0 items-center gap-1.5 max-md:flex" aria-label="Site navigation">
-            {NAV_LINKS.map(({ href, label, Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                aria-label={label}
-                aria-current={pathname === href ? 'page' : undefined}
-                className={`${HUD_BUBBLE} ${
-                  pathname === href ? 'text-text shadow-bubble-hover [&_svg]:opacity-100' : 'text-secondary'
-                }`}
-              >
-                <Icon width={20} height={20} />
-              </Link>
-            ))}
-          </nav>
           {/* Account dropdown — shared AccountMenu body, HUD-bubble trigger.
-              Same dropdown on mobile (popovers clamp to the viewport). */}
+              On mobile this menu is account-only (email + sign out). */}
           <div className="shrink-0">
             <AccountMenu
               renderTrigger={({ open, toggle }) => (
-                <button
-                  type="button"
-                  aria-label="Account menu"
-                  aria-haspopup="menu"
-                  aria-expanded={open}
-                  onClick={toggle}
-                  className={`${HUD_BUBBLE} ${open ? 'shadow-bubble-hover [&_svg]:opacity-100' : ''}`}
-                >
+                <MenuBubbleTrigger open={open} toggle={toggle} label="Account menu">
                   <UserProfileIcon width={20} height={20} />
-                </button>
+                </MenuBubbleTrigger>
               )}
             />
+          </div>
+          {/* Mobile site menu — far right, same popover pattern as the
+              account menu; every destination lives here (nav + Write + About),
+              each row iconed, active route highlighted. */}
+          <div className="hidden shrink-0 max-md:block">
+            <Popover
+              align="right"
+              ariaLabel="Site menu"
+              contentClassName="w-56 p-2"
+              renderTrigger={({ open, toggle }) => (
+                <MenuBubbleTrigger open={open} toggle={toggle} label="Site menu">
+                  {/* Same crossfade as the reading-list bookmark swap. */}
+                  <CrossfadeSwap swapKey={open ? 'close' : 'menu'}>
+                    {open ? <CloseIcon width={20} height={20} /> : <HamburgerIcon width={20} height={20} />}
+                  </CrossfadeSwap>
+                </MenuBubbleTrigger>
+              )}
+            >
+              {({ close }) => (
+                <MenuColumn>
+                  {NAV_LINKS.map(({ href, label, Icon }) => (
+                    <MenuRowLink
+                      key={href}
+                      href={href}
+                      label={label}
+                      icon={<Icon width={18} height={18} />}
+                      active={pathname === href}
+                      onClick={close}
+                    />
+                  ))}
+                  <MenuDivider />
+                  <MenuRowLink
+                    href="/creators/apply"
+                    label="Write on c.ai"
+                    icon={<PenIcon width={18} height={18} />}
+                    onClick={close}
+                  />
+                  <MenuRowLink
+                    href="/about"
+                    label="About"
+                    icon={<AboutIcon width={18} height={18} />}
+                    onClick={close}
+                  />
+                </MenuColumn>
+              )}
+            </Popover>
           </div>
         </div>
         </div>

@@ -14,6 +14,17 @@ const GRID_CLS =
   'grid grid-cols-4 gap-4 max-[1100px]:grid-cols-3 max-[768px]:grid-cols-2 max-[460px]:grid-cols-1';
 const LIST_CLS = 'grid grid-cols-1 gap-4 min-[1100px]:grid-cols-2';
 
+// Pre-hydration flash guard: server HTML is rendered with the shell's static
+// `initial` view, but the user's real mode is already on <html data-mode>
+// before first paint (ThemeScript). When the rendered view disagrees with the
+// live mode, hide the grid until hydration corrects `view` — a beat of blank
+// beats painting the wrong card layout. (view 'grid' ↔ mode 'visual',
+// view 'list' ↔ mode 'text'.)
+const MODE_GATE: Record<LayoutView, string> = {
+  grid: '[html[data-mode=text]_&]:hidden',
+  list: '[html[data-mode=visual]_&]:hidden',
+};
+
 interface Props {
   works: WorkSummary[];
   view: LayoutView;
@@ -53,7 +64,7 @@ export function WorkGrid({
   const reduce = useReducedMotion();
   const layoutKey = works.map((w) => w.slug).join('|');
   return (
-    <div className={`${!isFiltering && view === 'grid' ? GRID_CLS : LIST_CLS} ${containerClassName}`}>
+    <div className={`${!isFiltering && view === 'grid' ? GRID_CLS : LIST_CLS} ${MODE_GATE[view]} ${containerClassName}`}>
       {isFiltering ? (
         Array.from({ length: skeletonCount }, (_, i) => (
           <SkeletonCard key={i} index={i} />

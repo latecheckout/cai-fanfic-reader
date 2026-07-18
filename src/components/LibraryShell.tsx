@@ -1,22 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkSummary } from '@/types';
-import { LibraryTab, MOCK_BOOKMARKED, readSavedSlugs, readRemovedSlugs, removeBookmark } from '@/lib/library';
+import { LibraryTab, LIBRARY_SORT_OPTIONS, MOCK_BOOKMARKED, readSavedSlugs, readRemovedSlugs, removeBookmark } from '@/lib/library';
+import { usePendingParams } from '@/hooks/usePendingParams';
+import { SortDropdown } from './SortDropdown';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useFilterFlash } from '@/hooks/useFilterFlash';
 import { ScopedSearchInput } from './ScopedSearchInput';
-import { NavPillLink } from './NavPillLink';
+import { TabPill } from './TabPill';
 import { SectionHeader } from './RailSection';
 import { WorkGrid } from './WorkGrid';
-import { EmptyState } from './EmptyState';
-import { BookmarkCheckIcon } from './icons';
+import { EmptyState, EmptyStateCard } from './EmptyState';
+import { BookmarkCheckIcon, BookmarkIcon, CheckIcon, ProgressIcon } from './icons';
 
 const TAB_LABELS: Record<LibraryTab, string> = {
   continuing: 'Continue Reading',
   bookmarked: 'Bookmarked',
   completed: 'Completed',
+};
+
+// Per-tab empty states: each explains the tab's membership rule and offers a
+// goal-specific way back into the catalog.
+const TAB_EMPTY: Record<
+  LibraryTab,
+  { icon: ReactNode; title: string; body: string; ctaLabel: string }
+> = {
+  continuing: {
+    icon: <ProgressIcon width={20} height={20} />,
+    title: 'Nothing in progress.',
+    body: 'Start reading any story and it appears here, saved at your place.',
+    ctaLabel: 'Find a story',
+  },
+  bookmarked: {
+    icon: <BookmarkIcon width={20} height={20} />,
+    title: 'No bookmarks.',
+    body: 'Bookmark a work from its story page to keep it here.',
+    ctaLabel: 'Browse stories to bookmark',
+  },
+  completed: {
+    icon: <CheckIcon width={20} height={20} />,
+    title: 'Nothing completed yet.',
+    body: 'Finished works appear here after you reach the end of their final published chapter.',
+    ctaLabel: 'Find a story',
+  },
 };
 
 interface Props {
@@ -91,10 +119,29 @@ export function LibraryShell({
     setSavedSlugs(new Set(readSavedSlugs()));
   }, []);
 
+  const { readParams, pushParams } = usePendingParams('/reading');
+
   const handleTabChange = (tab: LibraryTab) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
+    // Sort options are tab-contextual — a carried-over library sort key can be
+    // invalid on the next tab, so each tab lands on its own default.
+    params.delete('sort');
+    params.delete('order');
     router.push(`/reading?${params.toString()}`);
+  };
+
+  // Current `sort:order` for the dropdown; absent params = the tab's default.
+  const sortValue = currentFilters.sort
+    ? `${currentFilters.sort}:${currentFilters.order ?? 'desc'}`
+    : LIBRARY_SORT_OPTIONS[activeTab][0].value;
+
+  const handleSortChange = (v: string) => {
+    const [sort, order] = v.split(':');
+    const params = readParams();
+    params.set('sort', sort);
+    params.set('order', order);
+    pushParams(params);
   };
 
   const handleRemove = (slug: string) => {
@@ -128,11 +175,16 @@ export function LibraryShell({
         <SectionHeader title="Library" subtitle="Your saved, in-progress, and finished stories" />
       </div>
 
-      {/* ── Tab row: nav-pill tabs left, scoped search right ── */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <nav className="flex items-center gap-1" aria-label="Library tabs">
+      {/* ── Tab row: text tabs over the dividing line. The wrapper's border-b
+          is the section divider AND the tab rail — the active tab's indicator
+          overlays it (-bottom-px) and slides between tabs. Fixed nav height
+          keeps the breathing room the search input used to set. ── */}
+      <div className="mb-5 border-b border-border">
+        {/* h matches the old row height (search h-10/h-11 + pb-5) so the gap
+            between the tab labels and the line is unchanged from before. */}
+        <nav className="flex h-15 max-md:h-16 items-stretch gap-6" aria-label="Library tabs">
           {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
-            <NavPillLink
+            <TabPill
               key={tab}
               href={`/reading?tab=${tab}`}
               label={`${TAB_LABELS[tab]} · ${displayedTabCounts[tab]}`}
@@ -144,10 +196,24 @@ export function LibraryShell({
             />
           ))}
         </nav>
-        <div className="flex min-w-[220px] max-w-[340px] flex-[1_1_auto] items-center">
-          <ScopedSearchInput basePath="/reading" placeholder="Search your bookmarks" />
-        </div>
       </div>
+
+      {/* ── Toolbar below the divider: scoped search + tab-contextual sort
+          (labels state the underlying field; max 3 per tab). Search flexes,
+          sort collapses to its icon on mobile — both CONTROL_HEIGHT.
+          Hidden while the tab is empty — nothing to search or sort. ── */}
+      {displayedTabCounts[activeTab] > 0 && (
+        <div className="mb-6 flex items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center">
+            <ScopedSearchInput basePath="/reading" placeholder="Search your bookmarks" />
+          </div>
+          <SortDropdown
+            options={LIBRARY_SORT_OPTIONS[activeTab]}
+            currentValue={sortValue}
+            onChange={handleSortChange}
+          />
+        </div>
+      )}
 
       {/* ── Work list ── (shared WorkGrid: skeletons on filter, layout morph
           on view switch, exit animation on bookmark removal) */}
@@ -157,17 +223,20 @@ export function LibraryShell({
         isFiltering={isFiltering}
         cardClassName={CARD_WRAPPER_CLS}
         empty={
-          <EmptyState
-            title={
-              activeTab === 'continuing'
-                ? 'Nothing in progress.'
-                : activeTab === 'bookmarked'
-                ? 'No bookmarks.'
-                : 'Nothing completed yet.'
-            }
-          >
-            <a href="/browse" className="text-text underline underline-offset-2 hover:opacity-70">Browse works →</a>
-          </EmptyState>
+          displayedTabCounts[activeTab] === 0 ? (
+            // Tab is truly empty — explain the membership rule + catalog CTA.
+            <EmptyStateCard {...TAB_EMPTY[activeTab]} ctaHref="/browse" />
+          ) : (
+            // Tab has items but the search/filters matched none of them.
+            <EmptyState title="No matches.">
+              <a
+                href={`/reading?tab=${activeTab}`}
+                className="text-text underline underline-offset-2 hover:opacity-70"
+              >
+                Clear search →
+              </a>
+            </EmptyState>
+          )
         }
         renderOverlay={
           activeTab === 'bookmarked'

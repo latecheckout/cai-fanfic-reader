@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import type { LayoutView } from '@/types';
 import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
 
@@ -19,8 +19,10 @@ interface Options {
 export function useViewMode({ initial = 'grid' }: Options = {}) {
   const [view, setView] = useState<LayoutView>(initial);
 
-  // Read the persisted global mode after mount (avoids an SSR/hydration mismatch).
-  useEffect(() => {
+  // Read the persisted global mode on mount, before the hydrated frame paints —
+  // useLayoutEffect (not useEffect) so a stored mode that differs from `initial`
+  // corrects without a visible flash. Still post-render, so no hydration mismatch.
+  useLayoutEffect(() => {
     setView(localStorage.getItem(SITE_MODE_KEY) === 'text' ? 'list' : 'grid');
   }, []);
 

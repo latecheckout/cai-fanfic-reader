@@ -7,28 +7,67 @@
 // In production this would come from a user API; for the prototype it's static.
 
 import { SAVED_KEY } from './constants';
+import type { SortOption } from '@/components/SortDropdown';
 
+// lastRead / bookmarkedAt — mock user-activity timestamps (@DUMMY, become
+// /user/library fields when wired). They back the library's per-tab default
+// sorts ("Recently read" / "Recently bookmarked").
 export const MOCK_LIBRARY = {
   continuing: [
-    { slug: 'work-01', chapter: 3 },
-    { slug: 'work-05', chapter: 1 },
-    { slug: 'work-09', chapter: 2 },
+    { slug: 'work-01', chapter: 3, lastRead: '2026-07-16T21:40:00Z' },
+    { slug: 'work-05', chapter: 1, lastRead: '2026-07-10T08:15:00Z' },
+    { slug: 'work-09', chapter: 2, lastRead: '2026-07-14T23:05:00Z' },
   ],
   bookmarked: [
-    { slug: 'work-02' },
-    { slug: 'work-04' },
-    { slug: 'work-07' },
-    { slug: 'work-10' },
-    { slug: 'work-11' },
+    { slug: 'work-02', bookmarkedAt: '2026-06-28T17:00:00Z' },
+    { slug: 'work-04', bookmarkedAt: '2026-07-12T12:30:00Z' },
+    { slug: 'work-07', bookmarkedAt: '2026-05-19T09:45:00Z' },
+    { slug: 'work-10', bookmarkedAt: '2026-07-17T19:20:00Z' },
+    { slug: 'work-11', bookmarkedAt: '2026-07-02T14:10:00Z' },
   ],
   completed: [
-    { slug: 'work-03' },
-    { slug: 'work-06' },
-    { slug: 'work-08' },
+    { slug: 'work-03', lastRead: '2026-06-30T22:00:00Z' },
+    { slug: 'work-06', lastRead: '2026-07-15T20:30:00Z' },
+    { slug: 'work-08', lastRead: '2026-05-25T11:00:00Z' },
   ],
 } as const;
 
 export type LibraryTab = keyof typeof MOCK_LIBRARY;
+
+// ── Per-tab sort taxonomy (max 3 per tab, first entry = the tab's default).
+//    Labels state the underlying field; `last_read`/`bookmarked_at` are
+//    library-only keys sorted by the timestamps above (reading/page.tsx),
+//    the rest are work-meta keys handled by applyFilters.
+export const LIBRARY_SORT_OPTIONS: Record<LibraryTab, SortOption[]> = {
+  continuing: [
+    { value: 'last_read:desc', label: 'Recently read' },
+    { value: 'updated:desc', label: 'Story updated' },
+    { value: 'words:desc', label: 'Longest first' },
+  ],
+  bookmarked: [
+    { value: 'bookmarked_at:desc', label: 'Recently bookmarked' },
+    { value: 'updated:desc', label: 'Story updated' },
+    { value: 'kudos:desc', label: 'Most kudos' },
+  ],
+  completed: [
+    { value: 'last_read:desc', label: 'Recently read' },
+    { value: 'updated:desc', label: 'Story updated' },
+    { value: 'kudos:desc', label: 'Most kudos' },
+  ],
+};
+
+/** Sort keys that live on library activity (not work meta). */
+export const LIBRARY_SORT_KEYS = new Set(['last_read', 'bookmarked_at']);
+
+/** slug → activity timestamp (ms) for a tab's library-only sort. */
+export function getLibraryTimestamps(tab: LibraryTab): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const item of MOCK_LIBRARY[tab]) {
+    const ts = 'lastRead' in item ? item.lastRead : 'bookmarkedAt' in item ? item.bookmarkedAt : undefined;
+    if (ts) map.set(item.slug, Date.parse(ts));
+  }
+  return map;
+}
 
 /** localStorage key for removed bookmarks (Set of slugs user has unbookmarked) */
 export const LIBRARY_REMOVED_KEY = 'cai_removed_bookmarks';
