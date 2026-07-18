@@ -4,8 +4,6 @@ import matter from 'gray-matter';
 import { Work, WorkMeta, WorkSummary } from '@/types';
 import { parseChapters } from './chapters';
 import { resolveCover } from './covers';
-// Re-export for Server Components that import utils via works
-export { readingTime, formatWords } from './utils';
 
 const WORKS_DIR = path.join(process.cwd(), 'content', 'works');
 

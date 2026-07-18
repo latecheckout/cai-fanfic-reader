@@ -12,8 +12,6 @@ interface RatingTier {
   rating: string;
   /** Badge letter (G/T/M/E/NR). */
   letter: string;
-  /** Short display name for the filter pill (General/Teen+/…). */
-  shortName: string;
   /** Lowercase tier key (g/t/m/e/nr). */
   key: string;
   /** Class key returned by ratingClass() (ratingG/ratingT/…). */
@@ -31,27 +29,27 @@ interface RatingTier {
 
 const RATING_TIERS: Record<string, RatingTier> = {
   'General Audiences': {
-    rating: 'General Audiences', letter: 'G', shortName: 'General', key: 'g',
+    rating: 'General Audiences', letter: 'G', key: 'g',
     classKey: 'ratingG', bg: 'bg-rating-g', fg: 'text-white', includeClass: 'bg-rating-g border-rating-g',
     tooltip: 'General Audiences',
   },
   'Teen And Up Audiences': {
-    rating: 'Teen And Up Audiences', letter: 'T', shortName: 'Teen+', key: 't',
+    rating: 'Teen And Up Audiences', letter: 'T', key: 't',
     classKey: 'ratingT', bg: 'bg-rating-t', fg: 'text-black', includeClass: 'bg-rating-t border-rating-t',
     tooltip: 'Teen And Up Audiences',
   },
   'Mature': {
-    rating: 'Mature', letter: 'M', shortName: 'Mature', key: 'm',
+    rating: 'Mature', letter: 'M', key: 'm',
     classKey: 'ratingM', bg: 'bg-rating-m', fg: 'text-black', includeClass: 'bg-rating-m border-rating-m',
     tooltip: 'Mature',
   },
   'Explicit': {
-    rating: 'Explicit', letter: 'E', shortName: 'Explicit', key: 'e',
+    rating: 'Explicit', letter: 'E', key: 'e',
     classKey: 'ratingE', bg: 'bg-rating-e', fg: 'text-white', includeClass: 'bg-rating-e border-rating-e',
     tooltip: 'Explicit',
   },
   'Not Rated': {
-    rating: 'Not Rated', letter: 'NR', shortName: 'Not Rated', key: 'nr',
+    rating: 'Not Rated', letter: 'NR', key: 'nr',
     classKey: 'ratingNR', bg: 'bg-rating-nr', fg: 'text-black', includeClass: 'bg-rating-nr border-rating-nr',
     tooltip: 'Not Rated',
   },

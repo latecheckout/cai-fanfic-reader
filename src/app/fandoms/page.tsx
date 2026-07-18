@@ -26,7 +26,7 @@ export default function FandomsPage() {
       <SiteHeader />
       <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12">
         <div className="mb-8 flex items-baseline gap-4">
-          <h2 className="font-sans text-2xl font-medium tracking-[-0.015em] text-text">Fandoms</h2>
+          <h1 className="font-sans text-2xl font-medium tracking-[-0.015em] text-text">Fandoms</h1>
           <span className="font-mono text-xs text-secondary">{fandoms.length} fandoms</span>
         </div>
 

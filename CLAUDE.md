@@ -61,7 +61,8 @@ npm run build     # Production build
 - `src/data/comments.ts` — `@DUMMY` — hardcoded comment threads (~1100 lines)
 - `src/styles/tokens.css` — Design tokens (CSS custom properties: color, type, shadow, radius, easing, z-index; light/paper/dark via `data-theme`)
 - `src/app/globals.css` — `@import "tailwindcss"` + `@theme inline` mapping tokens → utilities, global keyframes, `.cai-rail` scroller, `@custom-variant theme-dark`
-- `src/lib/motion.ts` — shared easing arrays (`EASE_OUT_EXPO`, `EASE_SPRING_OUT`) for `motion`
+- `src/lib/motion.ts` — shared easing arrays (`EASE_OUT_EXPO`) + popover/pill motion constants for `motion`
+- `src/lib/bookmarks.ts` — reading-position bookmark map (localStorage `BOOKMARKS_KEY`): `BookmarkEntry`, `readBookmarks`/`readBookmark`/`patchBookmark` — shared by ChapterList (writer), ReturnToPositionFAB + ContinueReadingSection (readers)
 - `src/lib/ratings.ts` — `RATING_TIERS` config (single source for rating letter/color/tooltip); `ratingTier()`
 - `src/lib/filterParams.ts` — shared filter-URL helpers (comma-list, 3-state pill, presets)
 - `src/hooks/` — `useViewMode`, `useDrawer`, `usePresets`
@@ -288,5 +289,5 @@ Drop a `.md` file into `content/works/` with the frontmatter format. The slug co
 - **Filter panel is a floating push panel on desktop** — a 380px card inset 12px from the viewport edges; `body.filter-open` adds `padding-right: var(--filter-push)` (404px, defined in `tokens.css`) to shift content left. The navbar (`.site-header`) gets a `padding-right`/negative-`margin-right` counterfix so its bottom stroke spans the full viewport under the panel, and the AO4 FAB + aura band (`.ao4-fab`/`.ao4-aura`) ride the push via `translateX(calc(16px - var(--filter-push)))`. All of it derives from `--filter-push` — change the panel width there.
 - **"Show X works" footer button is hidden on desktop** — results update live; button only shown on mobile where an explicit Apply is needed
 - **`SearchOverlay` has been deleted** — do not recreate. ⌘K focuses `BrowseSearchBar` input. All search/vibe/preset logic lives in `BrowseSearchBar.tsx`.
-- **Preset and AC item handlers use `onMouseDown` not `onClick`** — prevents input blur before handler fires. In tests, dispatch `mousedown` events not `click`.
+- **Dropdown-row buttons pair `onMouseDown={(e) => e.preventDefault()}` with the action on `onClick`** — mousedown-preventDefault stops the input blurring before activation, while keeping rows keyboard-operable (Enter/Space fire click). Never put the action itself on `onMouseDown`. In tests, `click` events work.
 - **Do not use `window.location.href =` in eval/preview contexts** — crashes the Next.js dev server. Use `router.push()` inside components.

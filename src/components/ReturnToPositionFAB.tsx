@@ -3,15 +3,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
-import { BOOKMARKS_KEY } from '@/lib/constants';
+import { readBookmark } from '@/lib/bookmarks';
 import { EASE_OUT_EXPO } from '@/lib/motion';
 import { BUBBLE_PILL } from './readingChrome';
 import { ArrowDownIcon } from './icons';
-
-interface BookmarkEntry {
-  furthestScrollPercent?: number;
-  [key: string]: unknown;
-}
 
 const THRESHOLD = 150; // px above the target before FAB appears
 
@@ -22,32 +17,18 @@ export function ReturnToPositionFAB() {
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(BOOKMARKS_KEY);
-      if (!raw) return;
-      const bookmarks: Record<string, BookmarkEntry> = JSON.parse(raw);
-      const entry = bookmarks[slug];
-      if (!entry?.furthestScrollPercent || entry.furthestScrollPercent < 0.02) return;
+    const entry = readBookmark(slug);
+    if (!entry?.furthestScrollPercent || entry.furthestScrollPercent < 0.02) return;
 
-      const compute = () => {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        return entry.furthestScrollPercent! * maxScroll;
-      };
-      targetYRef.current = compute();
-
-      function onScroll() {
-        if (targetYRef.current === null) return;
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        targetYRef.current = entry.furthestScrollPercent! * maxScroll;
-        setVisible(window.scrollY < targetYRef.current - THRESHOLD);
-      }
-
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-      return () => window.removeEventListener('scroll', onScroll);
-    } catch {
-      // fail silently
+    function onScroll() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      targetYRef.current = entry!.furthestScrollPercent! * maxScroll;
+      setVisible(window.scrollY < targetYRef.current - THRESHOLD);
     }
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, [slug]);
 
   function handleClick() {

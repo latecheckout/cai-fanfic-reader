@@ -101,6 +101,10 @@
   /* Author-note bubble (theme-adaptive quill-ink) */
   --color-author-bubble: var(--author-bubble);
   --color-author-bubble-fg: var(--author-bubble-fg);
+
+  /* Filled CTA pill (theme-adaptive fill + constant white stroke) */
+  --color-cta-fill: var(--cta-fill);
+  --color-cta-stroke: var(--cta-stroke);
 }
 
 /* ============================================================
@@ -256,15 +260,6 @@
 
   .hairline {
     border-top: 1px solid var(--border);
-  }
-  .hairline-bottom {
-    border-bottom: 1px solid var(--border);
-  }
-  .text-secondary {
-    color: var(--secondary);
-  }
-  .text-accent {
-    color: var(--accent);
   }
   .visually-hidden {
     position: absolute;

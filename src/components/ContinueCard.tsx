@@ -9,7 +9,7 @@ const META = 'font-mono text-[12px]';
 const TRACK = 'absolute bottom-0 left-0 right-0 h-1';
 const FILL = 'block h-full rounded-[0_2px_2px_0]';
 
-export interface ContinueItem {
+interface ContinueItem {
   slug: string;
   title: string;
   chapterIndex: number;

@@ -8,7 +8,7 @@
   /* Default to light theme */
   --bg: #F7F4EF;
   --text: #1A1816;
-  --secondary: #8A857D;
+  --secondary: #6B675F; /* 5.13:1 on --bg (AA for the 11-14px mono labels) */
   --border: rgba(26, 24, 22, 0.12);
   --border-strong: rgba(26, 24, 22, 0.22);
   --border-chip: rgba(26, 24, 22, 0.18);
@@ -28,7 +28,6 @@
   --card-radius: 16.5px;
   /* Subtle 1px image edge — pure black in light, pure white in dark (see dark block). */
   --image-outline: rgba(0, 0, 0, 0.1);
-  --image-outline-faint: rgba(0, 0, 0, 0.045); /* chat card + composer hairline */
 
   /* Rating dot colors — per brief spec */
   --rating-g:  #2b9247;  /* midnight-forest */
@@ -115,10 +114,10 @@
      #d90000. Text greens are the brand color mixed toward black — straight
      midnight-forest is ~4.1:1 on the paper bg, under the 4.5:1 AA bar for
      the pills' 14px labels; crimson passes as is. Tints use the brand RGB. */
-  --color-include:        color-mix(in srgb, #2b9247 80%, black);
+  --color-include:        color-mix(in srgb, #2b9247 65%, black); /* ≥5.1:1 on all light-family bgs */
   --color-include-bg:     rgba(43, 146, 71, 0.10);
   --color-include-border: rgba(43, 146, 71, 0.35);
-  --color-exclude:        #d90000;
+  --color-exclude:        color-mix(in srgb, #d90000 80%, black); /* ≥5.3:1 on all light-family bgs */
   --color-exclude-bg:     rgba(217, 0, 0, 0.08);
   --color-exclude-border: rgba(217, 0, 0, 0.30);
 
@@ -156,6 +155,12 @@
   --cached-crimson:   #d90000;
   --quill-ink:        #3e2733;
   --espresso:         #652E1F; /* the AO4 toggle's warm brown */
+
+  /* Filled CTA pill (header "Write on c.ai" + hero CTA): theme-adaptive fill
+     (espresso in dark — see dark override) + constant low-opacity white
+     stroke. Same pattern as --author-bubble. */
+  --cta-fill:   var(--quill-ink);
+  --cta-stroke: rgba(255, 255, 255, 0.2);
   --pinned-purple:    #6b2e63; /* character-brain palette (white text) */
 
   /* Author-note bubble — quill-ink base, lightened per theme so it stays
@@ -167,7 +172,7 @@
 [data-theme="light"] {
   --bg: #FFFFFF;
   --text: #1A1816;
-  --secondary: #8A857D;
+  --secondary: #6B675F; /* 5.40:1 on white */
   --border: rgba(26, 24, 22, 0.12);
   --border-strong: rgba(26, 24, 22, 0.22);
   --border-chip: rgba(26, 24, 22, 0.18);
@@ -186,7 +191,7 @@
 [data-theme="paper"] {
   --bg: #EDE8DE;
   --text: #1A1816;
-  --secondary: #7A756D;
+  --secondary: #635F57; /* 5.20:1 on the paper bg */
   --border: rgba(26, 24, 22, 0.14);
   --border-strong: rgba(26, 24, 22, 0.24);
   --border-chip: rgba(26, 24, 22, 0.18);
@@ -205,16 +210,17 @@
 [data-theme="dark"] {
   --bg: #141210;
   --text: #E5E1D8;
-  --secondary: #8C877E;
+  --secondary: #948F86; /* 4.75:1 on the bubble surface, 5.8:1 on --bg */
   --border: rgba(229, 225, 216, 0.14);
   --border-strong: rgba(229, 225, 216, 0.28);
   --border-chip: rgba(229, 225, 216, 0.22);
   --border-active: rgba(229, 225, 216, 0.42);
   --accent: #C4785A;
   --card-bg: #1D1B1A;
-  --card-border: rgba(229, 225, 216, 0.20);
+  /* Matches the hero banner stroke weight (--image-outline 0.10) — 0.20 read
+     too heavy against the dark bg. */
+  --card-border: rgba(229, 225, 216, 0.11);
   --image-outline: rgba(255, 255, 255, 0.1);
-  --image-outline-faint: rgba(255, 255, 255, 0.05);
   --rating-g:  #2b9247;  /* midnight-forest */
   --rating-t:  #ffe600;  /* gold-rush */
   --rating-m:  #f28500;  /* toasty-amber */
@@ -223,9 +229,13 @@
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
   --bubble-shadow-hover: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.24);
-  --bubble-ring: rgba(255, 255, 255, 0.24);
+  /* Was 0.24 — too hot in dark for the panel edge + section dividers;
+     matches --border (0.14). */
+  --bubble-ring: rgba(255, 255, 255, 0.14);
   /* Lift quill-ink off the near-black bg so the author bubble stays visible. */
   --author-bubble: color-mix(in srgb, var(--quill-ink) 78%, #ffffff 22%);
+  /* CTA pills wear the warm espresso brown in dark. */
+  --cta-fill: var(--espresso);
   --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.45);
 }
 

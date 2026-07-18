@@ -6,6 +6,11 @@ import { HeartIcon } from './icons';
 
 const PREVIEW_COUNT = 2;
 
+// Underlined text-link button (reply toggle, show more/less). Call sites add
+// their own opacity pair + spacing.
+const TEXT_LINK_BTN =
+  'cursor-pointer border-none bg-transparent p-0 font-mono text-[11px] text-secondary underline transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px]';
+
 interface Props {
   slug: string;
   chapterIndex: number;
@@ -26,17 +31,20 @@ function CommentItem({ comment }: { comment: Comment }) {
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-baseline gap-2">
           <span className="font-sans text-xs font-semibold text-text">{comment.author}</span>
-          <span className="font-mono text-[10px] text-secondary opacity-60">{comment.timestamp}</span>
+          <span className="font-mono text-[10px] text-secondary">{comment.timestamp}</span>
         </div>
         <p className="font-sans text-[13px] leading-[1.55] text-text opacity-85">{comment.text}</p>
         <div className="mt-2 flex items-center gap-3">
-          <span className="flex cursor-pointer items-center gap-1 border-none bg-none p-0 font-mono text-[11px] text-secondary opacity-60 transition-opacity duration-[120ms] [transition-timing-function:ease] hover:opacity-100">
+          {/* Display-only like count — no handler yet (@WIRE), so no
+              interactive affordances (cursor/hover) that promise one. */}
+          <span className="flex items-center gap-1 p-0 font-mono text-[11px] text-secondary">
             <HeartIcon width={11} height={11} className="shrink-0" />
             {comment.likes.toLocaleString()}
+            <span className="visually-hidden">likes</span>
           </span>
           {hasReplies && (
             <button
-              className="cursor-pointer border-none bg-none p-0 font-mono text-[11px] text-secondary underline opacity-50 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-80"
+              className={`${TEXT_LINK_BTN} hover:text-text`}
               onClick={() => setRepliesOpen((o) => !o)}
               aria-expanded={repliesOpen}
             >
@@ -95,7 +103,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   return (
     <div className="mt-6 w-screen bg-[color-mix(in_srgb,var(--text)_3.5%,var(--bg))] pt-10 pb-16 [margin-inline:calc(50%-50vw)]">
       <div className="mx-auto max-w-[var(--reader-line-width)] px-6">
-        <div className="mb-5 font-mono text-[9px] uppercase tracking-[0.12em] text-secondary opacity-60">
+        <div className="mb-5 font-mono text-[9px] uppercase tracking-[0.12em] text-secondary" aria-live="polite">
           <span>
             {allComments.length === 0
               ? 'comments'
@@ -104,7 +112,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
         </div>
 
         {allComments.length === 0 ? (
-          <p className="pt-7 pb-3 text-center font-mono text-[11px] tracking-[0.08em] text-secondary opacity-40">· be the first to comment ·</p>
+          <p className="pt-7 pb-3 text-center font-mono text-[11px] tracking-[0.08em] text-secondary">· be the first to comment ·</p>
         ) : (
           <div>
             {visibleComments.map((comment) => (
@@ -115,7 +123,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
 
         {!expanded && hiddenCount > 0 && (
           <button
-            className="cursor-pointer border-none bg-none px-0 pt-3 pb-0 font-mono text-[11px] text-secondary underline opacity-55 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-85"
+            className={`${TEXT_LINK_BTN} pt-3 hover:text-text`}
             onClick={() => setExpanded(true)}
           >
             Show {hiddenCount} more {hiddenCount === 1 ? 'comment' : 'comments'}
@@ -124,7 +132,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
 
         {expanded && allComments.length > PREVIEW_COUNT && (
           <button
-            className="cursor-pointer border-none bg-none px-0 pt-3 pb-0 font-mono text-[11px] text-secondary underline opacity-55 transition-opacity duration-[120ms] [transition-timing-function:ease] [text-underline-offset:2px] hover:opacity-85"
+            className={`${TEXT_LINK_BTN} pt-3 hover:text-text`}
             onClick={() => setExpanded(false)}
           >
             Show less

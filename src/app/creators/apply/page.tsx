@@ -85,9 +85,10 @@ export default function WritersPage() {
         />
         <section className="mt-8">
           <h2 className={H2_CLS}>Why write for (c.ai) reads?</h2>
-          <dl className="m-0 mt-6 flex flex-col gap-6">
+          {/* ul (not dl): dt/dd can't nest inside the icon-row wrapper divs. */}
+          <ul className="m-0 mt-6 flex list-none flex-col gap-6 p-0">
             {BENEFITS.map(({ title, body, Icon }) => (
-              <div key={title} className="flex max-w-[62ch] gap-4">
+              <li key={title} className="flex max-w-[62ch] gap-4">
                 {/* Icon bubble, same treatment as EmptyStateCard's. */}
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-overlay-medium text-text"
@@ -96,14 +97,14 @@ export default function WritersPage() {
                   <Icon width={22} height={22} />
                 </div>
                 <div className="min-w-0">
-                  <dt className="font-sans text-[17px] font-medium text-text">{title}</dt>
-                  <dd className="m-0 mt-1 font-sans text-[16px] leading-relaxed text-secondary [text-wrap:pretty]">
+                  <h3 className="m-0 font-sans text-[17px] font-medium text-text">{title}</h3>
+                  <p className="m-0 mt-1 font-sans text-[16px] leading-relaxed text-secondary [text-wrap:pretty]">
                     {body}
-                  </dd>
+                  </p>
                 </div>
-              </div>
+              </li>
             ))}
-          </dl>
+          </ul>
         </section>
 
         {/* ── The (co)created mark ── */}

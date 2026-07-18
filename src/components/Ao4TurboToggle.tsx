@@ -7,9 +7,7 @@ import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
 import { LightningIcon } from './icons';
 import { Tooltip } from './Tooltip';
 
-export type SiteMode = 'visual' | 'text';
-// Re-exported for back-compat; canonical definitions live in @/lib/constants.
-export { SITE_MODE_KEY, SITE_MODE_EVENT };
+type SiteMode = 'visual' | 'text';
 
 const TRAVEL = 48; // px the thumb slides between off (left) and on (right)
 const SNAP = { type: 'spring' as const, duration: 0.42, bounce: 0.3 };
@@ -114,13 +112,12 @@ export function Ao4TurboToggle() {
               with a tooltip naming what the mode does — only the exposed side is
               interactive, the thumb sits on top of the other. */}
           <Tooltip label={VISUAL_LABEL} disabled={!on}>
+            {/* NO explicit ids on any Tooltip trigger: overriding Base UI's own
+                trigger id silently breaks EVERY tooltip in the provider group
+                (bisected 2026-07-18; the useId hydration mismatch these ids
+                once worked around no longer reproduces). */}
             <button
               type="button"
-              // Explicit ids on all three tooltip triggers: Base UI falls back
-              // to useId, which hydration-mismatches on this header when a
-              // sibling Suspense boundary (the search slot) suspends during
-              // SSR and shifts the server's useId tree (React limitation).
-              id="ao4-mark-visual"
               tabIndex={-1}
               aria-label="Switch to visual mode"
               onClick={() => commit(false)}
@@ -134,7 +131,6 @@ export function Ao4TurboToggle() {
           <Tooltip label={TEXT_LABEL} disabled={on}>
             <button
               type="button"
-              id="ao4-mark-text"
               tabIndex={-1}
               aria-label="Switch to AO4 text mode"
               onClick={() => commit(true)}
@@ -149,7 +145,6 @@ export function Ao4TurboToggle() {
           <Tooltip label={on ? TEXT_LABEL : VISUAL_LABEL}>
           <motion.button
             type="button"
-            id="ao4-thumb"
             role="switch"
             aria-checked={on}
             aria-label="AO4 Mode"
@@ -171,7 +166,9 @@ export function Ao4TurboToggle() {
               'font-sans text-sm max-md:text-[15px] font-semibold tracking-[0.01em] whitespace-nowrap text-white cursor-grab will-change-transform active:cursor-grabbing ' +
               'shadow-[0_2px_5px_-1px_rgba(0,0,0,0.26),0_9px_20px_-9px_rgba(0,0,0,0.38)] ' +
               '[--ab-magenta:#652E1F] [--ab-hot-pink:#AE00D9] [--ab-alt-violet:#6B2E63] [--mx:50%] [--my:50%] ' +
-              (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary')
+              // Dark theme: --secondary is too light for the white label
+              // (3.4:1) — fixed darker gray keeps it ≥5:1 in every theme.
+              (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary theme-dark:bg-[#6B675F]')
             }
           >
             {/* Mouse-tracked dual-radial oklch glow (fades in on hover). */}

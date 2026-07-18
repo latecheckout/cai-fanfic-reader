@@ -6,7 +6,7 @@ import { MenuColumn, MenuDivider } from './Menu';
 import { LogOutIcon } from './icons';
 
 // @DUMMY logged-in user — becomes the real session once auth is wired.
-export const MOCK_USER_EMAIL = 'collinbriggs19@gmail.com';
+const MOCK_USER_EMAIL = 'collinbriggs19@gmail.com';
 
 /**
  * Account dropdown body (email label + sign out) on the shared Popover.
@@ -33,7 +33,7 @@ export function AccountMenu({
 
 /** Menu body: account concerns only — email + sign out. Site links live in
  *  the navbar (desktop) and the header's site menu (mobile). */
-export function AccountMenuBody({ onClose }: { onClose: () => void }) {
+function AccountMenuBody({ onClose }: { onClose: () => void }) {
   return (
     <MenuColumn>
       <div className="truncate px-2.5 py-2 font-mono text-xs text-secondary">

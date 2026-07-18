@@ -30,6 +30,19 @@ export function Segmented({
   options: Option[];
   ariaLabel: string;
 }) {
+  // ARIA radio pattern: arrows move + select, only the checked radio is in
+  // the tab order (roving tabindex).
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const idx = options.findIndex((o) => o.value === value);
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (idx + 1) % options.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (idx - 1 + options.length) % options.length;
+    if (next === -1) return;
+    e.preventDefault();
+    onChange(options[next].value);
+    (e.currentTarget.parentElement?.querySelectorAll('[role="radio"]')[next] as HTMLElement)?.focus();
+  };
+
   return (
     <div role="radiogroup" aria-label={ariaLabel} className="relative flex rounded-xl bg-[color-mix(in_srgb,var(--text)_6%,transparent)] p-1">
       {options.map((opt) => {
@@ -41,7 +54,9 @@ export function Segmented({
             role="radio"
             aria-checked={active}
             aria-label={opt.label}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(opt.value)}
+            onKeyDown={handleKeyDown}
             className="relative z-10 flex aspect-square flex-1 cursor-pointer items-center justify-center rounded-lg px-2 py-2"
           >
             {active && (

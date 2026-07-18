@@ -7,7 +7,7 @@
  * 40px desktop / 44px mobile, anchored to HUD_BUBBLE (h-10/h-11) so the
  * search pill, sort/filter buttons, CTA pill, and icon bubbles all align.
  */
-export const CONTROL_HEIGHT = 'h-10 max-md:h-11';
+const CONTROL_HEIGHT = 'h-10 max-md:h-11';
 
 export const SEARCH_INPUT =
   `${CONTROL_HEIGHT} w-full rounded-full border border-border-strong bg-transparent pl-[34px] ` +

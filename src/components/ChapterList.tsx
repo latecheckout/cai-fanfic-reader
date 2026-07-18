@@ -10,7 +10,7 @@ import { EndOfStory } from './EndOfStory';
 import { KudosSection } from './KudosSection';
 import { useReading } from '@/context/ReadingContext';
 import { stripChapterPrefix } from '@/lib/utils';
-import { BOOKMARKS_KEY } from '@/lib/constants';
+import { readBookmark, patchBookmark } from '@/lib/bookmarks';
 
 interface Props {
   chapters: Chapter[];
@@ -46,29 +46,21 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
   useEffect(() => {
     if (didRestoreRef.current) return;
     didRestoreRef.current = true;
-    try {
-      const raw = localStorage.getItem(BOOKMARKS_KEY);
-      if (raw) {
-        const bookmarks = JSON.parse(raw);
-        const saved = bookmarks[slug];
-        if (saved) {
-          if (typeof saved.scrollPercent === 'number' && saved.scrollPercent > 0) {
-            const target =
-              saved.scrollPercent * (document.documentElement.scrollHeight - window.innerHeight);
-            requestAnimationFrame(() => {
-              window.scrollTo({ top: target, behavior: 'instant' });
-            });
-          }
-          if (typeof saved.furthestScrollPercent === 'number') {
-            furthestPctRef.current = saved.furthestScrollPercent;
-          }
-          if (typeof saved.activeChapterIndex === 'number') {
-            setLastReadChapterIndex(saved.activeChapterIndex);
-          }
-        }
+    const saved = readBookmark(slug);
+    if (saved) {
+      if (typeof saved.scrollPercent === 'number' && saved.scrollPercent > 0) {
+        const target =
+          saved.scrollPercent * (document.documentElement.scrollHeight - window.innerHeight);
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: target, behavior: 'instant' });
+        });
       }
-    } catch {
-      // Fail silently
+      if (typeof saved.furthestScrollPercent === 'number') {
+        furthestPctRef.current = saved.furthestScrollPercent;
+      }
+      if (typeof saved.activeChapterIndex === 'number') {
+        setLastReadChapterIndex(saved.activeChapterIndex);
+      }
     }
   }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -104,28 +96,20 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
   const saveScrollPosition = useCallback(() => {
     if (scrollSaveTimerRef.current) clearTimeout(scrollSaveTimerRef.current);
     scrollSaveTimerRef.current = setTimeout(() => {
-      try {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        if (maxScroll <= 0) return;
-        const scrollPct = window.scrollY / maxScroll;
-        const newFurthest = Math.max(furthestPctRef.current, scrollPct);
-        furthestPctRef.current = newFurthest;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll <= 0) return;
+      const scrollPct = window.scrollY / maxScroll;
+      const newFurthest = Math.max(furthestPctRef.current, scrollPct);
+      furthestPctRef.current = newFurthest;
 
-        const raw = localStorage.getItem(BOOKMARKS_KEY);
-        const bookmarks = raw ? JSON.parse(raw) : {};
-        bookmarks[slug] = {
-          ...bookmarks[slug],
-          scrollPercent: scrollPct,
-          furthestScrollPercent: newFurthest,
-          timestamp: Date.now(),
-          title: workMeta.title,
-          activeChapterIndex: activeRef.current,
-          totalChapters,
-        };
-        localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
-      } catch {
-        // Fail silently
-      }
+      patchBookmark(slug, {
+        scrollPercent: scrollPct,
+        furthestScrollPercent: newFurthest,
+        timestamp: Date.now(),
+        title: workMeta.title,
+        activeChapterIndex: activeRef.current,
+        totalChapters,
+      });
     }, 300);
   }, [slug, workMeta.title, totalChapters]);
 

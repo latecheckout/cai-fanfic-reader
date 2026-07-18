@@ -65,10 +65,13 @@ export function KudosSection({ slug, totalKudos }: Props) {
           {given ? 'Kudos left' : 'Leave Kudos'}
         </span>
       </button>
-      <p className={[
-        'font-mono text-[11px] tracking-[0.08em] text-secondary m-0 transition-opacity duration-200',
-        animating ? 'kudos-count-pop !opacity-[0.85]' : 'opacity-50',
-      ].filter(Boolean).join(' ')}>
+      <p
+        aria-live="polite"
+        className={[
+          'font-mono text-[11px] tracking-[0.08em] text-secondary m-0 transition-opacity duration-200',
+          animating ? 'kudos-count-pop' : '',
+        ].filter(Boolean).join(' ')}
+      >
         {displayCount.toLocaleString()} kudos
       </p>
     </div>

@@ -15,6 +15,15 @@ export function formatWords(words: number): string {
   return `${words} words`;
 }
 
+/** Human label for a min/max word-count filter ("1,000–5,000 words", "≥ 1,000 words"). */
+export function formatWordRange(min?: string | number, max?: string | number): string {
+  const fmt = (n: string | number) => Number(n).toLocaleString();
+  if (min && max) return `${fmt(min)}–${fmt(max)} words`;
+  if (min) return `≥ ${fmt(min)} words`;
+  if (max) return `≤ ${fmt(max)} words`;
+  return '';
+}
+
 /** Format count with k/M suffix for social stats */
 export function formatCount(n: number): string {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;

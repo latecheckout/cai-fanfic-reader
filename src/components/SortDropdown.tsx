@@ -143,7 +143,10 @@ export const SortDropdown = memo(function SortDropdown({
               className={`${MENU_ROW} whitespace-nowrap font-sans text-sm ${
                 currentValue === opt.value ? `${MENU_ROW_ACTIVE} font-medium text-text` : 'text-secondary hover:text-text'
               }`}
-              onMouseDown={(e) => { e.preventDefault(); onChange(opt.value); onOpenChange(false); }}
+              // preventDefault on mousedown stops the pre-click blur; the
+              // action itself lives on click so Enter/Space work too.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { onChange(opt.value); onOpenChange(false); }}
               role="option"
               aria-selected={currentValue === opt.value}
               onKeyDown={(e) => {

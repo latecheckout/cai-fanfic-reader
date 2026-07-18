@@ -22,8 +22,5 @@ const ICON_BUTTON_BASE =
   'transition-[background-color,transform] duration-150 active:scale-[0.96] ' +
   'after:absolute after:-inset-1.5 [&_svg]:opacity-55 [&_svg]:transition-opacity hover:[&_svg]:opacity-100';
 
-/** Transparent at rest, soft fill on hover. */
-export const ICON_BUTTON = `${ICON_BUTTON_BASE} hover:bg-overlay-soft`;
-
 /** Soft fill at rest, medium on hover (both text-tinted → theme-aware). */
 export const ICON_BUTTON_FILLED = `${ICON_BUTTON_BASE} bg-overlay-soft hover:bg-overlay-medium`;

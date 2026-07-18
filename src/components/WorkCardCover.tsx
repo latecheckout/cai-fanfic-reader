@@ -166,7 +166,7 @@ export function SignalStrip({
       <RatingBadge rating={rating} />
       {catLabel && (
         <Badge
-          className="min-w-6 bg-secondary px-[6px] text-[13px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_80%,var(--bg))] theme-dark:text-white"
+          className="min-w-6 bg-secondary px-[6px] text-[13px] font-semibold tracking-[0.04em] text-bg theme-dark:bg-[color-mix(in_srgb,var(--secondary)_70%,var(--bg))] theme-dark:text-white"
           tooltip={CATEGORY_TOOLTIPS[category[0]] ?? catLabel}
         >
           {catLabel}

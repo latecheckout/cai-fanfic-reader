@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
 import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
-import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
+import { Preset, loadPresets, addToCommaList, presetToParams } from '@/lib/filterParams';
 import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
 import { POPOVER_PANEL, MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
 import { PILL_SHAPE, PILL_INCLUDE, PILL_EXCLUDE } from './GhostButton';
@@ -86,6 +86,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
   const reduceMotion = useReducedMotion();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Combobox wiring — unique per instance (header + toolbar can co-exist).
+  const listboxId = useId();
   const vibeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [query, setQuery] = useState('');
@@ -317,11 +319,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
   }, [readParams, pushParams, close]);
 
   const applyPreset = useCallback((preset: Preset) => {
-    const p = new URLSearchParams(preset.params);
-    const tab = readParams().get('tab');
-    if (tab) p.set('tab', tab);
-    p.set('preset', preset.name);
-    pushParams(p);
+    pushParams(presetToParams(preset, readParams().get('tab')));
     close();
   }, [readParams, pushParams, close]);
 
@@ -413,6 +411,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
   return (
     <div
       ref={containerRef}
+      // Fullscreen mode covers the page — expose it as a modal search dialog.
+      {...(isMobileFS ? { role: 'dialog', 'aria-modal': true, 'aria-label': 'Search' } : {})}
       className={`group relative min-w-0 flex-1 ${
         isMobileFS
           ? 'fixed inset-0 z-[400] flex flex-col bg-bg pt-[calc(8px+var(--safe-top))] pr-0 pb-0 pl-0'
@@ -443,13 +443,16 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             }}
             onKeyDown={handleKeyDown}
             aria-label="Search"
+            role="combobox"
             aria-autocomplete="list"
             aria-expanded={focused}
+            aria-controls={listboxId}
+            aria-activedescendant={selectedIndex >= 0 ? `${listboxId}-opt-${selectedIndex}` : undefined}
           />
 
           {/* ⌘K hint — hidden when query is present */}
           {!query && (
-            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[12px] text-secondary opacity-[0.35] transition-opacity duration-150 group-focus-within:opacity-0">
+            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[12px] text-secondary transition-opacity duration-150 group-focus-within:opacity-0">
               ⌘K
             </kbd>
           )}
@@ -459,8 +462,10 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             <>
               <button
                 className="absolute right-[38px] top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center p-0 text-secondary opacity-[0.45] transition-[opacity,color] duration-150 ease-in-out hover:text-text hover:opacity-100"
-                onMouseDown={(e) => {
-                  e.preventDefault();
+                // preventDefault on mousedown stops the input blur; actions
+                // live on click so Enter/Space work (pattern used panel-wide).
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
                   setQuery('');
                   setSelectedIndex(-1);
                   inputRef.current?.focus();
@@ -472,10 +477,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
               </button>
               <button
                 className="absolute right-[6px] top-1/2 flex h-[26px] w-[26px] origin-center -translate-y-1/2 items-center justify-center rounded-full bg-text p-0 text-bg transition-[opacity,transform] duration-150 hover:scale-105 hover:opacity-80 active:scale-95"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSubmit();
-                }}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleSubmit}
                 aria-label="Submit search"
               >
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
@@ -489,7 +492,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
         {isMobileFS && (
           <button
             className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-secondary transition-[color,background] duration-150 ease-in-out hover:bg-overlay-soft hover:text-text"
-            onMouseDown={(e) => { e.preventDefault(); close(); }}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={close}
             aria-label="Close search"
           >
             <CloseIcon width={20} height={20} />
@@ -501,6 +505,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
         {focused && (
           <motion.div
             role="listbox"
+            id={listboxId}
+            aria-label="Search suggestions"
             // Fullscreen sheet (mobile) keeps a plain fade — the desktop panel
             // springs open like the reading-page popovers.
             initial={reduceMotion ? false : isMobileFS ? { opacity: 0 } : POPOVER_ENTER}
@@ -539,10 +545,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                 ) : vibeResult ? (
                   <button
                     className="flex w-full cursor-pointer flex-col gap-[6px] rounded-xl bg-overlay-soft px-2.5 py-2 text-left transition-colors hover:bg-overlay-medium"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      applyVibeItem(vibeResult);
-                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyVibeItem(vibeResult)}
                     role="option"
                     aria-selected={false}
                   >
@@ -572,10 +576,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             {!isDefaultState && query.trim() && (
               <button
                 className={`${MENU_ROW} gap-[5px]`}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleTextSearch();
-                }}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleTextSearch}
                 role="option"
                 aria-selected={false}
               >
@@ -596,11 +598,10 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                       <button
                         key={`${item.group}-${item.name}`}
                         className={`${MENU_ROW} justify-between ${selected ? MENU_ROW_ACTIVE : ''}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          applyACItem(item);
-                        }}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyACItem(item)}
                         role="option"
+                        id={`${listboxId}-opt-${item.flatIdx}`}
                         aria-selected={selected}
                       >
                         <span
@@ -625,7 +626,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
 
             {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
             {showVibeHint && (
-              <div className="-mx-2 border-t border-bubble-ring px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
+              <div className="-mx-2 border-t border-bubble-ring px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary">
                 ✦ try: cozy · slow burn · found family · enemies to lovers
               </div>
             )}
@@ -640,17 +641,16 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                       <div key={h} className="group/hist flex items-center rounded-xl transition-colors hover:bg-overlay-soft">
                         <button
                           className="flex flex-1 cursor-pointer items-center gap-[7px] border-none bg-transparent px-2.5 py-2 text-left font-sans text-[15px] text-secondary transition-colors hover:text-text group-hover/hist:text-text"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            applyHistoryItem(h);
-                          }}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => applyHistoryItem(h)}
                         >
                           <ClockIcon width={13} height={13} className="flex-shrink-0 text-secondary opacity-[0.55]" />
                           <span>{h}</span>
                         </button>
                         <button
                           className="cursor-pointer border-none bg-none py-2 pl-[6px] pr-2.5 leading-none text-secondary opacity-[0.35] transition-opacity hover:text-text hover:opacity-90"
-                          onMouseDown={(e) => handleRemoveHistory(h, e)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={(e) => handleRemoveHistory(h, e)}
                           aria-label={`Remove "${h}" from history`}
                         >
                           <CloseIcon width={18} height={18} />
@@ -667,10 +667,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                       <button
                         key={i}
                         className={MENU_ROW}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          applyPreset(preset);
-                        }}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyPreset(preset)}
                       >
                         <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap font-sans text-[15px] text-text">{preset.name}</span>
                       </button>
@@ -684,7 +682,8 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                 the text with the inset rows (8px panel + 10px row padding). */}
             {/* Inline text flow (not flex items) so a narrow panel wraps the
                 whole line like a sentence instead of each span separately. */}
-            <div className="-mx-2 -mb-2 border-t border-bubble-ring px-[18px] py-2 font-mono text-[12px] leading-relaxed text-secondary opacity-70">
+            {/* aria-live: announces the vibe "analyzing…" state swap. */}
+            <div aria-live="polite" className="-mx-2 -mb-2 border-t border-bubble-ring px-[18px] py-2 font-mono text-[12px] leading-relaxed text-secondary">
               {isDefaultState ? (
                 <>
                   type to search · <UpDownArrowIcon width={13} height={13} className="inline-block align-[-2px]" />{' '}

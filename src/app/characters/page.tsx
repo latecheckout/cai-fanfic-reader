@@ -40,6 +40,7 @@ export default function CharactersPage() {
     <div>
       <SiteHeader />
       <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12 max-md:px-4 max-md:pt-5">
+        <h1 className="visually-hidden">Characters</h1>
         <div className="mb-8">
           <SectionHeader title="Characters" subtitle="Everyone the stories are about" />
         </div>

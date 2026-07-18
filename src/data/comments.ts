@@ -8,7 +8,7 @@ export interface Comment {
   replies?: Comment[];
 }
 
-export type CommentsData = Record<string, Comment[]>;
+type CommentsData = Record<string, Comment[]>;
 
 // @DUMMY — Entire object below is hardcoded placeholder data (~1100 lines).
 // @WIRE  — Replace with: GET /works/:slug/comments?chapter=:index

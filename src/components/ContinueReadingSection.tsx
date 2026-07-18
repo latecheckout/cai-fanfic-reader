@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { ContinueCard, ContinueCardSkeleton } from './ContinueCard';
 import { RailViewport } from './RailViewport';
 import { ChevronRightIcon } from './icons';
-import { BOOKMARKS_KEY } from '@/lib/constants';
+import { readBookmarks } from '@/lib/bookmarks';
 
 interface Props {
   /** slug → cover path, passed from the page (localStorage bookmarks lack meta.cover). */
@@ -23,39 +23,23 @@ interface Bookmark {
   timestamp: number;
 }
 
-interface RawBookmark {
-  scrollPercent: number;
-  timestamp: number;
-  title?: string;
-  activeChapterIndex?: number;
-  totalChapters?: number;
-}
-
 export function ContinueReadingSection({ covers }: Props) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
-    try {
-      const raw = localStorage.getItem(BOOKMARKS_KEY);
-      if (raw) {
-        const data: Record<string, RawBookmark> = JSON.parse(raw);
-        const items: Bookmark[] = Object.entries(data)
-          .map(([slug, b]) => ({
-            slug,
-            title: b.title ?? slug,
-            chapterIndex: b.activeChapterIndex ?? 0,
-            totalChapters: b.totalChapters ?? 1,
-            scrollPercent: b.scrollPercent ?? 0,
-            timestamp: b.timestamp,
-          }))
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 8);
-        setBookmarks(items);
-      }
-    } catch {
-      // Fail silently if localStorage is unavailable
-    }
+    const items: Bookmark[] = Object.entries(readBookmarks())
+      .map(([slug, b]) => ({
+        slug,
+        title: b.title ?? slug,
+        chapterIndex: b.activeChapterIndex ?? 0,
+        totalChapters: b.totalChapters ?? 1,
+        scrollPercent: b.scrollPercent ?? 0,
+        timestamp: b.timestamp ?? 0,
+      }))
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 8);
+    setBookmarks(items);
     setLoaded(true);
   }, []);
 
@@ -73,18 +57,19 @@ export function ContinueReadingSection({ covers }: Props) {
     // actually have a reading list (data-has-reading set by ThemeScript before
     // paint). Everyone else sees nothing — no flash, no late push-down.
     <section
+      aria-label="Continue reading"
       className={`mb-10 border-b border-border${pending ? ' hidden [html[data-has-reading]_&]:block' : ''}`}
     >
       {/* Section header band */}
       <div className="flex items-center justify-between py-3 border-b border-border">
-        <span className="inline-flex items-center gap-2 font-mono text-[12px] font-medium tracking-[0.05em] text-secondary">
+        <h2 className="m-0 inline-flex items-center gap-2 font-mono text-[12px] font-medium tracking-[0.05em] text-secondary">
           Continue reading
           {!pending && (
             <span className="hidden rounded-full bg-overlay-soft px-2.5 py-1 font-normal leading-none tracking-normal md:inline-block">
               {bookmarks.length} in progress
             </span>
           )}
-        </span>
+        </h2>
         {!pending && (
           <span className="hidden items-center gap-2 font-mono text-[12px] text-secondary md:inline-flex">
             <a href="/reading" className="inline-flex items-center gap-1 text-inherit no-underline hover:underline hover:underline-offset-2 max-md:text-secondary max-md:opacity-70 max-md:hover:opacity-100">

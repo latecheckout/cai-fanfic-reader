@@ -4,7 +4,8 @@
  * Nav pill link — character-ux-audit's treatment: lowercase mono pill,
  * bg reveal + underline on hover, magenta dot on the active pill.
  * `big` bumps the padding for header CTAs; `filled` swaps the quiet link
- * treatment for an espresso fill that deepens to quill-ink on hover.
+ * treatment for the CTA fill (quill-ink; espresso in dark via --cta-fill) with
+ * a low-opacity white stroke, deepening to pinned-purple on hover.
  * Bg/text classes live entirely inside each variant branch — never stacked
  * (same-property utilities resolve by emission order).
  */
@@ -28,7 +29,9 @@ export function NavPillLink({
   // Font family + bg/text live inside the variant branches — same-property
   // utilities on one element resolve by emission order, never stack them.
   const variant = filled
-    ? 'bg-quill-ink font-sans text-[13px] text-white shadow-bubble hover:bg-pinned-purple hover:shadow-bubble-hover'
+    // No shadow-bubble here: it carries its own 1px ring, which doubles the
+    // --cta-stroke border.
+    ? 'bg-cta-fill border border-cta-stroke font-sans text-[13px] text-white hover:bg-pinned-purple'
     : `bg-bg/16 font-mono text-[12px] backdrop-blur-md hover:bg-text/6 ${
         active ? 'text-text' : 'text-secondary hover:text-text'
       }`;

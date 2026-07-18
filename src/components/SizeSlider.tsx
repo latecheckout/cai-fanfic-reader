@@ -88,7 +88,8 @@ export function SizeSlider({
         if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); onChange(Math.max(min, value - step)); }
         else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); onChange(Math.min(max, value + step)); }
       }}
-      className="relative h-5 flex-1 cursor-pointer touch-none select-none outline-none"
+      // No outline-none: keyboard focus keeps the global :focus-visible ring.
+      className="relative h-5 flex-1 cursor-pointer touch-none select-none focus:outline-none focus-visible:outline focus-visible:outline-[1.5px] focus-visible:outline-[var(--accent)] focus-visible:outline-offset-2"
     >
       {/* Track + fill (both width and thumb derive from `progress`) */}
       <div className="pointer-events-none absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 overflow-hidden rounded-full bg-border-strong">

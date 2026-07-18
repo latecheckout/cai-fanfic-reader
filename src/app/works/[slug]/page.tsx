@@ -106,6 +106,9 @@ export default async function ReaderPage({ params }: PageProps) {
             stacking context and trap the sticky cluster's z-index below the bar. */}
         {/* Mobile bottom padding clears the bottom pill cluster (44px pills on mobile) */}
         <main className="p-0 max-md:pb-[calc(44px+20px+var(--safe-bottom)+24px)]">
+          {/* Work-level page heading — chapter titles are h2s (ChapterContent /
+              LockedChapterCard), so the outline is work → chapters. */}
+          <h1 className="visually-hidden">{meta.title}</h1>
 
           {/* Reading cluster — fixed bottom-center pills: title + chapter + "Your place" */}
           <ReadingCluster />

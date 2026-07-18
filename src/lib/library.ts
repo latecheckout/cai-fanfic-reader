@@ -70,7 +70,7 @@ export function getLibraryTimestamps(tab: LibraryTab): Map<string, number> {
 }
 
 /** localStorage key for removed bookmarks (Set of slugs user has unbookmarked) */
-export const LIBRARY_REMOVED_KEY = 'cai_removed_bookmarks';
+const LIBRARY_REMOVED_KEY = 'cai_removed_bookmarks';
 
 /** Returns the slugs for a given tab */
 export function getTabSlugs(tab: LibraryTab): string[] {
@@ -100,11 +100,11 @@ function writeSlugList(key: string, slugs: string[]): void {
 
 /** Reading-list additions made on the reading page (SAVED_KEY). */
 export const readSavedSlugs = () => readSlugList(SAVED_KEY);
-export const writeSavedSlugs = (slugs: string[]) => writeSlugList(SAVED_KEY, slugs);
+const writeSavedSlugs = (slugs: string[]) => writeSlugList(SAVED_KEY, slugs);
 
 /** Bookmarks the user removed in the library (only meaningful for mock entries). */
 export const readRemovedSlugs = () => readSlugList(LIBRARY_REMOVED_KEY);
-export const writeRemovedSlugs = (slugs: string[]) => writeSlugList(LIBRARY_REMOVED_KEY, slugs);
+const writeRemovedSlugs = (slugs: string[]) => writeSlugList(LIBRARY_REMOVED_KEY, slugs);
 
 // ── Bookmark state — ONE logical value spread across three stores:
 //    bookmarked(slug) = (SAVED ∪ MOCK_BOOKMARKED) − REMOVED.

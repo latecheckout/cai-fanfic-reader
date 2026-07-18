@@ -19,8 +19,9 @@ interface Props {
 export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
   const { lastReadChapterIndex, lockedChapters } = useReading();
   return (
+    // Plain list of buttons (not listbox/option — an option must not contain
+    // its own focusable button, and Tab-through matches how it behaves).
     <ul
-      role="listbox"
       aria-label="Chapters"
       className="flex flex-1 list-none flex-col gap-1 overflow-y-auto p-2 [&::-webkit-scrollbar-thumb]:rounded-[2px] [&::-webkit-scrollbar-thumb]:bg-border-strong [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-[3px]"
     >
@@ -34,10 +35,11 @@ export function ChapterPanel({ chapters, activeIndex, onSelect }: Props) {
         // (01, 02, … 10, 11) — keeps the divider line vertically aligned.
         const num = String(i + 1).padStart(2, '0');
         return (
-          <li key={i} role="option" aria-selected={active}>
+          <li key={i}>
             <button
               className={`${MENU_ROW} ${active ? MENU_ROW_ACTIVE : ''}`}
               onClick={() => onSelect(i)}
+              aria-current={active || undefined}
             >
               {/* Mirror the main pill: mono number · divider line · sans title */}
               <span className={`shrink-0 font-mono text-[12px] tabular-nums ${active ? 'text-text' : 'text-secondary'}`}>

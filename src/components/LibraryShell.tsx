@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { WorkSummary } from '@/types';
 import { LibraryTab, LIBRARY_SORT_OPTIONS, MOCK_BOOKMARKED, readSavedSlugs, readRemovedSlugs, removeBookmark } from '@/lib/library';
 import { usePendingParams } from '@/hooks/usePendingParams';
+import { setSortParam } from '@/lib/filterParams';
 import { SortDropdown } from './SortDropdown';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useFilterFlash } from '@/hooks/useFilterFlash';
@@ -137,10 +138,8 @@ export function LibraryShell({
     : LIBRARY_SORT_OPTIONS[activeTab][0].value;
 
   const handleSortChange = (v: string) => {
-    const [sort, order] = v.split(':');
     const params = readParams();
-    params.set('sort', sort);
-    params.set('order', order);
+    setSortParam(params, v);
     pushParams(params);
   };
 
@@ -171,6 +170,7 @@ export function LibraryShell({
   return (
     <>
       {/* ── Page heading — same SectionHeader style as browse/characters ── */}
+      <h1 className="visually-hidden">Library</h1>
       <div className="mb-5">
         <SectionHeader title="Library" subtitle="Your reading, saved in one place" />
       </div>

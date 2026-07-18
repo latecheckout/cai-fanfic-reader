@@ -223,7 +223,7 @@ export function applyFilters(works: WorkSummary[], filters: FilterState): WorkSu
   return result;
 }
 
-export interface SearchOption {
+interface SearchOption {
   name: string;
   count: number;
 }
@@ -279,7 +279,6 @@ interface VibeRule {
   kw: string[];
   tags?: string[];
   exTags?: string[];
-  warnings?: string[];
   exWarnings?: string[];
   ratings?: string[];
   maxWords?: number;

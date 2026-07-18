@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
 import { useScrollProgress } from '@/hooks/useScrollProgress';
-import { ratingClass, stripChapterPrefix } from '@/lib/utils';
+import { ratingClass, stripChapterPrefix, isTypingTarget } from '@/lib/utils';
 import { BUBBLE_PILL } from './readingChrome';
 import { ChevronDownIcon, InfoIcon } from './icons';
 import { ChapterPanel } from './ChapterPanel';
@@ -16,7 +16,7 @@ import { ReturnToPositionFAB } from './ReturnToPositionFAB';
 // Sibling glide when the "Your place" pill mounts/unmounts.
 const LAYOUT_SPRING = { type: 'spring', duration: 0.35, bounce: 0 } as const;
 
-export const PROGRESS_BG: Record<string, string> = {
+const PROGRESS_BG: Record<string, string> = {
   ratingG: 'bg-rating-g',
   ratingT: 'bg-rating-t',
   ratingM: 'bg-rating-m',
@@ -34,8 +34,7 @@ export function ReadingCluster() {
   // Keyboard: arrows navigate chapters
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      const tag = (e.target as HTMLElement).tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (isTypingTarget(e)) return;
       if (e.key === 'ArrowLeft' || e.key === 'j') {
         e.preventDefault();
         scrollToChapter(activeChapterIndex - 1);
@@ -113,7 +112,7 @@ export function ReadingCluster() {
                   onClick={toggle}
                   aria-label="Chapter navigation"
                   aria-expanded={open}
-                  aria-haspopup="listbox"
+                  aria-haspopup="dialog"
                   className={`${BUBBLE_PILL} relative min-w-0 max-w-[240px] gap-2 overflow-hidden px-4 ${open ? 'shadow-bubble-hover' : ''}`}
                 >
                   <span className="shrink-0 font-mono text-[12px] tabular-nums text-secondary">{String(activeChapterIndex + 1).padStart(2, '0')}</span>

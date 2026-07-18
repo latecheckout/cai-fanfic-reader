@@ -12,8 +12,11 @@ import {
   addToCommaList,
   removeFromCommaList,
   getPillState,
+  setSortParam,
+  presetToParams,
 } from '@/lib/filterParams';
 import { ratingTier } from '@/lib/ratings';
+import { formatWordRange } from '@/lib/utils';
 import { POPOVER_PANEL } from './popoverChrome';
 import { ChevronDownIcon, CloseIcon, PlusIcon, MinusIcon, CheckIcon, ProgressIcon, CalendarIcon } from './icons';
 import { GhostButton, PILL_METRICS, PILL_SHAPE, PILL_INCLUDE, PILL_EXCLUDE } from './GhostButton';
@@ -143,17 +146,14 @@ function parsePresetParams(params: string): string {
   if (tag) tag.split(',').slice(0, 2).forEach((t) => parts.push(t.trim()));
   const rating = p.get('rating');
   if (rating) rating.split(',').slice(0, 2).forEach((r) => {
-    const label = { 'General Audiences': 'G', 'Teen And Up Audiences': 'T', 'Mature': 'M', 'Explicit': 'E', 'Not Rated': 'NR' }[r.trim()];
-    if (label) parts.push(label);
+    parts.push(ratingTier(r.trim()).letter);
   });
   const category = p.get('category');
   if (category) category.split(',').slice(0, 2).forEach((c) => parts.push(c.trim()));
   const status = p.get('status');
   if (status) parts.push(status.split(',')[0].trim());
-  const maxWords = p.get('max_words');
-  if (maxWords) parts.push(`≤${Number(maxWords).toLocaleString()} words`);
-  const minWords = p.get('min_words');
-  if (minWords && !maxWords) parts.push(`≥${Number(minWords).toLocaleString()} words`);
+  const wordRange = formatWordRange(p.get('min_words') ?? undefined, p.get('max_words') ?? undefined);
+  if (wordRange) parts.push(wordRange);
   const result = parts.join(' · ');
   return result.length > 42 ? result.slice(0, 42) + '…' : result;
 }
@@ -231,6 +231,73 @@ function dPillClass(state: PillState) {
   return `${DPILL_BASE} bg-transparent border-border-strong text-secondary hover:text-text hover:border-border-active`;
 }
 
+// ── Preset pills + dashed "Custom" expander — shared skeleton of the Words
+// and Updated sections (preset row → Custom toggle → animated custom body).
+// `children` is the section-specific custom body (number inputs / date inputs).
+function PresetExpanderSection({
+  label,
+  open,
+  onToggle,
+  showClear,
+  onClear,
+  reduce,
+  presets,
+  customOpen,
+  onToggleCustom,
+  children,
+}: {
+  label: string;
+  open: boolean;
+  onToggle: () => void;
+  showClear: boolean;
+  onClear: () => void;
+  reduce: boolean | null;
+  presets: { key: string; label: string; active: boolean; onClick: () => void }[];
+  customOpen: boolean;
+  onToggleCustom: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <DrawerSection label={label} open={open} onToggle={onToggle} showClear={showClear} onClear={onClear} reduce={reduce}>
+      <>
+        <div className="flex flex-wrap gap-1.5">
+          {presets.map((p) => (
+            <button key={p.key} className={dPillClass(p.active ? 'include' : 'neutral')} onClick={p.onClick}>
+              {p.label}
+            </button>
+          ))}
+          <button
+            className={`${dPillClass('neutral')} border-dashed pr-2`}
+            onClick={onToggleCustom}
+            aria-expanded={customOpen}
+          >
+            Custom{' '}
+            <ChevronDownIcon className={`ml-[3px] inline-block h-[18px] w-[18px] align-[-5px] transition-transform duration-200 ease-out-expo ${customOpen ? 'rotate-0' : '-rotate-90'}`} />
+          </button>
+        </div>
+        <AnimatePresence initial={false}>
+          {customOpen && (
+            <motion.div
+              key="custom"
+              initial={reduce ? false : { opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.2, ease: EASE_OUT_EXPO }}
+              className="overflow-hidden"
+            >
+              <div className="flex items-center gap-2">{children}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </>
+    </DrawerSection>
+  );
+}
+
+// Custom word-range number input (min/max pair in the Words section).
+const RANGE_INPUT =
+  'w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active';
+
 // ── FilterPill — the 3-state cycle pill shared by the rating / warnings /
 // category / status sections. Top-level (`rerender-no-inline-components`) and
 // memoized (`rerender-memo`) since ~20 render at once; a stable `onCycle`
@@ -260,11 +327,12 @@ const TOOLBAR_PILL = `inline-flex flex-shrink-0 items-center ${PILL_SHAPE} max-m
 
 // Custom date input: native picker indicator invisible but clickable, our
 // CalendarIcon rendered in its place. One definition for the from/to pair.
-function DateInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function DateInput({ value, onChange, label }: { value: string; onChange: (v: string) => void; label: string }) {
   return (
     <span className="relative min-w-0 flex-1">
       <input
         type="date"
+        aria-label={label}
         className="w-full rounded-lg border border-border-strong bg-transparent py-[5px] pl-2.5 pr-7 font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 focus:border-border-active [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -359,8 +427,13 @@ const FilterPill = memo(function FilterPill({
         },
       };
   const handleClick = () => onCycle(value, incKey, exKey);
+  // Announces the current state, then the next action in the cycle.
   const title =
-    state === 'neutral' ? `Include: ${value}` : state === 'include' ? `Exclude: ${value}` : `Remove: ${value}`;
+    state === 'neutral'
+      ? `Include ${value}`
+      : state === 'include'
+        ? `${value} included, activate to exclude`
+        : `${value} excluded, activate to clear`;
 
   if (variant === 'rating') {
     const tier = ratingTier(value);
@@ -392,7 +465,7 @@ const FilterPill = memo(function FilterPill({
     return (
       // pl-3 pulls the icon in for optical alignment (icon glyphs carry inset
       // padding of their own); mr-1.5 gives the label breathing room.
-      <motion.button {...flipAnim} className={`${dPillClass(state)} pl-3`} onClick={handleClick} title={title}>
+      <motion.button {...flipAnim} className={`${dPillClass(state)} pl-3`} onClick={handleClick} title={title} aria-label={title}>
         <StatusIcon width={16} height={16} className="mr-1.5 inline-block align-[-3px] opacity-70" />
         {value}
       </motion.button>
@@ -406,6 +479,8 @@ const FilterPill = memo(function FilterPill({
       {...flipAnim}
       className={`${dPillClass(state)} ${state !== 'neutral' ? 'pl-3' : ''}`}
       onClick={handleClick}
+      title={title}
+      aria-label={title}
     >
       {state !== 'neutral' &&
         (state === 'include' ? (
@@ -510,6 +585,34 @@ export function FilterPanel({
     }
   }, [drawerOpen]);
 
+  // Restore focus to the Filters toggle when the drawer closes, so keyboard
+  // users aren't dropped to <body> after Escape / Close.
+  const filtersBtnRef = useRef<HTMLButtonElement>(null);
+  const drawerWasOpen = useRef(false);
+  useEffect(() => {
+    if (drawerWasOpen.current && !drawerOpen) {
+      filtersBtnRef.current?.focus({ preventScroll: true });
+    }
+    drawerWasOpen.current = drawerOpen;
+  }, [drawerOpen]);
+
+  // Escape closes the save-preset popover (capture phase: it must win over
+  // useDrawer's Escape, which would close the whole drawer) and returns focus
+  // to its trigger.
+  useEffect(() => {
+    if (!saveFormOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setSaveFormOpen(false);
+        setSaveName('');
+        savePresetBtnRef.current?.focus({ preventScroll: true });
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => document.removeEventListener('keydown', onKey, true);
+  }, [saveFormOpen]);
+
   // Sync word inputs with URL params
   useEffect(() => {
     setWordMin(currentFilters.min_words ?? '');
@@ -559,10 +662,8 @@ export function FilterPanel({
 
   const handleSortChange = useCallback(
     (v: string) => {
-      const [sort, order] = v.split(':');
       const params = readParams();
-      params.set('sort', sort);
-      params.set('order', order);
+      setSortParam(params, v);
       pushParams(params);
     },
     [readParams, pushParams]
@@ -677,11 +778,7 @@ export function FilterPanel({
   };
 
   const applyPreset = (preset: Preset) => {
-    const p = new URLSearchParams(preset.params);
-    const tab = readParams().get('tab');
-    if (tab) p.set('tab', tab);
-    p.set('preset', preset.name);
-    pushParams(p);
+    pushParams(presetToParams(preset, readParams().get('tab')));
     closeDrawer();
     showToast(`'${preset.name}' loaded`);
   };
@@ -794,15 +891,7 @@ export function FilterPanel({
 
   // Word count pill (no toggle)
   if (currentFilters.min_words || currentFilters.max_words) {
-    const fmt = (n: string) => Number(n).toLocaleString();
-    let label = '';
-    if (currentFilters.min_words && currentFilters.max_words) {
-      label = `${fmt(currentFilters.min_words)}–${fmt(currentFilters.max_words)} words`;
-    } else if (currentFilters.min_words) {
-      label = `≥ ${fmt(currentFilters.min_words)} words`;
-    } else {
-      label = `≤ ${fmt(currentFilters.max_words!)} words`;
-    }
+    const label = formatWordRange(currentFilters.min_words, currentFilters.max_words);
     activePills.push({ id: 'words', paramKey: 'words', value: '', label, isExclude: false, canToggle: false });
   }
 
@@ -913,8 +1002,11 @@ export function FilterPanel({
                   ? 'border-border-active bg-transparent text-text hover:border-border-active hover:text-text'
                   : 'border-border-strong bg-transparent text-secondary hover:border-border-active hover:text-text'
             }`}
+            ref={filtersBtnRef}
             onClick={toggleDrawer}
             aria-label={drawerOpen ? 'Close filters' : 'Open filters'}
+            aria-expanded={drawerOpen}
+            aria-haspopup="dialog"
           >
             <svg width="12" height="10" viewBox="0 0 12 10" fill="none" aria-hidden="true">
               <path d="M1 1.5h10M3 5h6M5 8.5h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -947,10 +1039,12 @@ export function FilterPanel({
                 )}
                 {isPresetModified && (
                   <span className="ml-0.5 inline-flex items-center gap-1">
-                    <button className="p-0 font-sans text-[13px] text-secondary transition-colors duration-150 hover:text-text hover:underline" onMouseDown={(e) => { e.preventDefault(); handlePresetUpdate(); }}>
+                    {/* preventDefault on mousedown stops the pre-click blur;
+                        actions live on click so Enter/Space work too. */}
+                    <button className="p-0 font-sans text-[13px] text-secondary transition-colors duration-150 hover:text-text hover:underline" onMouseDown={(e) => e.preventDefault()} onClick={handlePresetUpdate}>
                       Update
                     </button>
-                    <button className="p-0 font-sans text-[13px] text-secondary transition-colors duration-150 hover:text-text hover:underline" onMouseDown={(e) => { e.preventDefault(); setSaveFormOpen(true); }}>
+                    <button className="p-0 font-sans text-[13px] text-secondary transition-colors duration-150 hover:text-text hover:underline" onMouseDown={(e) => e.preventDefault()} onClick={() => setSaveFormOpen(true)}>
                       Save as new
                     </button>
                   </span>
@@ -1024,7 +1118,26 @@ export function FilterPanel({
             ref={drawerRef}
             data-filter-drawer
             role="dialog"
+            aria-modal="true"
             aria-label="Filter options"
+            // Focus trap: wrap Tab at the drawer's edges (dialog is modal on
+            // mobile and the only sensible Tab scope on desktop too).
+            onKeyDown={(e) => {
+              if (e.key !== 'Tab') return;
+              const focusables = drawerRef.current?.querySelectorAll<HTMLElement>(
+                'button, input, select, a[href], [tabindex]:not([tabindex="-1"])'
+              );
+              if (!focusables?.length) return;
+              const first = focusables[0];
+              const last = focusables[focusables.length - 1];
+              if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+              } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            }}
             initial={drawerAnim.initial}
             animate={drawerAnim.animate}
             exit={drawerAnim.exit}
@@ -1113,6 +1226,7 @@ export function FilterPanel({
                         <AnimatePresence>
                           {toastMessage && (
                             <motion.div
+                              role="status"
                               initial={reduce ? false : { opacity: 0, y: 4 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -2 }}
@@ -1166,136 +1280,85 @@ export function FilterPanel({
               <hr className="mx-5 my-1 border-none border-t border-border" />
 
               {/* Words — preset pills + custom expander */}
-              <DrawerSection
+              <PresetExpanderSection
                 label="Words"
                 open={isSectionOpen('words')}
                 onToggle={() => toggleSection('words')}
                 showClear={!!(currentFilters.min_words || currentFilters.max_words)}
                 onClear={() => { clearSection(['min_words', 'max_words']); setWordsCustomOpen(false); }}
                 reduce={reduce}
+                presets={WORD_PRESETS.map((p) => {
+                  const isActive = activeWordPreset?.label === p.label;
+                  return {
+                    key: p.label,
+                    label: p.label,
+                    active: isActive,
+                    onClick: () =>
+                      isActive
+                        ? applyWordPreset(undefined, undefined)
+                        : applyWordPreset(p.min, p.max),
+                  };
+                })}
+                customOpen={wordsCustomOpen}
+                onToggleCustom={() => setWordsCustomOpen((o) => !o)}
               >
-                <>
-                  <div className="flex flex-wrap gap-1.5">
-                    {WORD_PRESETS.map((p) => {
-                      const isActive = activeWordPreset?.label === p.label;
-                      return (
-                        <button
-                          key={p.label}
-                          className={dPillClass(isActive ? 'include' : 'neutral')}
-                          onClick={() =>
-                            isActive
-                              ? applyWordPreset(undefined, undefined)
-                              : applyWordPreset(p.min, p.max)
-                          }
-                        >
-                          {p.label}
-                        </button>
-                      );
-                    })}
-                    <button
-                      className={`${dPillClass('neutral')} border-dashed pr-2`}
-                      onClick={() => setWordsCustomOpen((o) => !o)}
-                    >
-                      Custom{' '}
-                      <ChevronDownIcon className={`ml-[3px] inline-block h-[18px] w-[18px] align-[-5px] transition-transform duration-200 ease-out-expo ${wordsCustomOpen ? 'rotate-0' : '-rotate-90'}`} />
-                    </button>
-                  </div>
-                  <AnimatePresence initial={false}>
-                    {wordsCustomOpen && (
-                      <motion.div
-                        key="words-custom"
-                        initial={reduce ? false : { opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-                        transition={{ duration: 0.2, ease: EASE_OUT_EXPO }}
-                        className="overflow-hidden"
-                      >
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
-                            placeholder="min"
-                            value={wordMin}
-                            onChange={(e) => handleWordInput(e.target.value, wordMax)}
-                          />
-                          <span className="font-mono text-[13px] text-secondary">–</span>
-                          <input
-                            type="number"
-                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
-                            placeholder="max"
-                            value={wordMax}
-                            onChange={(e) => handleWordInput(wordMin, e.target.value)}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </>
-              </DrawerSection>
+                <input
+                  type="number"
+                  className={RANGE_INPUT}
+                  placeholder="min"
+                  aria-label="Minimum words"
+                  value={wordMin}
+                  onChange={(e) => handleWordInput(e.target.value, wordMax)}
+                />
+                <span className="font-mono text-[13px] text-secondary" aria-hidden="true">–</span>
+                <input
+                  type="number"
+                  className={RANGE_INPUT}
+                  placeholder="max"
+                  aria-label="Maximum words"
+                  value={wordMax}
+                  onChange={(e) => handleWordInput(wordMin, e.target.value)}
+                />
+              </PresetExpanderSection>
 
               {/* Updated — preset pills + custom date expander */}
-              <DrawerSection
+              <PresetExpanderSection
                 label="Updated"
                 open={isSectionOpen('updated')}
                 onToggle={() => toggleSection('updated')}
                 showClear={!!(currentFilters.date_preset || currentFilters.date_from || currentFilters.date_to)}
                 onClear={() => { clearSection(['date_preset', 'date_from', 'date_to']); setDateCustomOpen(false); }}
                 reduce={reduce}
+                presets={DATE_PRESETS.map((d) => {
+                  const isActive = currentFilters.date_preset === d.value;
+                  return {
+                    key: d.value,
+                    label: d.label,
+                    active: isActive,
+                    onClick: () => applyDatePreset(isActive ? '' : d.value),
+                  };
+                })}
+                customOpen={dateCustomOpen}
+                onToggleCustom={() => setDateCustomOpen((o) => !o)}
               >
-                <>
-                  <div className="flex flex-wrap gap-1.5">
-                    {DATE_PRESETS.map((d) => {
-                      const isActive = currentFilters.date_preset === d.value;
-                      return (
-                        <button
-                          key={d.value}
-                          className={dPillClass(isActive ? 'include' : 'neutral')}
-                          onClick={() => applyDatePreset(isActive ? '' : d.value)}
-                        >
-                          {d.label}
-                        </button>
-                      );
-                    })}
-                    <button
-                      className={`${dPillClass('neutral')} border-dashed pr-2`}
-                      onClick={() => setDateCustomOpen((o) => !o)}
-                    >
-                      Custom{' '}
-                      <ChevronDownIcon className={`ml-[3px] inline-block h-[18px] w-[18px] align-[-5px] transition-transform duration-200 ease-out-expo ${dateCustomOpen ? 'rotate-0' : '-rotate-90'}`} />
-                    </button>
-                  </div>
-                  <AnimatePresence initial={false}>
-                    {dateCustomOpen && (
-                      <motion.div
-                        key="date-custom"
-                        initial={reduce ? false : { opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-                        transition={{ duration: 0.2, ease: EASE_OUT_EXPO }}
-                        className="overflow-hidden"
-                      >
-                        <div className="flex items-center gap-2">
-                          <DateInput
-                            value={dateFrom}
-                            onChange={(v) => {
-                              setDateFrom(v);
-                              applyDateCustom(v, dateTo);
-                            }}
-                          />
-                          <span className="font-mono text-[13px] text-secondary">–</span>
-                          <DateInput
-                            value={dateTo}
-                            onChange={(v) => {
-                              setDateTo(v);
-                              applyDateCustom(dateFrom, v);
-                            }}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </>
-              </DrawerSection>
+                <DateInput
+                  label="Updated from"
+                  value={dateFrom}
+                  onChange={(v) => {
+                    setDateFrom(v);
+                    applyDateCustom(v, dateTo);
+                  }}
+                />
+                <span className="font-mono text-[13px] text-secondary" aria-hidden="true">–</span>
+                <DateInput
+                  label="Updated to"
+                  value={dateTo}
+                  onChange={(v) => {
+                    setDateTo(v);
+                    applyDateCustom(dateFrom, v);
+                  }}
+                />
+              </PresetExpanderSection>
             </div>
 
             {/* Sticky footer */}
@@ -1331,6 +1394,24 @@ export function FilterPanel({
             <motion.div
               key="save-popover"
               ref={savePopoverRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Save filter preset"
+              // Two-control dialog: wrap Tab between the name input and Save.
+              onKeyDown={(e) => {
+                if (e.key !== 'Tab') return;
+                const focusables = savePopoverRef.current?.querySelectorAll<HTMLElement>('input, button');
+                if (!focusables?.length) return;
+                const first = focusables[0];
+                const last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                  e.preventDefault();
+                  last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                  e.preventDefault();
+                  first.focus();
+                }
+              }}
               initial={reduce ? false : { opacity: 0, scale: 0.82, x: '-50%', y: '-50%' }}
               animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
               exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, x: '-50%', y: '-50%', transition: { duration: 0.12 } }}

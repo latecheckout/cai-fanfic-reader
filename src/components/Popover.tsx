@@ -99,6 +99,23 @@ export function Popover({
     return () => window.removeEventListener('resize', measure);
   }, [open, align]);
 
+  // Focus return — closing via Escape or an in-panel selection would drop
+  // focus to <body>; restore it to the trigger so keyboard users keep their
+  // place. Click-outside is unaffected: the browser focuses the clicked
+  // element after our handler, so it wins over this restore.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (wasOpen.current && !open) {
+      const active = document.activeElement;
+      if (!active || active === document.body || wrapRef.current?.contains(active)) {
+        wrapRef.current
+          ?.querySelector<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')
+          ?.focus({ preventScroll: true });
+      }
+    }
+    wasOpen.current = open;
+  }, [open]);
+
   // Click-outside + Escape close (only while open).
   useEffect(() => {
     if (!open) return;

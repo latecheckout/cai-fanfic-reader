@@ -68,7 +68,7 @@ export function MenuBubbleTrigger({
     <button
       type="button"
       aria-label={label}
-      aria-haspopup="menu"
+      aria-haspopup="dialog"
       aria-expanded={open}
       onClick={toggle}
       className={`${HUD_BUBBLE} ${open ? 'shadow-bubble-hover [&_svg]:opacity-100' : ''}`}

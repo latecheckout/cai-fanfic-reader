@@ -39,7 +39,7 @@ export function WorkCardGrid({ work, priority = false }: Props) {
         {meta.cover && (
           <Image
             src={meta.cover}
-            alt={meta.title}
+            alt=""
             fill
             sizes={COVER_SIZES}
             priority={priority}
@@ -77,7 +77,9 @@ export function WorkCardGrid({ work, priority = false }: Props) {
             <Avatar />
             <Link
               href={`/browse?q=${encodeURIComponent(meta.author)}`}
-              className="pointer-events-auto text-inherit no-underline hover:text-white hover:underline hover:underline-offset-2"
+              // py-1/-my-1: invisible padding lifts the ~20px link to the
+              // 24px WCAG 2.2 target minimum without moving the layout.
+              className="pointer-events-auto inline-block py-1 -my-1 text-inherit no-underline hover:text-white hover:underline hover:underline-offset-2"
             >
               {meta.author}
             </Link>

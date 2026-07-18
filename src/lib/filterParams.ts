@@ -25,6 +25,21 @@ export function savePresetsToStorage(presets: Preset[]) {
   localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
 }
 
+/** Apply a SortDropdown `sort:order` value onto params. */
+export function setSortParam(params: URLSearchParams, value: string) {
+  const [sort, order] = value.split(':');
+  params.set('sort', sort);
+  params.set('order', order);
+}
+
+/** Params for applying a saved preset — carries the current tab across. */
+export function presetToParams(preset: Preset, currentTab: string | null): URLSearchParams {
+  const p = new URLSearchParams(preset.params);
+  if (currentTab) p.set('tab', currentTab);
+  p.set('preset', preset.name);
+  return p;
+}
+
 /** Append a value to a comma-separated param (case-insensitive dedupe). */
 export function addToCommaList(current: string | undefined, value: string): string {
   if (!current) return value;

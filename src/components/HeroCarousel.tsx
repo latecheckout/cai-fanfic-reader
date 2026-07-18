@@ -130,6 +130,12 @@ export function HeroCarousel() {
       aria-label="Featured"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      // Keyboard parity with hover: autoplay pauses while anything inside
+      // (slide links, arrows, dots) holds focus.
+      onFocus={() => setPaused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false);
+      }}
     >
       <div
         className="flex overflow-x-auto snap-x snap-mandatory rounded-card [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
@@ -177,27 +183,34 @@ export function HeroCarousel() {
         direction="left"
         onClick={retreat}
         label="Previous"
-        positionClassName="left-[14px] opacity-0 group-hover/hero:opacity-100 max-sm:hidden"
+        positionClassName="left-[14px] opacity-0 group-hover/hero:opacity-100 focus-visible:opacity-100 max-sm:hidden"
       />
       <CarouselArrow
         direction="right"
         onClick={advance}
         label="Next"
-        positionClassName="right-[14px] opacity-0 group-hover/hero:opacity-100 max-sm:hidden"
+        positionClassName="right-[14px] opacity-0 group-hover/hero:opacity-100 focus-visible:opacity-100 max-sm:hidden"
       />
 
-      <div className="absolute bottom-[14px] left-1/2 z-[3] flex -translate-x-1/2 gap-[7px]">
+      {/* bottom-[5.5px]: 24px buttons center their 7px dots at the old 14px inset. */}
+      <div className="absolute bottom-[5.5px] left-1/2 z-[3] flex -translate-x-1/2">
+        {/* 24px buttons (WCAG 2.2 target size) around 7px visual dots. */}
         {SLIDES.map((s, i) => (
           <button
             key={s.href}
             type="button"
-            className={`h-[7px] cursor-pointer rounded-full border-none p-0 transition-[background-color,width] duration-150 ease-in-out ${
-              i === index ? 'w-5 bg-white' : 'w-[7px] bg-white/45'
-            }`}
+            className="flex h-6 min-w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0 px-[3.5px]"
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === index}
-          />
+          >
+            <span
+              aria-hidden="true"
+              className={`h-[7px] rounded-full transition-[background-color,width] duration-150 ease-in-out ${
+                i === index ? 'w-5 bg-white' : 'w-[7px] bg-white/45'
+              }`}
+            />
+          </button>
         ))}
       </div>
     </section>

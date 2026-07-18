@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Preset, loadPresets, savePresetsToStorage } from '@/lib/filterParams';
 
 /**
@@ -50,11 +50,13 @@ export function usePresets() {
     });
   }, []);
 
-  // Matches the original inline pattern exactly (plain timeout, no clearing).
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const showToast = useCallback((message: string) => {
     setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 2000);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMessage(null), 2000);
   }, []);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   return { presets, addPreset, deletePreset, updatePreset, toastMessage, showToast };
 }

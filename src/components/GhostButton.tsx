@@ -26,7 +26,7 @@ export const PILL_EXCLUDE =
 // the `bordered` prop, NOT the base: two same-property utilities on one
 // element resolve by stylesheet emission order (not className order), so the
 // base must never carry a border color a call site would need to override.
-export const GHOST_BUTTON =
+const GHOST_BUTTON =
   `${PILL_METRICS} cursor-pointer bg-transparent px-3 text-secondary transition-colors duration-150 hover:text-text`;
 
 export function GhostButton({

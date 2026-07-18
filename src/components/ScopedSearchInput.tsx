@@ -89,10 +89,10 @@ export function ScopedSearchInput({
           // after:-inset-3 extends the 20px glyph to a 44px hit area without
           // changing the visual size (same pattern as popoverChrome's ICON_BUTTON).
           className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center p-0 text-secondary opacity-[0.45] transition-[opacity,color] duration-150 ease-in-out hover:text-text hover:opacity-100 after:absolute after:-inset-3"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            clear();
-          }}
+          // preventDefault on mousedown keeps the input from blurring; the
+          // action lives on click so Enter/Space work too.
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={clear}
           aria-label="Clear search"
         >
           <CloseIcon width={20} height={20} />

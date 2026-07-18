@@ -43,10 +43,10 @@ export function ChapterContent({ chapter, chapterHtml, totalChapters, author, wo
               {workTitle}
             </p>
           )}
-          <h1 className="mt-4 text-balance font-serif text-[28px] font-medium leading-[1.2] tracking-[-0.02em] text-text">
+          <h2 className="mt-4 text-balance font-serif text-[28px] font-medium leading-[1.2] tracking-[-0.02em] text-text">
             <span className="mr-4 opacity-50">{toRoman(chapter.index + 1)}</span>
             {stripChapterPrefix(chapter.title)}
-          </h1>
+          </h2>
           {author && (
             <p className="mt-3 flex flex-nowrap items-center justify-center font-serif text-[14px] text-secondary opacity-[0.65]">
               <span className="mr-1.5 shrink-0">by</span>

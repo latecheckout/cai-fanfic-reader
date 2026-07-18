@@ -22,8 +22,8 @@ export function LockedChapterCard({ chapterNumber, title, summary }: Props) {
     // Pure card — fills its container; spacing/column come from the caller
     // (ChapterList matches the recommendation grid's rhythm below it).
     <div className="flex flex-col items-center rounded-card border border-border px-10 py-9 text-center max-md:px-6 max-md:py-7">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary opacity-[0.65]">
-          Chapter {chapterNumber} — Locked
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary">
+          Chapter {chapterNumber} · Locked
         </p>
         <h2 className="mt-5 text-balance font-serif text-[28px] font-medium leading-[1.2] tracking-[-0.02em] text-text">
           {title}
