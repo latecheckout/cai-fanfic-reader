@@ -13,6 +13,14 @@ export const PILL_SHAPE =
   'rounded-full border font-sans text-[14px] leading-[1.5] whitespace-nowrap';
 export const PILL_METRICS = `${PILL_SHAPE} py-1.5`;
 
+// Include/exclude pill colors — one border + bg + text set per state, shared
+// by the filter drawer chips (dPillClass), and the search bar's vibe preview
+// pills. Each is a complete single-border-color treatment per the rule above.
+export const PILL_INCLUDE =
+  'bg-[var(--color-include-bg)] border-[var(--color-include-border)] text-[var(--color-include)]';
+export const PILL_EXCLUDE =
+  'bg-[var(--color-exclude-bg)] border-[var(--color-exclude-border)] text-[var(--color-exclude)]';
+
 // Quiet rounded-pill text button — the filter drawer's "Clear all" treatment:
 // secondary text, soft pill bg on hover, no underline. Border color is set by
 // the `bordered` prop, NOT the base: two same-property utilities on one

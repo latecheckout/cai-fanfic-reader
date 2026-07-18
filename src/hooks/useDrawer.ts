@@ -65,9 +65,12 @@ export function useDrawer({ isMobile, escapeBlocked = false }: Options) {
   }, []);
 
   // Click-away — mobile only (desktop uses the push panel, no click-away).
+  // 769px exactly complements the isMobile query (max-width: 768px) so no
+  // width gets a mixed mode (previously 1080px left 768-1080 with click-away
+  // but no push panel).
   useEffect(() => {
     if (!open) return;
-    const isDesktop = window.matchMedia('(min-width: 1080px)').matches;
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches;
     if (isDesktop) return;
     const handler = (e: MouseEvent) => {
       const drawer = drawerRef.current;

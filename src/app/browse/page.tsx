@@ -91,7 +91,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         <h1 className="visually-hidden">Browse Works</h1>
 
         <div className="mb-2">
-          <SectionHeader title="Stories for you" subtitle="The whole archive, ready to filter" />
+          <SectionHeader title="Stories for you" subtitle="Every story in the archive" />
         </div>
 
         {/* The catalog surface: search, sort, and filters live in its sticky toolbar. */}

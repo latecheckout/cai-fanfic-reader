@@ -7,6 +7,7 @@ import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/cons
 import { Preset, loadPresets, addToCommaList } from '@/lib/filterParams';
 import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
 import { POPOVER_PANEL, MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
+import { PILL_SHAPE, PILL_INCLUDE, PILL_EXCLUDE } from './GhostButton';
 import { HUD_BUBBLE } from './readingChrome';
 import { SEARCH_INPUT, SEARCH_ICON } from './searchChrome';
 import { ClockIcon, CloseIcon, MagnifierIcon, UpDownArrowIcon } from './icons';
@@ -508,9 +509,11 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             transition={isMobileFS ? { duration: 0.13, ease: 'easeOut' } : POPOVER_TRANSITION}
             style={isMobileFS ? undefined : { transformOrigin: 'top' }}
             className={
+              // flex-col gap-1 = the shared menu-row separation (adjacent
+              // hover/active fills never touch, matches MenuColumn).
               isMobileFS
-                ? 'flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] mt-0 border-none bg-transparent p-2'
-                : `absolute left-0 right-0 top-[calc(100%+5px)] z-[var(--z-popover)] overflow-hidden p-2 ${POPOVER_PANEL}`
+                ? 'flex flex-1 flex-col gap-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] mt-0 border-none bg-transparent p-2'
+                : `absolute left-0 right-0 top-[calc(100%+5px)] z-[var(--z-popover)] flex flex-col gap-1 overflow-hidden p-2 ${POPOVER_PANEL}`
             }
           >
 
@@ -545,13 +548,15 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                   >
                     <span className="font-sans text-[15px] text-text">{vibeResult.desc}</span>
                     <div className="flex flex-wrap gap-1">
+                      {/* Same PILL_SHAPE + include/exclude treatment as the
+                          filter drawer chips, at preview scale. */}
                       {vibeResult.pills.map((pill, i) => (
                         <span
                           key={i}
-                          className={`rounded-[20px] border-none px-[9px] py-[2px] font-sans text-[13px] ${
+                          className={`${PILL_SHAPE} px-2.5 py-[2px] text-[13px] ${
                             pill.mode === 'include'
-                              ? 'bg-[var(--color-include-bg)] text-[var(--color-include)]'
-                              : 'bg-[var(--color-exclude-bg)] text-[var(--color-exclude)] line-through decoration-current'
+                              ? PILL_INCLUDE
+                              : `${PILL_EXCLUDE} line-through decoration-current`
                           }`}
                         >
                           {pill.mode === 'include' ? '+' : '−'} {pill.label}
@@ -582,7 +587,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             {/* Grouped AC results */}
             {hasACResults &&
               groupedItems.map(({ group, items: gItems }) => (
-                <div key={group}>
+                <div key={group} className="flex flex-col gap-1">
                   <div className={groupHeaderCls}>{group}</div>
                   {gItems.map((item) => {
                     const isFandom = group === 'Fandoms' || group === 'Popular Fandoms';
@@ -620,7 +625,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
 
             {/* Vibe discovery hint — shown when typing + has AC results + no vibe match yet */}
             {showVibeHint && (
-              <div className="mt-1 -mx-2 border-t border-bubble-ring px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
+              <div className="-mx-2 border-t border-bubble-ring px-[18px] pt-[6px] pb-2 font-mono text-[11.5px] tracking-[0.05em] text-secondary opacity-50">
                 ✦ try: cozy · slow burn · found family · enemies to lovers
               </div>
             )}
@@ -629,7 +634,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
             {isDefaultState && (
               <>
                 {history.length > 0 && (
-                  <div className="pb-1">
+                  <div className="flex flex-col gap-1 pb-1">
                     <div className={groupHeaderCls}>Recent</div>
                     {history.map((h) => (
                       <div key={h} className="group/hist flex items-center rounded-xl transition-colors hover:bg-overlay-soft">
@@ -656,7 +661,7 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
                 )}
 
                 {savedPresets.length > 0 && (
-                  <div className="-mx-2 border-t border-bubble-ring px-2">
+                  <div className="-mx-2 flex flex-col gap-1 border-t border-bubble-ring px-2">
                     <div className={groupHeaderCls}>Saved filters</div>
                     {savedPresets.map((preset, i) => (
                       <button
@@ -677,19 +682,20 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
 
             {/* Full-bleed divider: -mx-2 cancels the panel's p-2; px-[18px] re-aligns
                 the text with the inset rows (8px panel + 10px row padding). */}
-            <div className="mt-1 -mx-2 -mb-2 flex items-center gap-[5px] border-t border-bubble-ring px-[18px] py-2 font-mono text-[12px] text-secondary opacity-70">
+            {/* Inline text flow (not flex items) so a narrow panel wraps the
+                whole line like a sentence instead of each span separately. */}
+            <div className="-mx-2 -mb-2 border-t border-bubble-ring px-[18px] py-2 font-mono text-[12px] leading-relaxed text-secondary opacity-70">
               {isDefaultState ? (
                 <>
-                  <span>type to search ·</span>
-                  <UpDownArrowIcon width={13} height={13} className="shrink-0" />
-                  <span>navigate · esc to close</span>
+                  type to search · <UpDownArrowIcon width={13} height={13} className="inline-block align-[-2px]" />{' '}
+                  navigate · esc to close
                 </>
               ) : vibeLoading ? (
                 'analyzing vibe…'
               ) : (
                 <>
-                  <UpDownArrowIcon width={13} height={13} className="shrink-0" />
-                  <span>select · enter to search text · esc to close</span>
+                  <UpDownArrowIcon width={13} height={13} className="inline-block align-[-2px]" /> select · enter to
+                  search text · esc to close
                 </>
               )}
             </div>

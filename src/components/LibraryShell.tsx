@@ -172,7 +172,7 @@ export function LibraryShell({
     <>
       {/* ── Page heading — same SectionHeader style as browse/characters ── */}
       <div className="mb-5">
-        <SectionHeader title="Library" subtitle="Your saved, in-progress, and finished stories" />
+        <SectionHeader title="Library" subtitle="Your reading, saved in one place" />
       </div>
 
       {/* ── Tab row: text tabs over the dividing line. The wrapper's border-b

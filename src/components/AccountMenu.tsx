@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react';
 import { Popover } from './Popover';
-import { MenuColumn, MenuDivider, MenuRowLink } from './Menu';
-import { AboutIcon, LogOutIcon } from './icons';
+import { MenuColumn, MenuDivider } from './Menu';
+import { LogOutIcon } from './icons';
 
 // @DUMMY logged-in user — becomes the real session once auth is wired.
 export const MOCK_USER_EMAIL = 'collinbriggs19@gmail.com';
@@ -31,9 +31,8 @@ export function AccountMenu({
   );
 }
 
-/** Menu body: account concerns only — email + sign out. About keeps a row on
- *  desktop (no other desktop home); on mobile it's `hidden` because every
- *  site link, About and Write included, lives in the header's site menu. */
+/** Menu body: account concerns only — email + sign out. Site links live in
+ *  the navbar (desktop) and the header's site menu (mobile). */
 export function AccountMenuBody({ onClose }: { onClose: () => void }) {
   return (
     <MenuColumn>
@@ -41,13 +40,6 @@ export function AccountMenuBody({ onClose }: { onClose: () => void }) {
         {MOCK_USER_EMAIL}
       </div>
       <MenuDivider />
-      <MenuRowLink
-        href="/about"
-        label="About"
-        icon={<AboutIcon width={18} height={18} />}
-        onClick={onClose}
-        className="max-md:hidden"
-      />
       {/* MENU_ROW layout minus its hover bg — two bg utilities on one
           element resolve by emission order, so the crimson fill must be
           the only one. @WIRE — sign out becomes the real session call. */}

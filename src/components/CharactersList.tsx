@@ -93,28 +93,29 @@ export function CharactersList({ grouped }: Props) {
 
   return (
     <>
-      {/* ── Toolbar: shared scoped search (live) + sort ── */}
-      <div className="mb-8 flex items-center gap-2">
-        <div className="flex min-w-0 flex-1 items-center gap-4">
+      {/* ── Toolbar: shared scoped search (live) + sort, with the result
+          count on its own line under the search while querying ── */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2">
           <div className="flex min-w-0 flex-1 items-center">
             <ScopedSearchInput basePath="/characters" placeholder="Search characters…" live />
           </div>
-          {q && (
-            <span className="shrink-0 font-mono text-[13px] text-secondary max-md:hidden">
-              {totalVisible} {totalVisible === 1 ? 'character' : 'characters'}
-            </span>
-          )}
+          <SortDropdown
+            options={CHARACTER_RANGES}
+            currentValue={range.value}
+            onChange={(v) => {
+              const params = readParams();
+              if (v === 'all') params.delete('range');
+              else params.set('range', v);
+              pushParams(params);
+            }}
+          />
         </div>
-        <SortDropdown
-          options={CHARACTER_RANGES}
-          currentValue={range.value}
-          onChange={(v) => {
-            const params = readParams();
-            if (v === 'all') params.delete('range');
-            else params.set('range', v);
-            pushParams(params);
-          }}
-        />
+        {q && (
+          <p className="m-0 mt-2 px-4 font-mono text-[13px] text-secondary">
+            {totalVisible} {totalVisible === 1 ? 'character' : 'characters'}
+          </p>
+        )}
       </div>
 
       {/* ── List ── */}

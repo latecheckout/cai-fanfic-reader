@@ -41,7 +41,7 @@ export default function CharactersPage() {
       <SiteHeader />
       <main className="mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-12 max-md:px-4 max-md:pt-5">
         <div className="mb-8">
-          <SectionHeader title="Characters" subtitle={`${sorted.length} characters across the archive, A to Z`} />
+          <SectionHeader title="Characters" subtitle="Everyone the stories are about" />
         </div>
         {/* CharactersList reads useSearchParams (q/sort) — the boundary keeps
             the page statically renderable. */}

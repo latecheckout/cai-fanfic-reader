@@ -7,7 +7,7 @@ import { AboutIcon, BrowseIcon, CharactersIcon, CloseIcon, HamburgerIcon, Librar
 import { AccountMenu } from './AccountMenu';
 import { CrossfadeSwap } from './ReadingActions';
 import { Popover } from './Popover';
-import { MenuBubbleTrigger, MenuColumn, MenuDivider, MenuRowLink } from './Menu';
+import { MenuBubbleTrigger, MenuColumn, MenuRowLink } from './Menu';
 import { NavPillLink } from './NavPillLink';
 import { TabPill } from './TabPill';
 
@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: '/browse', label: 'Browse', Icon: BrowseIcon },
   { href: '/characters', label: 'Characters', Icon: CharactersIcon },
   { href: '/reading', label: 'Library', Icon: LibraryIcon },
+  { href: '/about', label: 'About', Icon: AboutIcon },
 ];
 
 interface Props {
@@ -28,14 +29,19 @@ export function BrowseHeader({ search }: Props = {}) {
 
   return (
     <>
-      <header className="site-header sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
-        <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--browse-max-width)] items-stretch px-6 max-md:items-center max-md:justify-between max-md:px-4">
+      {/* @container: the header collapses on its OWN width, not the viewport —
+          the filter push panel shrinks its content box by --filter-push, so a
+          desktop window with the panel open gets the compact (two-icon)
+          layout instead of the nav/CTA overlapping. @max-3xl (48rem) = the
+          container-width equivalent of the old max-md viewport breakpoint. */}
+      <header className="site-header @container sticky top-0 z-[var(--z-sticky)] border-b border-border bg-bg">
+        <div className="mx-auto flex h-[var(--header-height)] max-w-[var(--browse-max-width)] items-stretch px-6 @max-3xl:items-center @max-3xl:justify-between @max-3xl:px-4">
           {/* ── Left zone: logo + nav links (desktop) ── */}
-          <div className="flex min-w-0 flex-1 items-center gap-8 max-md:gap-0">
+          <div className="flex min-w-0 flex-1 items-center gap-8 @max-3xl:gap-0">
             <a
               href="/"
               className="flex items-center text-text no-underline opacity-[0.88] transition-opacity duration-150 ease-in-out hover:opacity-100"
-              aria-label="fanfic — home"
+              aria-label="fanfic, home"
             >
             <svg viewBox="0 0 545 100" fill="none" className="block h-5 w-auto" aria-hidden="true">
             <path d="M27.9102 0.0478516C17.9215 13.1127 13.0053 31.2431 12.918 50C13.0053 68.757 17.9215 86.8884 27.9102 99.9531L16.626 100C6.90745 87.966 0.0873406 68.7408 0 50C0.0873655 31.2671 6.90745 12.0343 16.626 0L27.9102 0.0478516Z" fill="currentColor"/>
@@ -59,7 +65,7 @@ export function BrowseHeader({ search }: Props = {}) {
               as the library tabs): text-only mono labels stretched to the
               header height, active indicator riding the header's bottom
               stroke and sliding between links on client nav. */}
-          <nav className="flex items-stretch gap-6 self-stretch max-md:hidden" aria-label="Site navigation">
+          <nav className="flex items-stretch gap-6 self-stretch @max-3xl:hidden" aria-label="Site navigation">
             {NAV_LINKS.map(({ href, label }) => (
               <TabPill
                 key={href}
@@ -73,13 +79,13 @@ export function BrowseHeader({ search }: Props = {}) {
         </div>
 
         {/* ── Right zone: search slot + CTA (desktop) + nav icons (mobile) + avatar ── */}
-        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 max-md:gap-1.5">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2 @max-3xl:gap-1.5">
           {/* Header search is desktop-only — mobile keeps just the two icons
               (profile + menu); each surface owns its own scoped search. */}
-          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center max-md:hidden">{search}</div>}
+          {search && <div className="flex min-w-0 max-w-[340px] flex-[1_1_auto] items-center @max-3xl:hidden">{search}</div>}
           {/* CTA — big filled variant of the nav-pill link (espresso → quill-ink).
               Desktop only; on mobile it lives in the account dropdown. */}
-          <NavPillLink href="/creators/apply" label="Write on c.ai" big filled className="shrink-0 max-md:hidden" />
+          <NavPillLink href="/creators/apply" label="Write on c.ai" big filled className="shrink-0 @max-3xl:hidden" />
           {/* Account dropdown — shared AccountMenu body, HUD-bubble trigger.
               On mobile this menu is account-only (email + sign out). */}
           <div className="shrink-0">
@@ -94,7 +100,7 @@ export function BrowseHeader({ search }: Props = {}) {
           {/* Mobile site menu — far right, same popover pattern as the
               account menu; every destination lives here (nav + Write + About),
               each row iconed, active route highlighted. */}
-          <div className="hidden shrink-0 max-md:block">
+          <div className="hidden shrink-0 @max-3xl:block">
             <Popover
               align="right"
               ariaLabel="Site menu"
@@ -120,17 +126,10 @@ export function BrowseHeader({ search }: Props = {}) {
                       onClick={close}
                     />
                   ))}
-                  <MenuDivider />
                   <MenuRowLink
                     href="/creators/apply"
                     label="Write on c.ai"
                     icon={<PenIcon width={18} height={18} />}
-                    onClick={close}
-                  />
-                  <MenuRowLink
-                    href="/about"
-                    label="About"
-                    icon={<AboutIcon width={18} height={18} />}
                     onClick={close}
                   />
                 </MenuColumn>

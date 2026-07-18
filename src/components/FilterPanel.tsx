@@ -16,7 +16,7 @@ import {
 import { ratingTier } from '@/lib/ratings';
 import { POPOVER_PANEL } from './popoverChrome';
 import { ChevronDownIcon, CloseIcon, PlusIcon, MinusIcon, CheckIcon, ProgressIcon, CalendarIcon } from './icons';
-import { GhostButton, PILL_METRICS, PILL_SHAPE } from './GhostButton';
+import { GhostButton, PILL_METRICS, PILL_SHAPE, PILL_INCLUDE, PILL_EXCLUDE } from './GhostButton';
 import { SortDropdown, SORT_OPTIONS } from './SortDropdown';
 import { useDrawer } from '@/hooks/useDrawer';
 import { usePresets } from '@/hooks/usePresets';
@@ -225,9 +225,9 @@ const DPILL_BASE =
   `${PILL_METRICS} px-3.5 cursor-pointer transition-[background,color,border-color] duration-150 ease-in-out`;
 function dPillClass(state: PillState) {
   if (state === 'include')
-    return `${DPILL_BASE} bg-[var(--color-include-bg)] border-[var(--color-include-border)] text-[var(--color-include)] hover:bg-[rgba(30,100,40,0.16)]`;
+    return `${DPILL_BASE} ${PILL_INCLUDE} hover:bg-[rgba(30,100,40,0.16)]`;
   if (state === 'exclude')
-    return `${DPILL_BASE} bg-[var(--color-exclude-bg)] border-[var(--color-exclude-border)] text-[var(--color-exclude)] hover:bg-[rgba(140,30,30,0.16)]`;
+    return `${DPILL_BASE} ${PILL_EXCLUDE} hover:bg-[rgba(140,30,30,0.16)]`;
   return `${DPILL_BASE} bg-transparent border-border-strong text-secondary hover:text-text hover:border-border-active`;
 }
 
@@ -265,7 +265,7 @@ function DateInput({ value, onChange }: { value: string; onChange: (v: string) =
     <span className="relative min-w-0 flex-1">
       <input
         type="date"
-        className="w-full rounded-lg border border-border-strong bg-transparent py-[5px] pl-2.5 pr-7 font-mono text-sm text-text outline-none transition-[border-color] duration-150 focus:border-border-active [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+        className="w-full rounded-lg border border-border-strong bg-transparent py-[5px] pl-2.5 pr-7 font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 focus:border-border-active [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -859,9 +859,11 @@ export function FilterPanel({
     ? { initial: false as const, animate: {}, exit: {}, transition: { duration: 0 } }
     : isMobile
       ? {
-          initial: { y: '100%' },
+          // 110% (not 100%): the card floats 12px inside the bottom edge, so
+          // 100% of its own height wouldn't fully clear it (or its shadow).
+          initial: { y: '110%' },
           animate: { y: 0 },
-          exit: { y: '100%', transition: { duration: 0.2, ease: EASE_COLLAPSE } },
+          exit: { y: '110%', transition: { duration: 0.2, ease: EASE_COLLAPSE } },
           transition: { duration: 0.25, ease: EASE_OUT_EXPO },
         }
       : {
@@ -879,7 +881,7 @@ export function FilterPanel({
       <div ref={sentinelRef} style={{ height: 0, overflow: 'hidden' }} aria-hidden="true" />
       <div
         ref={barRef}
-        className="sticky top-[var(--header-height)] z-50 mb-5 pt-3 bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] [backdrop-filter:blur(8px)_saturate(1.2)] [&[data-stuck]]:border-b [&[data-stuck]]:border-border [body.search-fs-open_&]:z-[500] [body.search-fs-open_&]:[backdrop-filter:none]"
+        className="sticky top-[var(--header-height)] z-50 mb-5 pt-3 bg-[color-mix(in_srgb,var(--bg)_92%,transparent)] [backdrop-filter:blur(8px)_saturate(1.2)] [-webkit-backdrop-filter:blur(8px)_saturate(1.2)] [&[data-stuck]]:border-b [&[data-stuck]]:border-border [body.search-fs-open_&]:z-[500] [body.search-fs-open_&]:[backdrop-filter:none]"
       >
         {/* Row 1: search (catalog surface) + controls — pages without
             searchOptions rely on the global header search, so the controls
@@ -1007,7 +1009,7 @@ export function FilterPanel({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[var(--z-panel)] bg-transparent pointer-events-none md:[background-image:linear-gradient(to_right,transparent_calc(100%_-_var(--filter-push)),var(--bg)_calc(100%_-_var(--filter-push)_+_108px))] max-md:pointer-events-auto max-md:bg-[rgba(26,24,22,0.45)] max-md:[backdrop-filter:blur(2px)]"
+            className="fixed inset-0 z-[var(--z-panel)] bg-transparent pointer-events-none md:[background-image:linear-gradient(to_right,transparent_calc(100%_-_var(--filter-push)),var(--bg)_calc(100%_-_var(--filter-push)_+_108px))] max-md:pointer-events-auto max-md:bg-[rgba(26,24,22,0.45)] max-md:[backdrop-filter:blur(2px)] max-md:[-webkit-backdrop-filter:blur(2px)] max-md:touch-none"
             onClick={closeDrawer}
             aria-hidden="true"
           />
@@ -1027,13 +1029,12 @@ export function FilterPanel({
             animate={drawerAnim.animate}
             exit={drawerAnim.exit}
             transition={drawerAnim.transition}
-            className={`fixed top-3 right-3 bottom-3 z-[calc(var(--z-panel)_+_10)] flex w-[min(380px,90vw)] flex-col overflow-hidden ${POPOVER_PANEL} max-md:top-auto max-md:left-0 max-md:right-0 max-md:bottom-0 max-md:h-auto max-md:max-h-[85vh] max-md:w-full max-md:rounded-none max-md:rounded-t-2xl max-md:border-0 max-md:border-t max-md:border-border-strong`}
+            // Mobile = the same floating card, bottom-anchored: 12px insets
+            // (+ safe area), full POPOVER_PANEL chrome at every breakpoint.
+            className={`fixed top-3 right-3 bottom-3 z-[calc(var(--z-panel)_+_10)] flex w-[min(380px,90vw)] flex-col overflow-hidden ${POPOVER_PANEL} max-md:top-auto max-md:left-3 max-md:right-3 max-md:bottom-[calc(12px+var(--safe-bottom))] max-md:h-auto max-md:max-h-[85dvh] max-md:w-auto`}
           >
-            {/* Drag handle (mobile only) */}
-            <div className="mx-auto mt-2.5 hidden h-1 w-10 flex-shrink-0 rounded-sm bg-border-strong max-md:block" aria-hidden="true" />
-
             {/* Header */}
-            <div className="flex flex-shrink-0 items-center gap-3 border-b border-bubble-ring p-2 max-md:pt-3">
+            <div className="flex flex-shrink-0 items-center gap-3 border-b border-bubble-ring p-2">
               {/* pl-3 lines the title up with the sections' px-5 (8px frame + 12px) */}
               <span className="pl-3 font-sans text-base font-semibold tracking-[-0.01em] text-text">Filters</span>
               <button
@@ -1048,7 +1049,7 @@ export function FilterPanel({
 
             {/* Scrollable body — scrollbar hidden (scrolling still works); subtle
                 bubble-ring dividers between sections */}
-            <div className="flex-1 divide-y divide-bubble-ring overflow-y-auto pt-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex-1 divide-y divide-bubble-ring overflow-y-auto overscroll-contain pt-1 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {/* Sort section — only shown on mobile (sort dropdown is hidden in toolbar) */}
               {isMobile && (
                 <DrawerSection
@@ -1212,7 +1213,7 @@ export function FilterPanel({
                         <div className="flex items-center gap-2">
                           <input
                             type="number"
-                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
+                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
                             placeholder="min"
                             value={wordMin}
                             onChange={(e) => handleWordInput(e.target.value, wordMax)}
@@ -1220,7 +1221,7 @@ export function FilterPanel({
                           <span className="font-mono text-[13px] text-secondary">–</span>
                           <input
                             type="number"
-                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
+                            className="w-[88px] rounded-lg border border-border-strong bg-transparent px-2.5 py-[5px] font-mono text-sm max-md:text-base text-text outline-none transition-[border-color] duration-150 placeholder:text-text focus:border-border-active"
                             placeholder="max"
                             value={wordMax}
                             onChange={(e) => handleWordInput(wordMin, e.target.value)}
@@ -1300,21 +1301,15 @@ export function FilterPanel({
             {/* Sticky footer */}
             <div className="flex flex-shrink-0 items-center justify-between gap-3 border-t border-bubble-ring px-5 py-4">
               <GhostButton className="-ml-3" onClick={clearAll}>Clear all</GhostButton>
-              <div className="flex items-center gap-2">
-                {/* Apply button — visible on mobile only */}
-                <button
-                  className="hidden cursor-pointer whitespace-nowrap rounded-[10px] border border-border-strong bg-transparent px-[18px] py-[9px] font-sans text-[15px] font-medium text-text transition-opacity duration-150 hover:opacity-80 max-md:flex"
-                  onClick={closeDrawer}
-                >
-                  Apply filters
-                </button>
-                <button
-                  className="hidden cursor-pointer whitespace-nowrap rounded-[10px] border-none bg-text px-[22px] py-[9px] font-sans text-[15px] font-medium text-bg transition-opacity duration-150 hover:opacity-85 max-md:flex"
-                  onClick={closeDrawer}
-                >
-                  Show {filteredCount} work{filteredCount !== 1 ? 's' : ''}
-                </button>
-              </div>
+              {/* Primary dismiss — mobile only (desktop results update live in
+                  view). Shared pill metrics, inverted fill like the toolbar's
+                  active pills; filters are already applied, this just closes. */}
+              <button
+                className={`${PILL_METRICS} hidden cursor-pointer border-transparent bg-text px-5 font-medium text-bg transition-opacity duration-150 hover:opacity-85 max-md:inline-flex`}
+                onClick={closeDrawer}
+              >
+                Show {filteredCount} work{filteredCount !== 1 ? 's' : ''}
+              </button>
             </div>
           </motion.aside>
         )}
@@ -1330,7 +1325,7 @@ export function FilterPanel({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="fixed inset-0 z-[var(--z-modal)] bg-[rgba(26,24,22,0.15)] [backdrop-filter:blur(3px)]"
+              className="fixed inset-0 z-[var(--z-modal)] bg-[rgba(26,24,22,0.15)] [backdrop-filter:blur(3px)] [-webkit-backdrop-filter:blur(3px)]"
               onMouseDown={() => { setSaveFormOpen(false); setSaveName(''); }}
             />,
             <motion.div

@@ -7,7 +7,8 @@ import { useViewMode } from '@/hooks/useViewMode';
 import { useFilterFlash } from '@/hooks/useFilterFlash';
 import { FilterPanel } from './FilterPanel';
 import { WorkGrid } from './WorkGrid';
-import { EmptyState } from './EmptyState';
+import { EmptyStateCard } from './EmptyState';
+import { MagnifierIcon } from './icons';
 
 interface Props {
   works: WorkSummary[];
@@ -93,14 +94,13 @@ export function BrowseShell({
         priorityCount={4}
         containerClassName="transition-opacity duration-[180ms] ease-[ease] motion-safe:animate-[fadeIn_650ms_var(--ease-out-expo)_400ms_both]"
         empty={
-          <EmptyState title="No works match your filters.">
-            {activeFilterLabels.length > 0 && (
-              <>
-                Try removing a filter or{' '}
-                <a href="/browse" className="text-text underline underline-offset-2 hover:opacity-70">clear all</a>.
-              </>
-            )}
-          </EmptyState>
+          <EmptyStateCard
+            icon={<MagnifierIcon width={18} height={18} />}
+            title="No works match."
+            body="Try removing a filter or loosening your search. The whole archive is one click away."
+            ctaLabel="Clear all filters"
+            ctaHref="/browse"
+          />
         }
       />
     </>
