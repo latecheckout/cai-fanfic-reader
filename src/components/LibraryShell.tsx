@@ -10,7 +10,7 @@ import { SortDropdown } from './SortDropdown';
 import { useViewMode } from '@/hooks/useViewMode';
 import { useFilterFlash } from '@/hooks/useFilterFlash';
 import { ScopedSearchInput } from './ScopedSearchInput';
-import { TabPill } from './TabPill';
+import { TabPill, TabRow } from './TabPill';
 import { SectionHeader } from './RailSection';
 import { WorkGrid } from './WorkGrid';
 import { EmptyState, EmptyStateCard } from './EmptyState';
@@ -182,7 +182,13 @@ export function LibraryShell({
       <div className="mb-5 border-b border-border">
         {/* h matches the old row height (search h-10/h-11 + pb-5) so the gap
             between the tab labels and the line is unchanged from before. */}
-        <nav className="flex h-15 max-md:h-16 items-stretch gap-6" aria-label="Library tabs">
+        <TabRow
+          // Count is in the label, so a count change moves tab widths — key on
+          // it too so the indicator re-measures.
+          activeKey={`${activeTab}:${displayedTabCounts[activeTab]}`}
+          ariaLabel="Library tabs"
+          className="flex h-15 max-md:h-16 items-stretch gap-6"
+        >
           {(Object.keys(TAB_LABELS) as LibraryTab[]).map((tab) => (
             <TabPill
               key={tab}
@@ -195,7 +201,7 @@ export function LibraryShell({
               }}
             />
           ))}
-        </nav>
+        </TabRow>
       </div>
 
       {/* ── Toolbar below the divider: scoped search + tab-contextual sort

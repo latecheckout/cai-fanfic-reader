@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, useScroll } from 'motion/react';
 import { useReading } from '@/context/ReadingContext';
-import { useScrollProgress } from '@/hooks/useScrollProgress';
-import { ratingClass, stripChapterPrefix, isTypingTarget } from '@/lib/utils';
+import { stripChapterPrefix, isTypingTarget } from '@/lib/utils';
 import { BUBBLE_PILL } from './readingChrome';
 import { ChevronDownIcon, InfoIcon } from './icons';
 import { ChapterPanel } from './ChapterPanel';
@@ -13,23 +12,14 @@ import { Popover } from './Popover';
 import { Tooltip } from './Tooltip';
 import { ReturnToPositionFAB } from './ReturnToPositionFAB';
 
-// Sibling glide when the "Your place" pill mounts/unmounts.
-const LAYOUT_SPRING = { type: 'spring', duration: 0.35, bounce: 0 } as const;
-
-const PROGRESS_BG: Record<string, string> = {
-  ratingG: 'bg-rating-g',
-  ratingT: 'bg-rating-t',
-  ratingM: 'bg-rating-m',
-  ratingE: 'bg-rating-e',
-  ratingNR: 'bg-rating-nr',
-};
-
 export function ReadingCluster() {
   const { workMeta, chapterTitles, totalChapters, activeChapterIndex, scrollToChapter } = useReading();
-  // Drives the chapter pill's progress bar.
-  const scrollPct = useScrollProgress();
-
-  const rClass = ratingClass(workMeta.rating);
+  // Drives the chapter pill's progress bar. MotionValue, NOT React state:
+  // scroll must never rerender this component — the pill wrappers carry
+  // `layout` props, so a per-scroll-event rerender forces a layout re-measure
+  // every frame and wrecks the "Your place" enter/exit (which by definition
+  // happens mid-scroll).
+  const { scrollYProgress } = useScroll();
 
   // Keyboard: arrows navigate chapters
   useEffect(() => {
@@ -54,13 +44,15 @@ export function ReadingCluster() {
     /* Bottom pill cluster — one layout at every breakpoint. Panels open upward. */
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[var(--z-reading-cluster)] flex justify-center p-4">
       <div className="pointer-events-auto flex min-w-0 max-w-full items-center gap-2">
-        {/* `layout="position"` on the pill wrappers: when the "Your place" pill
-            mounts or unmounts (popLayout), the siblings glide over instead of
-            jumping — position-only so the pills translate without the scale
-            squish plain `layout` applies. Spring (bounce 0) keeps it
-            interruptible and natural. */}
+        {/* No layout animation on the pills: "Your place" stays mounted and
+            animates its WIDTH (see ReturnToPositionFAB), so siblings are
+            pushed by real layout each frame — adding `layout` wrappers here
+            would double-animate against that and jitter. */}
+        {/* "Your place" pill — returns to the furthest-read position */}
+        <ReturnToPositionFAB />
+
         {/* Title pill — opens the story-overview panel */}
-        <motion.div layout="position" transition={LAYOUT_SPRING} className="min-w-0 shrink">
+        <div className="min-w-0 shrink">
         <Popover
           align="center"
           side="top"
@@ -96,11 +88,11 @@ export function ReadingCluster() {
         >
           <StoryOverview />
         </Popover>
-        </motion.div>
+        </div>
 
         {/* Chapter pill */}
         {totalChapters > 1 && (
-          <motion.div layout="position" transition={LAYOUT_SPRING} className="min-w-0">
+          <div className="min-w-0">
             <Popover
               align="center"
               side="top"
@@ -126,9 +118,13 @@ export function ReadingCluster() {
                     height={17}
                     className={`shrink-0 text-secondary transition-transform duration-200 ${open ? '' : 'rotate-180'}`}
                   />
-                  <span
-                    className={`absolute bottom-0 left-0 h-[3px] rounded-none opacity-[0.38] transition-[width] duration-[120ms] ${PROGRESS_BG[rClass] ?? 'bg-secondary'}`}
-                    style={{ width: `${scrollPct}%` }}
+                  {/* scaleX off the scroll MotionValue: updates on the
+                      compositor, no rerender, no width-layout thrash.
+                      Solid --progress-fill (theme-adaptive): no opacity — a
+                      faded fill fails WCAG 1.4.11 non-text 3:1 on the bubble. */}
+                  <motion.span
+                    className="absolute bottom-0 left-0 h-[3px] w-full origin-left rounded-none bg-progress-fill"
+                    style={{ scaleX: scrollYProgress }}
                     aria-hidden="true"
                   />
                 </button>
@@ -143,11 +139,8 @@ export function ReadingCluster() {
                 />
               )}
             </Popover>
-          </motion.div>
+          </div>
         )}
-
-        {/* "Your place" pill — returns to the furthest-read position */}
-        <ReturnToPositionFAB />
       </div>
     </div>
   );

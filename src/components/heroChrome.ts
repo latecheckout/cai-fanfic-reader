@@ -24,13 +24,18 @@ export const heroSlide = {
   kicker: 'font-mono text-[13px] font-semibold uppercase tracking-[0.14em] text-[#f3d9a4]',
   headline:
     "font-serif text-[clamp(20px,3.2vw,38px)] font-normal leading-[1.14] tracking-[-0.01em] text-[#fbf2dc] [text-shadow:0_2px_16px_rgba(0,0,0,0.4)] max-w-[30ch] whitespace-pre-line",
-  // Same chrome as the header's "Write on c.ai" CTA (NavPillLink `big filled`:
-  // h-10 px-4 --cta-fill pill + --cta-stroke ring, deepening to pinned-purple
-  // on hover). It's a span (the
-  // whole slide is the anchor), so hover rides the slide group instead of the
-  // element's own :hover.
-  // No shadow-bubble (its baked-in 1px ring doubles the --cta-stroke border).
-  cta:
-    'mt-1 inline-flex h-10 items-center whitespace-nowrap rounded-full bg-cta-fill border border-cta-stroke px-4 font-sans text-[13px] leading-none text-white ' +
-    'transition-[background-color] duration-150 ease-out group-hover/slide:bg-pinned-purple',
+  // Same shape as the header's "Write on c.ai" CTA (NavPillLink `big filled`:
+  // h-10 px-4 pill + --cta-stroke ring). It's a span (the whole slide is the
+  // anchor), so hover rides the slide group instead of the element's own
+  // :hover. No shadow-bubble (its baked-in 1px ring doubles the --cta-stroke
+  // border). Fill is a param:
+  // - 'glass' (hero carousel) — low-opacity white over the slide's scrim,
+  //   stepping up on hover. Scrim is constant-dark, so it reads in every theme.
+  // - 'solid' (creator banner) — --cta-fill deepening to pinned-purple.
+  cta: (fill: 'solid' | 'glass' = 'solid') =>
+    'mt-1 inline-flex h-10 items-center whitespace-nowrap rounded-full border border-cta-stroke px-4 font-sans text-[13px] leading-none text-white ' +
+    'transition-[background-color] duration-150 ease-out ' +
+    (fill === 'glass'
+      ? 'bg-pure-white/15 group-hover/slide:bg-pure-white/25'
+      : 'bg-cta-fill group-hover/slide:bg-pinned-purple'),
 };

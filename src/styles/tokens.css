@@ -30,10 +30,10 @@
   --image-outline: rgba(0, 0, 0, 0.1);
 
   /* Rating dot colors — per brief spec */
-  --rating-g:  #2b9247;  /* midnight-forest */
-  --rating-t:  #ffe600;  /* gold-rush */
-  --rating-m:  #f28500;  /* toasty-amber */
-  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-g:  #abf5ed;  /* icy-sky */
+  --rating-t:  #7db4ff;  /* cloudy-blue */
+  --rating-m:  #df91f2;  /* lowkey-lavender */
+  --rating-e:  #d90082;  /* hyperlink-magenta */
   --rating-nr: #aca7b0;  /* off-white-3 */
 
   /* Typography */
@@ -151,6 +151,14 @@
   --hot-pink:       #ff4dc9;
 
   --toasty-amber:      #f28500;
+  --lowkey-lavender:   #df91f2;
+
+  /* Progress fills (chapter pill, continue-card text variant). Theme-adaptive
+     for WCAG 1.4.11 non-text 3:1: pinned-purple on light surfaces (9.6:1 white
+     bubble, 8.4:1 paper), lowkey-lavender on dark (6.9:1 bubble — see dark
+     block). The continue card's VISUAL variant sits on an always-dark image
+     scrim, so it uses bg-lowkey-lavender directly (4.4:1), not this token. */
+  --progress-fill: var(--pinned-purple);
 
   --cached-crimson:   #d90000;
   --quill-ink:        #3e2733;
@@ -180,10 +188,10 @@
   --accent: #8B4040;
   --card-bg: #F6F6F6;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #2b9247;  /* midnight-forest */
-  --rating-t:  #ffe600;  /* gold-rush */
-  --rating-m:  #f28500;  /* toasty-amber */
-  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-g:  #abf5ed;  /* icy-sky */
+  --rating-t:  #7db4ff;  /* cloudy-blue */
+  --rating-m:  #df91f2;  /* lowkey-lavender */
+  --rating-e:  #d90082;  /* hyperlink-magenta */
   --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #ffffff;
 }
@@ -199,10 +207,10 @@
   --accent: #8B4040;
   --card-bg: #F4F1EB;
   --card-border: rgba(26, 24, 22, 0.09);
-  --rating-g:  #2b9247;  /* midnight-forest */
-  --rating-t:  #ffe600;  /* gold-rush */
-  --rating-m:  #f28500;  /* toasty-amber */
-  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-g:  #abf5ed;  /* icy-sky */
+  --rating-t:  #7db4ff;  /* cloudy-blue */
+  --rating-m:  #df91f2;  /* lowkey-lavender */
+  --rating-e:  #d90082;  /* hyperlink-magenta */
   --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #f5f0e8;
 }
@@ -221,10 +229,10 @@
      too heavy against the dark bg. */
   --card-border: rgba(229, 225, 216, 0.11);
   --image-outline: rgba(255, 255, 255, 0.1);
-  --rating-g:  #2b9247;  /* midnight-forest */
-  --rating-t:  #ffe600;  /* gold-rush */
-  --rating-m:  #f28500;  /* toasty-amber */
-  --rating-e:  #d90000;  /* cached-crimson */
+  --rating-g:  #abf5ed;  /* icy-sky */
+  --rating-t:  #7db4ff;  /* cloudy-blue */
+  --rating-m:  #df91f2;  /* lowkey-lavender */
+  --rating-e:  #d90082;  /* hyperlink-magenta */
   --rating-nr: #aca7b0;  /* off-white-3 */
   --bubble-bg: #272523;
   --bubble-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.16);
@@ -236,6 +244,8 @@
   --author-bubble: color-mix(in srgb, var(--quill-ink) 78%, #ffffff 22%);
   /* CTA pills wear the warm espresso brown in dark. */
   --cta-fill: var(--espresso);
+  /* Progress fills flip to the light lavender on dark surfaces (6.9:1 vs bubble). */
+  --progress-fill: var(--lowkey-lavender);
   --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.45);
 }
 

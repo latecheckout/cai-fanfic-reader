@@ -1,17 +1,15 @@
 /**
  * SkeletonCard — loading placeholder shaped like a work list card, shown by
- * WorkGrid while filters settle. The shimmer bar is a base→highlight→base
- * gradient wider than the bar; sweeping its background-position slides a light
- * band across (caiSkeletonShimmer).
+ * WorkGrid while filters settle. Flat token-backed bars with a gentle opacity
+ * pulse (same treatment as ContinueCardSkeleton); everything re-resolves live
+ * on theme change. Card bg mirrors the real card (WorkCardCover): white-mixed
+ * in light themes, plain bg-card in dark.
  */
 const CARD =
   'relative flex min-h-[300px] flex-col gap-[10px] p-3 rounded-card ' +
-  'bg-[color-mix(in_srgb,var(--card-bg),#fff_35%)] opacity-0 ' +
+  'bg-[color-mix(in_srgb,var(--card-bg),#fff_35%)] theme-dark:bg-card opacity-0 ' +
   'animate-[fadeIn_200ms_var(--ease-out-expo)_forwards]';
-const LINE =
-  'rounded-[3px] bg-border-strong ' +
-  'bg-[linear-gradient(90deg,var(--border-strong)_0%,color-mix(in_srgb,var(--border-strong),#fff_60%)_50%,var(--border-strong)_100%)] ' +
-  'bg-[length:200%_100%] bg-no-repeat animate-[caiSkeletonShimmer_1.3s_linear_infinite]';
+const LINE = 'rounded-[3px] bg-border-strong animate-[caiSkeletonPulse_1.4s_ease-in-out_infinite]';
 
 export function SkeletonCard({ index }: { index: number }) {
   return (

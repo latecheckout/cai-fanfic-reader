@@ -75,7 +75,7 @@ npm run build     # Production build
 - **Values without a mapped utility** use arbitrary refs to the raw var, never hardcoded numbers: `z-[var(--z-popover)]`, `max-w-[var(--browse-max-width)]`.
 - **Spacing** uses the default Tailwind scale (4px step) — it already equals the `--space-*` tokens, so it's intentionally not mapped.
 - **Theming**: `data-theme` (`light`/`paper`/`dark`) on `<html>` overrides only the changed vars; utilities re-resolve live. Dark-only overrides use the `theme-dark:` variant. Global-attribute descendant styles use arbitrary variants, e.g. `[html[data-mode=text]_&]:hidden`.
-- **Animation**: `motion` (`motion/react`) with easings from `src/lib/motion.ts`; guard entrances with `useReducedMotion()`; `initial={false}` when state is localStorage-seeded. Keyframes shared across components live top-level in `globals.css` (`fadeIn`, `caiRevealUp`, `caiRailFade*`, `caiSkeletonShimmer`, kudos set); reference via `animate-[name…]`.
+- **Animation**: `motion` (`motion/react`) with easings from `src/lib/motion.ts`; guard entrances with `useReducedMotion()`; `initial={false}` when state is localStorage-seeded. Keyframes shared across components live top-level in `globals.css` (`fadeIn`, `caiRevealUp`, `caiRailFade*`, `caiSkeletonPulse`, kudos set); reference via `animate-[name…]`.
 - **Shared chrome** as exported class-string constants co-located in a `*.ts` (e.g. `readingChrome.ts` `HUD_BUBBLE`/`BUBBLE_PILL`, `heroChrome.ts`, `popoverChrome.ts` `POPOVER_PANEL`/`MENU_ROW`).
 - **Dropdowns/popovers** use the shared `Popover` component (uncontrolled by default, `open`/`onOpenChange` for controlled) — its panel surface is `POPOVER_PANEL` and its open/close motion lives in `src/lib/motion.ts` (`POPOVER_ENTER`/`POPOVER_EXIT`/`POPOVER_TRANSITION`). Don't hand-roll new dropdown state machines; the one sanctioned exception is `BrowseSearchBar` (focus-driven + mobile fullscreen), which reuses the panel chrome + motion constants only.
 
@@ -260,8 +260,8 @@ One layout at every breakpoint (no separate mobile bar/sheets), two fixed layers
 1. **Top HUD row** (`position: fixed`, top) — `ReadingHUD` (Back-to-browse chevron, left) + `ReadingActions` (prefs / reading-list / account, right), over a gradient scrim
 2. **ReadingCluster** (`position: fixed`, bottom center) — pill cluster:
    - Title pill — always visible; opens the `StoryOverview` popover (cover, `WorkMetaBlock` identity block, dashed-divider `TagRow` list, report flag)
-   - Chapter pill — current chapter + rating-tinted scroll progress bar (`useScrollProgress`), opens `ChapterPanel` (multi-chapter only; locked rows get a gradient-masked title + `LockIcon`)
-   - `ReturnToPositionFAB` — "Your place" pill, returns to furthest-read position
+   - Chapter pill — current chapter + `--progress-fill` scroll progress bar (pinned-purple / lavender in dark) (motion `useScroll` MotionValue — never React state; the cluster must not rerender on scroll or its `layout` pills re-measure every frame), opens `ChapterPanel` (multi-chapter only; locked rows get a gradient-masked title + `LockIcon`)
+   - `ReturnToPositionFAB` — "Your place" pill (espresso `BUBBLE_PILL_DARK`, `tone` prop), returns to furthest-read position; popLayout enter/exit + sibling glide on `CLUSTER_SPRING`
    - All popovers open upward via the shared `Popover` (`side="top"`); the StoryOverview panel width is viewport-clamped for small screens
 
 ---

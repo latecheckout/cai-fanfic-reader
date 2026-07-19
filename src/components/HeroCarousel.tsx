@@ -172,7 +172,7 @@ export function HeroCarousel() {
               <span className={`${heroSlide.content} ${s.cover ? 'items-start text-left' : 'items-center text-center'}`}>
                 <span className={heroSlide.kicker}>{s.kicker}</span>
                 <span className={heroSlide.headline}>{s.headline}</span>
-                <span className={heroSlide.cta}>{s.cta}</span>
+                <span className={heroSlide.cta('glass')}>{s.cta}</span>
               </span>
             </span>
           </Link>

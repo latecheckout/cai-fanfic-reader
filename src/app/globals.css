@@ -92,6 +92,8 @@
   --color-hot-pink: var(--hot-pink);
 
   --color-toasty-amber: var(--toasty-amber);
+  --color-lowkey-lavender: var(--lowkey-lavender);
+  --color-progress-fill: var(--progress-fill);
 
   --color-cached-crimson: var(--cached-crimson);
   --color-quill-ink: var(--quill-ink);
@@ -477,12 +479,6 @@ html.focus-active .prose-outer::after {
 @keyframes caiRevealUp {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Skeleton shimmer — a light band swept across via background-position. */
-@keyframes caiSkeletonShimmer {
-  0%   { background-position: 150% 0; }
-  100% { background-position: -150% 0; }
 }
 
 /* ============================================================

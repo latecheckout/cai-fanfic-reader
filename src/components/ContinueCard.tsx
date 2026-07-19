@@ -49,7 +49,8 @@ export function ContinueCard({ item, cover }: Props) {
             <span className={`${META} text-white/80`}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
           </span>
           <span className={`${TRACK} bg-black/45`}>
-            <span className={`${FILL} bg-rating-t`} style={{ width: pctLabel }} />
+            {/* Always-dark image scrim → the light lavender in every theme. */}
+            <span className={`${FILL} bg-lowkey-lavender`} style={{ width: pctLabel }} />
           </span>
         </span>
       </span>
@@ -61,7 +62,8 @@ export function ContinueCard({ item, cover }: Props) {
           <span className={`${META} text-secondary`}>Ch {item.chapterIndex + 1} of {item.totalChapters}</span>
         </span>
         <span className={`${TRACK} bg-border`}>
-          <span className={`${FILL} bg-rating-t`} style={{ width: pctLabel }} />
+          {/* Theme-adaptive fill — this variant sits on the card surface. */}
+          <span className={`${FILL} bg-progress-fill`} style={{ width: pctLabel }} />
         </span>
       </span>
     </Link>

@@ -30,7 +30,7 @@ export function CreatorCTABanner() {
             <span id="creator-cta-title" className={heroSlide.headline}>
               Want to write for c.ai?
             </span>
-            <span className={heroSlide.cta}>Apply now</span>
+            <span className={heroSlide.cta('glass')}>Apply now</span>
           </span>
         </span>
       </Link>

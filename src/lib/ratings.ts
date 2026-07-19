@@ -30,7 +30,7 @@ interface RatingTier {
 const RATING_TIERS: Record<string, RatingTier> = {
   'General Audiences': {
     rating: 'General Audiences', letter: 'G', key: 'g',
-    classKey: 'ratingG', bg: 'bg-rating-g', fg: 'text-white', includeClass: 'bg-rating-g border-rating-g',
+    classKey: 'ratingG', bg: 'bg-rating-g', fg: 'text-black', includeClass: 'bg-rating-g border-rating-g',
     tooltip: 'General Audiences',
   },
   'Teen And Up Audiences': {

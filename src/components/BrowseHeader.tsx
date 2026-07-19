@@ -9,7 +9,7 @@ import { CrossfadeSwap } from './ReadingActions';
 import { Popover } from './Popover';
 import { MenuBubbleTrigger, MenuColumn, MenuRowLink } from './Menu';
 import { NavPillLink } from './NavPillLink';
-import { TabPill } from './TabPill';
+import { TabPill, TabRow } from './TabPill';
 
 const NAV_LINKS = [
   { href: '/browse', label: 'Browse', Icon: BrowseIcon },
@@ -63,17 +63,15 @@ export function BrowseHeader({ search }: Props = {}) {
               as the library tabs): text-only mono labels stretched to the
               header height, active indicator riding the header's bottom
               stroke and sliding between links on client nav. */}
-          <nav className="flex items-stretch gap-6 self-stretch @max-3xl:hidden" aria-label="Site navigation">
+          <TabRow
+            activeKey={pathname}
+            ariaLabel="Site navigation"
+            className="flex items-stretch gap-6 self-stretch @max-3xl:hidden"
+          >
             {NAV_LINKS.map(({ href, label }) => (
-              <TabPill
-                key={href}
-                href={href}
-                label={label}
-                active={pathname === href}
-                indicatorId="site-nav-indicator"
-              />
+              <TabPill key={href} href={href} label={label} active={pathname === href} />
             ))}
-          </nav>
+          </TabRow>
         </div>
 
         {/* ── Right zone: search slot + CTA (desktop) + nav icons (mobile) + avatar ── */}
