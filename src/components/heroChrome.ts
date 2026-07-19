@@ -11,7 +11,7 @@ export const heroSlide = {
   slide:
     'group/slide relative grow-0 shrink-0 basis-full snap-center aspect-[15/4] max-sm:aspect-[3/2] ' +
     'overflow-hidden text-inherit no-underline bg-border ' +
-    "after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-card after:border after:border-image-outline after:content-['']",
+    "after:pointer-events-none after:absolute after:inset-0 after:z-[2] after:rounded-banner after:border after:border-image-outline after:content-['']",
   bg: 'object-cover transition-transform duration-[600ms] ease-out-expo group-hover/slide:scale-[1.02]',
   scrim:
     'absolute inset-0 bg-[linear-gradient(100deg,rgba(15,12,10,0.82)_0%,rgba(15,12,10,0.55)_38%,rgba(15,12,10,0.12)_62%,rgba(15,12,10,0)_80%)]',
@@ -22,8 +22,12 @@ export const heroSlide = {
   cover: 'object-cover',
   content: 'flex min-w-0 flex-col gap-3',
   kicker: 'font-mono text-[13px] font-semibold uppercase tracking-[0.14em] text-[#f3d9a4]',
+  // Authored \n breaks (whitespace-pre-line) are composed for the wide
+  // banner; on narrow screens natural wrapping + the forced break collide
+  // into ragged lines — so below md the break is ignored (whitespace-normal)
+  // and text-wrap:balance evens out whatever wraps remain.
   headline:
-    "font-serif text-[clamp(20px,3.2vw,38px)] font-normal leading-[1.14] tracking-[-0.01em] text-[#fbf2dc] [text-shadow:0_2px_16px_rgba(0,0,0,0.4)] max-w-[30ch] whitespace-pre-line",
+    "font-serif text-[clamp(20px,3.2vw,38px)] font-normal leading-[1.14] tracking-[-0.01em] text-[#fbf2dc] [text-shadow:0_2px_16px_rgba(0,0,0,0.4)] max-w-[30ch] whitespace-pre-line max-md:whitespace-normal [text-wrap:balance]",
   // Same shape as the header's "Write on c.ai" CTA (NavPillLink `big filled`:
   // h-10 px-4 pill + --cta-stroke ring). It's a span (the whole slide is the
   // anchor), so hover rides the slide group instead of the element's own

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions } from '@/lib/filters';
+import { focusQuietly } from '@/lib/focusRing';
 import { BrowseSearchBar } from './BrowseSearchBar';
 import { RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
 import {
@@ -578,10 +579,11 @@ export function FilterPanel({
     return () => observer.disconnect();
   }, []);
 
-  // Focus close button when drawer opens
+  // Focus close button when drawer opens (quietly: mouse-opened drawers
+  // shouldn't strand a ring on the X; keyboard opens keep theirs).
   useEffect(() => {
     if (drawerOpen) {
-      requestAnimationFrame(() => drawerCloseBtnRef.current?.focus());
+      requestAnimationFrame(() => focusQuietly(drawerCloseBtnRef.current));
     }
   }, [drawerOpen]);
 
@@ -591,7 +593,7 @@ export function FilterPanel({
   const drawerWasOpen = useRef(false);
   useEffect(() => {
     if (drawerWasOpen.current && !drawerOpen) {
-      filtersBtnRef.current?.focus({ preventScroll: true });
+      focusQuietly(filtersBtnRef.current);
     }
     drawerWasOpen.current = drawerOpen;
   }, [drawerOpen]);

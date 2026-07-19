@@ -26,6 +26,7 @@
   /* Shared card/cover corner radius (also exposed as Tailwind `rounded-card`).
      Concentric with the badges inside: chip radius (4.5px) + their 12px inset. */
   --card-radius: 16.5px;
+  --banner-radius: 24px; /* hero carousel + creator CTA banner — rounder than cards */
   /* Subtle 1px image edge — pure black in light, pure white in dark (see dark block). */
   --image-outline: rgba(0, 0, 0, 0.1);
 

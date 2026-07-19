@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>What's new: (c.ai) reads update</title>
+<style>
+  :root {
+    --ink: #1a1816;
+    --soft: #6b675f;
+    --line: #e5e1d8;
+    --accent: #6b2e63;
+    --espresso: #652e1f;
+    --bg: #fbfaf8;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    padding: 56px 24px 96px;
+  }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 34px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.15; }
+  .sub { color: var(--soft); margin-top: 10px; font-size: 17px; }
+  .date { font-family: ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); margin-bottom: 18px; }
+  section { margin-top: 44px; }
+  h2 { font-size: 21px; font-weight: 500; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  p.lead { font-size: 16.5px; margin-bottom: 14px; }
+  ul { padding-left: 20px; display: grid; gap: 10px; font-size: 16.5px; }
+  li::marker { color: var(--accent); }
+  .callout {
+    margin-top: 44px; background: var(--card); border: 1px dashed #c9c3b6;
+    border-radius: 16px; padding: 24px 26px;
+  }
+  .callout h2 { border: none; padding: 0; margin-bottom: 8px; color: var(--espresso); }
+  .callout p { font-size: 16.5px; }
+  .callout code { font-family: ui-monospace, Menlo, monospace; font-size: 14px; background: #f1ede4; padding: 2px 7px; border-radius: 6px; }
+  .foot { margin-top: 56px; color: var(--soft); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="date">Update notes, July 19, 2026</p>
+  <h1>(c.ai) reads: rebuild, rebrand, and UX overhaul</h1>
+  <p class="sub">New component architecture, Tailwind styling, brand design system, reworked UX on every screen, and a long list of fixes.</p>
+
+  <section>
+    <h2>Architecture</h2>
+    <ul>
+      <li>The entire interface was rebuilt with proper, reusable React components. Things that used to be copy-pasted in five places (cards, menus, buttons, badges, popovers, tabs) are now built once and shared everywhere, so they cannot drift apart and future changes happen in one spot.</li>
+      <li>All styling was migrated to Tailwind, wired to a single set of design tokens. Every color, radius, shadow, and spacing value comes from one source of truth, which is what makes the three themes (light, paper, dark) work reliably.</li>
+      <li>Animations were rebuilt on a real motion system instead of ad-hoc CSS, so panels, pills, and page elements move with consistent physics.</li>
+      <li>Dead code was swept out, duplicated logic was consolidated, and the data layer was tuned so pages load less duplicate data and build faster.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Brand and visual design</h2>
+    <ul>
+      <li>Full rebrand to (c.ai) reads: new logo, favicon, social preview images, and search-engine metadata.</li>
+      <li>The color system now comes straight from Character's design kit: quill ink, espresso, pinned purple, the hot brights for badges. The site looks like it belongs to the brand instead of a generic archive.</li>
+      <li>The UI was pushed toward a polished product feel: rounded corners everywhere, soft pill-shaped controls, frosted glass buttons on the banners, plush toggles, and consistent card chrome.</li>
+      <li>The five rating badges got a new cool-to-hot color ramp (icy blue up to magenta) with letters that stay readable on every background.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>UX changes</h2>
+    <ul>
+      <li>Reading page: one unified floating control system, a bottom dock with the story, chapter, and "Your place" pills, locked-chapter previews, and soft top and bottom fades (now edge-free on iPhone).</li>
+      <li>Browse and home: a new header and navigation system, the hero carousel, editorial shelves, and a floating filter panel that pushes the page aside instead of covering it.</li>
+      <li>Library and characters: proper toolbars, a tab rail with a sliding indicator, scoped search and sorting per tab, and empty-state cards that explain how each section fills up.</li>
+      <li>New pages: About and Writers, plus character chat and imagine dialogs from the fandom hub.</li>
+      <li>Mobile got its own pass: a real site menu, a filter experience built for small screens, touch-friendly controls, and headlines that wrap cleanly.</li>
+      <li>Accessibility went from 756 automated violations to zero, WCAG 2.2 AA, across every page and all three themes. Keyboard navigation, focus handling, contrast, and dialog behavior were all fixed for real.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Fixes</h2>
+    <ul>
+      <li>The page-menu underline no longer flies across the screen when you switch pages after scrolling.</li>
+      <li>The "Your place" button appears and disappears smoothly, with no stutter or overlap, and stands out in espresso brown.</li>
+      <li>The chapter progress bar is purple now and actually visible in every theme.</li>
+      <li>Loading placeholders are simpler (no more moving shine), match the current theme, and carry the same outline as real cards.</li>
+      <li>The mode toggle no longer flashes the wrong position when a page loads.</li>
+      <li>The carousel dots are evenly spaced no matter which slide is active, and identical on phone and desktop.</li>
+      <li>The smallest text anywhere on the site is now 10px.</li>
+      <li>Tooltips, hydration flashes, filter races, and a long tail of similar paper cuts were hunted down and fixed.</li>
+    </ul>
+  </section>
+
+  <div class="callout">
+    <h2>New: the demo page</h2>
+    <p>There is now a page at <code>/demo</code> that shows the parts of the site you normally cannot see just by browsing. It has the account menu in both states, signed out (with the new "Sign in with c.ai" prompt) and signed in, plus every "this section is empty" card and the loading placeholders. Each one has a short note saying exactly where it appears on the real site. It is not linked from anywhere and search engines are told to ignore it, so it is safe to share internally.</p>
+  </div>
+
+  <p class="foot">All changes are on the ux-audit branch.</p>
+</main>
+</body>
+</html>

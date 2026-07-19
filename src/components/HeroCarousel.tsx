@@ -138,7 +138,7 @@ export function HeroCarousel() {
       }}
     >
       <div
-        className="flex overflow-x-auto snap-x snap-mandatory rounded-card [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+        className="flex overflow-x-auto snap-x snap-mandatory rounded-banner [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
         ref={viewportRef}
         onScroll={onScroll}
       >
@@ -194,16 +194,19 @@ export function HeroCarousel() {
 
       {/* bottom-[5.5px]: 24px buttons center their 7px dots at the old 14px inset. */}
       <div className="absolute bottom-[5.5px] left-1/2 z-[3] flex -translate-x-1/2">
-        {/* FIXED 24px buttons (WCAG 2.2 target size) around the dots — fixed,
-            not min-width, so the active dot growing to 20px can't widen its
-            button and unevenly shove the row. Desktop (fine pointer) tightens
-            the pitch by overlapping the buttons; touch keeps the full 24px
-            pitch so targets don't overlap. */}
+        {/* Buttons are sized FROM their dot with symmetric 8.5px padding, so
+            the visible dot-edge gap is constant by construction (pad + pad +
+            margins) no matter which dot is the wide active one — a fixed
+            button width made the gap beside the active dot smaller than the
+            others. Inactive: 7 + 17 = 24px (WCAG 2.2 target); active grows
+            with its dot. -mx overlaps the buttons to tighten the gap to 9px —
+            SAME on touch and desktop by explicit request (visual consistency
+            over the non-overlapping-target guideline). */}
         {SLIDES.map((s, i) => (
           <button
             key={s.href}
             type="button"
-            className="flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0 md:-mx-[3px]"
+            className="flex h-6 min-w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0 px-[8.5px] -mx-[4px]"
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === index}

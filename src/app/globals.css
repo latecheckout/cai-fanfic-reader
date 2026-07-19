@@ -68,6 +68,7 @@
      share one source of truth. */
   --radius-chip: 4.5px;
   --radius-card: var(--card-radius);
+  --radius-banner: var(--banner-radius);
 
   /* ── Character brand palette → bg-/text-/border- utilities ── */
   --color-pure-white: var(--pure-white);
@@ -179,6 +180,15 @@
     outline: 1.5px solid var(--accent);
     outline-offset: 2px;
     border-radius: 2px;
+  }
+
+  /* Programmatic focus during a MOUSE flow (popover focus-return, dialog
+     auto-focus) matches :focus-visible in every browser and strands a ring
+     that outlives the click. focusQuietly (src/lib/focusRing.ts) stamps this
+     attribute when the last input was a pointer; it self-clears on blur, so
+     keyboard focus always keeps its ring. */
+  [data-focus-quiet]:focus-visible {
+    outline: none;
   }
 }
 

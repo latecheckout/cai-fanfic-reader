@@ -5,6 +5,7 @@ import { Popover } from './Popover';
 import { MENU_ROW, MENU_ROW_ACTIVE } from './popoverChrome';
 import { UpDownArrowIcon } from './icons';
 import { isTypingTarget } from '@/lib/utils';
+import { focusQuietly } from '@/lib/focusRing';
 
 export interface SortOption {
   /** Composite `sort:order` value, e.g. 'updated:desc'. */
@@ -84,11 +85,12 @@ export const SortDropdown = memo(function SortDropdown({
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
-  // Focus first option when the menu opens
+  // Focus first option when the menu opens (quietly: no stray ring when the
+  // menu was opened by mouse; arrow keys still work from the option either way).
   useEffect(() => {
     if (open) {
       requestAnimationFrame(() =>
-        listRef.current?.querySelector<HTMLButtonElement>('[role="option"]')?.focus()
+        focusQuietly(listRef.current?.querySelector<HTMLButtonElement>('[role="option"]'))
       );
     }
   }, [open]);

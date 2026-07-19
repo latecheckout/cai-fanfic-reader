@@ -2,7 +2,9 @@
 
 A front-end exploration for reading AI-generated fanfiction, built for Character.ai. Inspired by AO3's information density and reading experience — rebuilt with intentional typography, a rich metadata system, and a book-like reading view.
 
-> **Redesign branch (`0612-handoff`).** This is a front-end visual redesign. See **[`handoff.html`](handoff.html)** (open in a browser) for a plain-language summary of what changed, where it lives, and how to migrate. The diff against `main` is the authoritative change list.
+> **This branch (`ux-audit`).** Full rebuild, rebrand, and UX overhaul: proper shared React components, Tailwind v4 on a token system, brand colors from Character's design kit, reworked UX on every screen, WCAG 2.2 AA. See **[`update-notes-2026-07-19.html`](update-notes-2026-07-19.html)** (open in a browser) for the summary, including the internal `/demo` component showcase.
+>
+> Earlier redesign handoff (`0612-handoff` era): **[`handoff.html`](handoff.html)**.
 
 ---
 

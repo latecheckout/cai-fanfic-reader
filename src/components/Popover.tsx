@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { POPOVER_ENTER, POPOVER_VISIBLE, POPOVER_EXIT, POPOVER_TRANSITION } from '@/lib/motion';
 import { POPOVER_PANEL } from './popoverChrome';
+import { focusQuietly } from '@/lib/focusRing';
 
 type Align = 'left' | 'center' | 'right';
 type Side = 'bottom' | 'top';
@@ -108,9 +109,14 @@ export function Popover({
     if (wasOpen.current && !open) {
       const active = document.activeElement;
       if (!active || active === document.body || wrapRef.current?.contains(active)) {
-        wrapRef.current
-          ?.querySelector<HTMLElement>('button, a[href], [tabindex]:not([tabindex="-1"])')
-          ?.focus({ preventScroll: true });
+        // focusQuietly: keyboard closes keep their ring; a mouse-driven close
+        // (row selection etc.) still restores focus for later tabbing but
+        // without stranding a visible ring on the trigger.
+        focusQuietly(
+          wrapRef.current?.querySelector<HTMLElement>(
+            'button, a[href], [tabindex]:not([tabindex="-1"])'
+          )
+        );
       }
     }
     wasOpen.current = open;

@@ -13,7 +13,7 @@ import { heroSlide } from './heroChrome';
  */
 export function CreatorCTABanner() {
   return (
-    <section className="mb-12 flex overflow-hidden rounded-card" aria-labelledby="creator-cta-title">
+    <section className="mb-12 flex overflow-hidden rounded-banner" aria-labelledby="creator-cta-title">
       <Link href="/creators/apply" className={heroSlide.slide} aria-label="Apply for the c.ai creator beta">
         <Image
           src="/hero/banner-quill.png"
