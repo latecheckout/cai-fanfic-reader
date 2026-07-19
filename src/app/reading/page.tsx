@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getWorkSummaries } from '@/lib/works';
+import { getWorkSummaries, toClientWorks } from '@/lib/works';
 import { applyFilters } from '@/lib/filters';
 import { FilterState } from '@/types';
 import {
@@ -131,7 +131,7 @@ export default async function LibraryPage({ searchParams }: PageProps) {
       <main className="relative mx-auto max-w-[var(--browse-max-width)] px-6 pt-8 pb-[calc(128px+var(--safe-bottom))] max-md:px-4 max-md:pt-5">
         <Suspense>
           <LibraryShell
-            works={filteredWorks}
+            works={toClientWorks(filteredWorks)}
             tabCounts={tabCounts}
             activeTab={activeTab}
             currentFilters={params}

@@ -103,7 +103,7 @@ export function ChapterComments({ slug, chapterIndex }: Props) {
   return (
     <div className="mt-6 w-screen bg-[color-mix(in_srgb,var(--text)_3.5%,var(--bg))] pt-10 pb-16 [margin-inline:calc(50%-50vw)]">
       <div className="mx-auto max-w-[var(--reader-line-width)] px-6">
-        <div className="mb-5 font-mono text-[9px] uppercase tracking-[0.12em] text-secondary" aria-live="polite">
+        <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.12em] text-secondary" aria-live="polite">
           <span>
             {allComments.length === 0
               ? 'comments'

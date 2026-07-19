@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getWork, getAllSlugs, getWorkSummaries } from '@/lib/works';
+import { getWork, getAllSlugs, getWorkSummaries, toClientWorks } from '@/lib/works';
 import { markdownToHtml } from '@/lib/markdown';
 import { ReadingCluster } from '@/components/ReadingCluster';
 import { ChapterList } from '@/components/ChapterList';
@@ -133,7 +133,7 @@ export default async function ReaderPage({ params }: PageProps) {
           <ChapterList
             chapters={chapters}
             chapterHtmls={chapterHtmls}
-            recommendations={recommendations}
+            recommendations={toClientWorks(recommendations)}
             workMeta={meta}
           />
         </main>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { startTransition, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 /**
@@ -44,8 +44,13 @@ export function usePendingParams(basePath: string) {
       pending = { params, at: Date.now() };
       const qs = params.toString();
       const url = qs ? `${basePath}?${qs}` : basePath;
-      if (replace) router.replace(url);
-      else router.push(url);
+      // Non-urgent: filter/sort/search navigations re-render the whole
+      // results tree — keep the triggering interaction (pill press, keystroke)
+      // responsive instead of blocking on the tree render.
+      startTransition(() => {
+        if (replace) router.replace(url);
+        else router.push(url);
+      });
     },
     [router, basePath]
   );

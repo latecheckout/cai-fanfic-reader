@@ -197,7 +197,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
               {!chapter.locked && lastReadChapterIndex !== null && i === lastReadChapterIndex && i > 0 && (
                 <div className="pointer-events-none flex items-center gap-3 pb-6 pt-5" aria-hidden="true">
                   <span className="h-px flex-1 bg-secondary opacity-20" />
-                  <span className="shrink-0 whitespace-nowrap font-mono text-[9px] tracking-[0.1em] text-secondary opacity-[0.45]">
+                  <span className="shrink-0 whitespace-nowrap font-mono text-[10px] tracking-[0.1em] text-secondary opacity-[0.45]">
                     · you left off here ·
                   </span>
                   <span className="h-px flex-1 bg-secondary opacity-20" />
@@ -225,7 +225,7 @@ export function ChapterList({ chapters, chapterHtmls, recommendations, workMeta 
             {/* End of chapter label — above the comments zone for multi-chapter works */}
             {!chapter.locked && chapters.length > 1 && (
               <div
-                className="mx-auto mt-14 max-w-[var(--reader-line-width)] px-6 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-secondary opacity-[0.45] max-md:px-4"
+                className="mx-auto mt-14 max-w-[var(--reader-line-width)] px-6 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-secondary opacity-[0.45] max-md:px-4"
                 aria-hidden="true"
               >
                 END OF CHAPTER {i + 1}

@@ -24,7 +24,8 @@ const TAB_LABELS: Record<LibraryTab, string> = {
 
 // Per-tab empty states: each explains the tab's membership rule and offers a
 // goal-specific way back into the catalog.
-const TAB_EMPTY: Record<
+// Exported for the /demo showcase (renders every tab's empty card).
+export const TAB_EMPTY: Record<
   LibraryTab,
   { icon: ReactNode; title: string; body: string; ctaLabel: string }
 > = {

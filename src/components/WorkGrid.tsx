@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useMemo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import type { WorkSummary, LayoutView } from '@/types';
 import { WorkCardGrid } from './WorkCardGrid';
@@ -62,7 +63,7 @@ export function WorkGrid({
   renderOverlay,
 }: Props) {
   const reduce = useReducedMotion();
-  const layoutKey = works.map((w) => w.slug).join('|');
+  const layoutKey = useMemo(() => works.map((w) => w.slug).join('|'), [works]);
   return (
     <div className={`${!isFiltering && view === 'grid' ? GRID_CLS : LIST_CLS} ${MODE_GATE[view]} ${containerClassName}`}>
       {isFiltering ? (
@@ -83,7 +84,10 @@ export function WorkGrid({
               exit={reduce ? { opacity: 0 } : PILL_EXIT}
               // flex + flex-1 so the card fills the wrapper's height and rows
               // stay equal-height, as when cards were direct grid children.
-              className="relative flex [&>*]:min-w-0 [&>*]:flex-1"
+              // content-visibility: off-screen cards skip render work (the
+              // whole catalog mounts at once); intrinsic-size ~ card height
+              // keeps scrollbar geometry stable.
+              className="relative flex [&>*]:min-w-0 [&>*]:flex-1 [content-visibility:auto] [contain-intrinsic-size:auto_320px]"
             >
               {/* cardClassName (CSS entrance animations) lives on an inner div:
                   a filled CSS animation on the motion node would override the

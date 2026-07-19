@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getWorkSummaries } from '@/lib/works';
+import { getWorkSummaries, toClientWorks } from '@/lib/works';
 import { buildShelves, buildCreators } from '@/lib/shelves';
 import { SiteHeader } from '@/components/SiteHeader';
 import { BrowseHome } from '@/components/BrowseHome';
@@ -23,7 +23,9 @@ export default async function HomePage({ searchParams }: PageProps) {
     redirect(`/browse?${qs.toString()}`);
   }
 
-  const allWorks = getWorkSummaries();
+  // toClientWorks: BrowseHome is a client component — strip server-only
+  // search text before it enters the RSC payload.
+  const allWorks = toClientWorks(getWorkSummaries());
 
   return (
     <div className="min-h-screen">

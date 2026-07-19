@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { motion, animate, useMotionValue, type PanInfo } from 'motion/react';
 import { useGlimm } from 'glimm/next';
 import { SITE_MODE_KEY, SITE_MODE_EVENT } from '@/lib/constants';
@@ -54,14 +54,29 @@ const TEXT_LABEL = 'AO4 mode: dense text lists';
  */
 export function Ao4TurboToggle() {
   const [on, setOn] = useState(false); // on === text mode
+  // False until the persisted mode has been read. While false, the thumb's
+  // position/fill come from the CSS pre-hydration gate below (html[data-mode]
+  // is set pre-paint by ThemeScript) — the ONLY thing that can be right during
+  // the server-rendered paint of a full page load, which happens seconds
+  // before any client hook runs.
+  const [hydrated, setHydrated] = useState(false);
   const dragged = useRef(false);
   const x = useMotionValue(0);
   const { sweep } = useGlimm();
 
-  useEffect(() => {
+  // Read the persisted mode BEFORE the hydrated frame paints — useLayoutEffect
+  // (not useEffect, same pattern as useViewMode) so remounts (e.g. navigating
+  // back from the reading page in text mode) don't flash the thumb in its
+  // default visual position for a frame. Still post-render → no hydration
+  // mismatch.
+  useLayoutEffect(() => {
     const initial = localStorage.getItem(SITE_MODE_KEY) === 'text';
     setOn(initial);
     x.set(initial ? TRAVEL : 0);
+    // Same commit as the x.set: the CSS gate class is removed while the motion
+    // value takes over, both landing before the next paint (motion writes on
+    // rAF, which runs pre-paint) — no double-offset or gap frame.
+    setHydrated(true);
   }, [x]);
 
   const applyMode = (next: boolean) => {
@@ -168,7 +183,16 @@ export function Ao4TurboToggle() {
               '[--ab-magenta:#652E1F] [--ab-hot-pink:#AE00D9] [--ab-alt-violet:#6B2E63] [--mx:50%] [--my:50%] ' +
               // Dark theme: --secondary is too light for the white label
               // (3.4:1) — fixed darker gray keeps it ≥5:1 in every theme.
-              (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary theme-dark:bg-[#6B675F]')
+              (on ? 'bg-[var(--ab-magenta)]' : 'bg-secondary theme-dark:bg-[#6B675F]') +
+              // Pre-hydration gate: until the persisted mode is read, CSS keyed
+              // on html[data-mode] (set pre-paint by ThemeScript) positions +
+              // colors the thumb so the SSR paint of a text-mode visitor is
+              // already correct. translate-x uses the `translate` property, so
+              // it composes with (not fights) motion's transform while x is 0.
+              // Higher selector specificity beats the base bg-* utility.
+              (hydrated
+                ? ''
+                : ' [html[data-mode=text]_&]:translate-x-12 [html[data-mode=text]_&]:bg-[var(--ab-magenta)]')
             }
           >
             {/* Mouse-tracked dual-radial oklch glow (fades in on hover). */}

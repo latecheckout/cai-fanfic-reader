@@ -194,12 +194,16 @@ export function HeroCarousel() {
 
       {/* bottom-[5.5px]: 24px buttons center their 7px dots at the old 14px inset. */}
       <div className="absolute bottom-[5.5px] left-1/2 z-[3] flex -translate-x-1/2">
-        {/* 24px buttons (WCAG 2.2 target size) around 7px visual dots. */}
+        {/* FIXED 24px buttons (WCAG 2.2 target size) around the dots — fixed,
+            not min-width, so the active dot growing to 20px can't widen its
+            button and unevenly shove the row. Desktop (fine pointer) tightens
+            the pitch by overlapping the buttons; touch keeps the full 24px
+            pitch so targets don't overlap. */}
         {SLIDES.map((s, i) => (
           <button
             key={s.href}
             type="button"
-            className="flex h-6 min-w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0 px-[3.5px]"
+            className="flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0 md:-mx-[3px]"
             onClick={() => goTo(i)}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === index}

@@ -72,7 +72,7 @@ export function TagChip({ tag, category, clickable, href, onImage }: Props) {
 // nothing when the field is empty. `max-md:` stacking is a no-op there.
 const TAG_ROW = 'flex items-baseline gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5';
 const TAG_LABEL =
-  'w-[70px] shrink-0 pt-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary max-md:w-auto max-md:shrink max-md:text-[9px]';
+  'w-[70px] shrink-0 pt-0.5 font-sans text-[10px] font-medium uppercase tracking-[0.08em] text-secondary max-md:w-auto max-md:shrink';
 const TAG_GROUP = 'flex min-w-0 flex-wrap gap-1';
 
 export function TagRow({

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { getWorkSummaries } from '@/lib/works';
+import { getWorkSummaries, toClientWorks } from '@/lib/works';
 import { applyFilters, buildSearchOptions } from '@/lib/filters';
 import { FilterState } from '@/types';
 import { BrowseShell } from '@/components/BrowseShell';
@@ -97,7 +97,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
         {/* The catalog surface: search, sort, and filters live in its sticky toolbar. */}
         <Suspense>
           <BrowseShell
-            works={filteredWorks}
+            works={toClientWorks(filteredWorks)}
             searchOptions={searchOptions}
             currentFilters={params}
             filteredCount={filteredWorks.length}

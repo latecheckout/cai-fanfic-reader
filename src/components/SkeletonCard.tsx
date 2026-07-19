@@ -6,7 +6,7 @@
  * in light themes, plain bg-card in dark.
  */
 const CARD =
-  'relative flex min-h-[300px] flex-col gap-[10px] p-3 rounded-card ' +
+  'relative flex min-h-[300px] flex-col gap-[10px] p-3 rounded-card border border-card-border ' +
   'bg-[color-mix(in_srgb,var(--card-bg),#fff_35%)] theme-dark:bg-card opacity-0 ' +
   'animate-[fadeIn_200ms_var(--ease-out-expo)_forwards]';
 const LINE = 'rounded-[3px] bg-border-strong animate-[caiSkeletonPulse_1.4s_ease-in-out_infinite]';

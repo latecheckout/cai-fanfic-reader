@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { SearchOptions, buildVibeFilters, VibeResult } from '@/lib/filters';
 import { HISTORY_KEY, RATINGS, WARNINGS, CATEGORIES, STATUSES } from '@/lib/constants';
@@ -280,7 +280,9 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
     return items;
   }, [query, options]);
 
-  const items = buildItems();
+  // Memoized: recompute only when query/options change, not on every render
+  // (focus, vibe, breakpoint state) — the build filters five option lists.
+  const items = useMemo(buildItems, [buildItems]);
 
   const close = useCallback(() => {
     setFocused(false);
@@ -376,13 +378,17 @@ export function BrowseSearchBar({ options, basePath = '/browse', collapsible = f
     }
   };
 
-  // Group items for rendering
-  const groupedItems: { group: string; items: SearchItem[] }[] = [];
-  items.forEach((item) => {
-    const existing = groupedItems.find((g) => g.group === item.group);
-    if (existing) existing.items.push(item);
-    else groupedItems.push({ group: item.group, items: [item] });
-  });
+  // Group items for rendering — Map keeps it one pass, memo keeps it off
+  // unrelated renders.
+  const groupedItems = useMemo(() => {
+    const byGroup = new Map<string, SearchItem[]>();
+    for (const item of items) {
+      const bucket = byGroup.get(item.group);
+      if (bucket) bucket.push(item);
+      else byGroup.set(item.group, [item]);
+    }
+    return Array.from(byGroup, ([group, groupItems]) => ({ group, items: groupItems }));
+  }, [items]);
 
   const isDefaultState = query.trim().length === 0;
   const hasACResults = items.length > 0;

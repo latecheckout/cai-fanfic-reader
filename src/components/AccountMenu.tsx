@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { Popover } from './Popover';
 import { MenuColumn, MenuDivider } from './Menu';
+import { NavPillLink } from './NavPillLink';
 import { LogOutIcon } from './icons';
 
 // @DUMMY logged-in user — becomes the real session once auth is wired.
@@ -31,9 +32,33 @@ export function AccountMenu({
   );
 }
 
+/**
+ * Signed-out menu body — the sign-in prompt that replaces AccountMenuBody
+ * when there is no session. @WIRE — the CTA becomes the real auth entry
+ * (c.ai OAuth/redirect) once sessions exist; until then nothing renders this
+ * in production (the session is @DUMMY signed-in). Showcased on /demo.
+ */
+export function SignInMenuBody() {
+  return (
+    <MenuColumn>
+      <p className="m-0 px-2.5 pb-1 pt-2 font-sans text-sm font-medium text-text">
+        Sign in to keep your library
+      </p>
+      <p className="m-0 px-2.5 pb-2.5 font-sans text-[13px] leading-snug text-secondary">
+        Bookmarks and reading positions sync to your c.ai account.
+      </p>
+      <MenuDivider />
+      <div className="flex px-1 pb-1 pt-1.5">
+        <NavPillLink href="/" label="Sign in with c.ai" big filled className="flex-1 justify-center text-center" />
+      </div>
+    </MenuColumn>
+  );
+}
+
 /** Menu body: account concerns only — email + sign out. Site links live in
- *  the navbar (desktop) and the header's site menu (mobile). */
-function AccountMenuBody({ onClose }: { onClose: () => void }) {
+ *  the navbar (desktop) and the header's site menu (mobile).
+ *  Exported for the /demo showcase, which renders it statically open. */
+export function AccountMenuBody({ onClose }: { onClose: () => void }) {
   return (
     <MenuColumn>
       <div className="truncate px-2.5 py-2 font-mono text-xs text-secondary">

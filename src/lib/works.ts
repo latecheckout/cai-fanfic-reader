@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { cache } from 'react';
 import matter from 'gray-matter';
 import { Work, WorkMeta, WorkSummary } from '@/types';
 import { parseChapters } from './chapters';
@@ -69,7 +70,11 @@ function stripMarkdown(text: string): string {
     .trim();
 }
 
-export function getWorkSummaries(): WorkSummary[] {
+// React.cache: per-request/per-render dedup. SiteHeader AND most pages each
+// call this (and works/[slug] calls getWork in both generateMetadata and the
+// page), so without it every render re-reads + gray-matter-parses the whole
+// archive twice.
+export const getWorkSummaries = cache((): WorkSummary[] => {
   const slugs = getAllSlugs();
   return slugs.map((slug) => {
     const filePath = path.join(WORKS_DIR, `${slug}.md`);
@@ -110,9 +115,9 @@ export function getWorkSummaries(): WorkSummary[] {
       textChunks: textChunks.length > 0 ? textChunks : undefined,
     };
   });
-}
+});
 
-export function getWork(slug: string): Work | null {
+export const getWork = cache((slug: string): Work | null => {
   const filePath = path.join(WORKS_DIR, `${slug}.md`);
   if (!fs.existsSync(filePath)) return null;
 
@@ -127,4 +132,14 @@ export function getWork(slug: string): Work | null {
     meta,
     chapters: parseChapters(content),
   };
+});
+
+/**
+ * Drop server-only fields before a works array crosses to a client component.
+ * `textChunks` exists purely for server-side text search (applyFilters) — up
+ * to 3000 chars per chapter per work of dead weight in the RSC payload if it
+ * leaks to the browser.
+ */
+export function toClientWorks(works: WorkSummary[]): WorkSummary[] {
+  return works.map(({ textChunks: _textChunks, ...rest }) => rest);
 }
